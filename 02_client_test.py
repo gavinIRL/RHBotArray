@@ -16,9 +16,9 @@ class ClientTest():
 
     def start(self):
         while True:
-            self.sockets_list = [sys.stdin, self.server]
+            self.sockets_list = [socket.socket(), self.server]
             read_socks, write_sock, err_sock = select.select(
-                self.sockets_list, [], [], timeout=10)
+                self.sockets_list, [], [])
 
             for socks in read_socks:
                 if socks == self.server:
