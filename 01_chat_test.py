@@ -1,7 +1,7 @@
 import socket
 import select
 import sys
-import threading
+import _thread
 
 
 class ServerTest():
@@ -47,3 +47,12 @@ class ServerTest():
     def remove(self, connection):
         if connection in self.list_clients:
             self.list_clients.remove(connection)
+
+    def start(self):
+        while True:
+            connection, address = self.server.accept()
+
+            self.list_clients.append(connection)
+
+            print(address[0] + " connected")
+            _thread.start_new_thread(self.client_thread, (connection, address))
