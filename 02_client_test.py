@@ -2,6 +2,7 @@ import socket
 import select
 import sys
 import _thread
+from time import sleep
 
 
 class ClientTest():
@@ -24,12 +25,14 @@ class ClientTest():
                 if socks == self.server:
                     message = socks.recv(2048)
                     print(message)
+                    sleep(0.01)
                 else:
                     message = sys.stdin.readline()
                     self.server.send(message)
                     sys.stdout.write("<You>")
                     sys.stdout.write(message)
                     sys.stdout.flush()
+                    sleep(0.01)
 
 
 if __name__ == "__main__":

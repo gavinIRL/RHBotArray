@@ -2,6 +2,7 @@ import socket
 import select
 import sys
 import _thread
+from time import sleep
 
 
 class ServerTest():
@@ -50,6 +51,7 @@ class ServerTest():
 
     def start(self):
         while True:
+            sleep(0.1)
             connection, address = self.server.accept()
 
             self.list_clients.append(connection)
