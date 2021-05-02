@@ -4,6 +4,7 @@ import errno
 import sys
 from pynput.keyboard import Key, Listener, KeyCode
 from pynput import mouse, keyboard
+from random import randint
 
 
 class ListenClientTest():
@@ -12,7 +13,7 @@ class ListenClientTest():
         with open("ip.txt") as f:
             self.IP = f.readline()
         self.PORT = 1351
-        self.my_username = "Testy Test"
+        self.my_username = "Testy Test "+str(randint(100, 1000))
 
         # Create a socket
         # socket.AF_INET - address family, IPv4, some otehr possible are AF_INET6, AF_BLUETOOTH, AF_UNIX
