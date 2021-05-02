@@ -18,5 +18,5 @@ print(list_ips)
 output2 = run("ipconfig", capture_output=True).stdout.decode()
 _, post = output2.split("IPv4 Address. . . . . . . . . . . : 192")
 final, _ = post.split("Subnet Mask")
-final = "192" + final
-print(final)
+current_lan_ip = "192" + final
+print(current_lan_ip)
