@@ -7,7 +7,7 @@ HEADER_LENGTH = 10
 
 with open("ip.txt") as f:
     IP = f.readline()
-PORT = 1234
+PORT = 1351
 my_username = "Testy Test"
 
 # Create a socket
