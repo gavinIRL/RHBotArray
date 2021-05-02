@@ -16,11 +16,10 @@ class ServerTest():
 
         self.server.listen(100)
 
-        list_clients = []
+        self.list_clients = []
 
     def client_thread(self, connection, address):
         connection.send("Test")
-
         while True:
             try:
                 message = connection.recv(2048)
@@ -33,3 +32,18 @@ class ServerTest():
                     self.remove(connection)
             except:
                 continue
+
+    def broadcast(self, message, connection):
+        for clients in self.list_clients:
+            if clients != connection:
+                try:
+                    clients.send(message)
+                except:
+                    clients.close()
+
+                    # if the link is broken, we remove the client
+                    self.remove(clients)
+
+    def remove(self, connection):
+        if connection in self.list_clients:
+            self.list_clients.remove(connection)
