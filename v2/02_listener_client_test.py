@@ -100,6 +100,7 @@ class ClientKeypressListener():
     def __init__(self, client) -> None:
         self.client = client
         self.listener = None
+        self.unreleased_keys = []
 
     def start_keypress_listener(self):
         if self.listener == None:
@@ -108,13 +109,13 @@ class ClientKeypressListener():
             self.listener.start()
 
     def on_press(self, key):
-        if key == keyboard.Key.f4:
-            self.client.send_message("This is a test message")
-        else:
+        if str(key) not in self.unreleased_keys:
             self.client.send_message(str(key)+",down")
+            self.unreleased_keys.append(str(key))
 
     def on_release(self, key):
         self.client.send_message(str(key)+",up")
+        self.unreleased_keys.remove(str(key))
 
 
 if __name__ == "__main__":
