@@ -31,3 +31,8 @@ class ClientTest():
                     sys.stdout.write(message)
                     sys.stdout.flush()
         self.server.close()
+
+
+if __name__ == "__main__":
+    client = ClientTest()
+    client.start()
