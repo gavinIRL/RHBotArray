@@ -111,10 +111,10 @@ class ClientKeypressListener():
         if key == keyboard.Key.f4:
             self.client.send_message("This is a test message")
         else:
-            self.client.send_message(str(key))
+            self.client.send_message(str(key)+",down")
 
     def on_release(self, key):
-        pass
+        self.client.send_message(str(key)+",up")
 
 
 if __name__ == "__main__":
