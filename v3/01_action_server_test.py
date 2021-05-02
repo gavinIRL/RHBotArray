@@ -1,5 +1,6 @@
 import socket
 import select
+import pydirectinput
 
 
 class ListenServerTest():
@@ -28,6 +29,31 @@ class ListenServerTest():
         # List of connected clients - socket as a key, user header and name as data
         self.clients = {}
         print(f'Listening for connections on {self.IP}:{self.PORT}...')
+
+    def convert_pynput_to_pag(self, button):
+        PYNPUT_SPECIAL_CASE_MAP = {
+            'alt_l': 'altleft',
+            'alt_r': 'altright',
+            'alt_gr': 'altright',
+            'caps_lock': 'capslock',
+            'ctrl_l': 'ctrlleft',
+            'ctrl_r': 'ctrlright',
+            'page_down': 'pagedown',
+            'page_up': 'pageup',
+            'shift_l': 'shiftleft',
+            'shift_r': 'shiftright',
+            'num_lock': 'numlock',
+            'print_screen': 'printscreen',
+            'scroll_lock': 'scrolllock',
+        }
+
+        # example: 'Key.F9' should return 'F9', 'w' should return as 'w'
+        cleaned_key = button.replace('Key.', '')
+
+        if cleaned_key in PYNPUT_SPECIAL_CASE_MAP:
+            return PYNPUT_SPECIAL_CASE_MAP[cleaned_key]
+
+        return cleaned_key
 
     def receive_message(self, client_socket):
         try:
@@ -99,12 +125,16 @@ class ListenServerTest():
 
                     # print(
                     #     f'Received message from {user["data"].decode("utf-8")}: {message["data"].decode("utf-8")}')
-                    key, direction = str(
+                    button, direction = str(
                         message["data"].decode("utf-8")).split(",")
                     if direction == "down":
-                        print("Would press the {} key".format(key))
+                        key = self.convert_pynput_to_pag(button)
+                        pydirectinput.keyDown(key)
+                        # print("Would press the {} key".format(key))
                     elif direction == "up":
-                        print("Would release the {} key".format(key))
+                        key = self.convert_pynput_to_pag(button)
+                        pydirectinput.keyUp(key)
+                        #print("Would release the {} key".format(key))
 
                     # Iterate over connected clients and broadcast message
                     # for client_socket in self.clients:
