@@ -47,7 +47,7 @@ class ListenServerTest():
             # and that's also a cause when we receive an empty message
             return False
 
-    def Start(self):
+    def start(self):
         while True:
 
             # Calls Unix select() system call or Windows select() WinSock call with three parameters:
