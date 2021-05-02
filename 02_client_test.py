@@ -30,3 +30,4 @@ class ClientTest():
                     sys.stdout.write("<You>")
                     sys.stdout.write(message)
                     sys.stdout.flush()
+        self.server.close()
