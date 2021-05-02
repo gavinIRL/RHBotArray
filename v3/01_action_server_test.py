@@ -1,6 +1,8 @@
 import socket
 import select
 import pydirectinput
+import pyautogui
+import time
 
 
 class ListenServerTest():
@@ -128,22 +130,14 @@ class ListenServerTest():
                     button, direction = str(
                         message["data"].decode("utf-8")).split(",")
                     if direction == "down":
-                        key = self.convert_pynput_to_pag(button)
-                        pydirectinput.keyDown(key)
-                        # print("Would press the {} key".format(key))
+                        key = self.convert_pynput_to_pag(
+                            button.replace("'", ""))
+                        print(key)
+                        pyautogui.keyDown(key)
                     elif direction == "up":
-                        key = self.convert_pynput_to_pag(button)
-                        pydirectinput.keyUp(key)
-                        #print("Would release the {} key".format(key))
-
-                    # Iterate over connected clients and broadcast message
-                    # for client_socket in self.clients:
-                    #     # But don't sent it to sender
-                    #     if client_socket != notified_socket:
-                    #         # Send user and message (both with their headers)
-                    #         # We are reusing here message header sent by sender, and saved username header send by user when he connected
-                    #         client_socket.send(
-                    #             user['header'] + user['data'] + message['header'] + message['data'])
+                        key = self.convert_pynput_to_pag(
+                            button.replace("'", ""))
+                        pyautogui.keyUp(key)
 
             # It's not really necessary to have this, but will handle some socket exceptions just in case
             for notified_socket in exception_sockets:
@@ -152,7 +146,14 @@ class ListenServerTest():
                 # Remove from our list of users
                 del self.clients[notified_socket]
 
+    def press_key(self, key):
+        # time.sleep(2)
+        pydirectinput.keyDown(key)
+        time.sleep(0.1)
+        pydirectinput.keyUp(key)
+
 
 if __name__ == "__main__":
     lst = ListenServerTest()
     lst.start()
+    # ListenServerTest.press_key(ListenServerTest(), 'w')
