@@ -2,6 +2,8 @@ import socket
 import select
 import errno
 import sys
+from pynput.keyboard import Key, Listener, KeyCode
+from pynput import mouse, keyboard
 
 
 class ListenClientTest():
@@ -85,6 +87,23 @@ class ListenClientTest():
                 # Any other exception - something happened, exit
                 print('Reading error: '.format(str(e)))
                 sys.exit()
+
+
+class ClientListener():
+    def __init__(self) -> None:
+        self.listener = None
+
+    def start_keypress_listener(self):
+        if self.listener == None:
+            self.listener = Listener(on_press=self.on_press,
+                                     on_release=self.on_release)
+            self.listener.start()
+
+    def on_press(self, key):
+        pass
+
+    def on_release(self, key):
+        pass
 
 
 if __name__ == "__main__":
