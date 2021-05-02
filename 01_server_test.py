@@ -58,9 +58,9 @@ class ServerTest():
 
             print(address[0] + " connected")
             _thread.start_new_thread(self.client_thread, (connection, address))
-        self.server.close()
 
 
 if __name__ == "__main__":
     serv = ServerTest()
     serv.start()
+    serv.server.close()
