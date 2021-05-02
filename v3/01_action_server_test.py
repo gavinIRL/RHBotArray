@@ -95,19 +95,24 @@ class ListenServerTest():
                         del self.clients[notified_socket]
                         continue
                     # Get user by notified socket, so we will know who sent the message
-                    user = self.clients[notified_socket]
+                    # user = self.clients[notified_socket]
 
-                    print(
-                        f'Received message from {user["data"].decode("utf-8")}: {message["data"].decode("utf-8")}')
+                    # print(
+                    #     f'Received message from {user["data"].decode("utf-8")}: {message["data"].decode("utf-8")}')
+                    key, direction = str(message).split(",")
+                    if direction == "down":
+                        print("Would press the {} key".format(key))
+                    elif direction == "up":
+                        print("Would release the {} key".format(key))
 
                     # Iterate over connected clients and broadcast message
-                    for client_socket in self.clients:
-                        # But don't sent it to sender
-                        if client_socket != notified_socket:
-                            # Send user and message (both with their headers)
-                            # We are reusing here message header sent by sender, and saved username header send by user when he connected
-                            client_socket.send(
-                                user['header'] + user['data'] + message['header'] + message['data'])
+                    # for client_socket in self.clients:
+                    #     # But don't sent it to sender
+                    #     if client_socket != notified_socket:
+                    #         # Send user and message (both with their headers)
+                    #         # We are reusing here message header sent by sender, and saved username header send by user when he connected
+                    #         client_socket.send(
+                    #             user['header'] + user['data'] + message['header'] + message['data'])
 
             # It's not really necessary to have this, but will handle some socket exceptions just in case
             for notified_socket in exception_sockets:
