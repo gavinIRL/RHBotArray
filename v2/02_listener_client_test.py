@@ -39,7 +39,7 @@ class ListenClientTest():
             'utf-8')
         self.client_socket.send(message_header + message)
 
-    def start(self):
+    def main_loop(self):
         while True:
             # Wait for user to input a message
             message = input(f'{self.my_username} > ')
@@ -110,6 +110,8 @@ class ClientKeypressListener():
     def on_press(self, key):
         if key == keyboard.Key.f4:
             self.client.send_message("This is a test message")
+        else:
+            self.client.send_message(str(key))
 
     def on_release(self, key):
         pass
@@ -119,4 +121,4 @@ if __name__ == "__main__":
     lct = ListenClientTest()
     ckl = ClientKeypressListener(lct)
     ckl.start_keypress_listener()
-    lct.start()
+    lct.main_loop()
