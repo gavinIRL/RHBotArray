@@ -19,7 +19,7 @@ class ServerTest():
         self.list_clients = []
 
     def client_thread(self, connection, address):
-        connection.send("Test")
+        connection.send("Test".encode())
         while True:
             try:
                 message = connection.recv(2048)
