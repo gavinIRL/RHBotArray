@@ -99,7 +99,8 @@ class ListenServerTest():
 
                     # print(
                     #     f'Received message from {user["data"].decode("utf-8")}: {message["data"].decode("utf-8")}')
-                    key, direction = str(message).split(",")
+                    key, direction = str(
+                        message["data"].decode("utf-8")).split(",")
                     if direction == "down":
                         print("Would press the {} key".format(key))
                     elif direction == "up":
