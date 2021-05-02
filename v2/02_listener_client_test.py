@@ -10,7 +10,7 @@ class ListenClientTest():
         with open("ip.txt") as f:
             self.IP = f.readline()
         self.PORT = 1351
-        my_username = "Testy Test"
+        self.my_username = "Testy Test"
 
         # Create a socket
         # socket.AF_INET - address family, IPv4, some otehr possible are AF_INET6, AF_BLUETOOTH, AF_UNIX
@@ -25,7 +25,7 @@ class ListenClientTest():
 
         # Prepare username and header and send them
         # We need to encode username to bytes, then count number of bytes and prepare header of fixed size, that we encode to bytes as well
-        username = my_username.encode('utf-8')
+        username = self.my_username.encode('utf-8')
         username_header = f"{len(username):<{self.HEADER_LENGTH}}".encode(
             'utf-8')
         self.client_socket.send(username_header + username)
@@ -33,7 +33,7 @@ class ListenClientTest():
     def start(self):
         while True:
             # Wait for user to input a message
-            message = input(f'{my_username} > ')
+            message = input(f'{self.my_username} > ')
 
             # If message is not empty - send it
             if message:
