@@ -19,19 +19,12 @@ class RHBotClientConnection():
         self.PORT = 1351
         self.my_username = "Testy Test "+str(randint(100, 1000))
 
-        # Create a socket
-        # socket.AF_INET - address family, IPv4, some otehr possible are AF_INET6, AF_BLUETOOTH, AF_UNIX
-        # socket.SOCK_STREAM - TCP, conection-based, socket.SOCK_DGRAM - UDP, connectionless, datagrams, socket.SOCK_RAW - raw IP packets
         self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-        # Connect to a given ip and port
         self.client_socket.connect((self.IP, self.PORT))
 
-        # Set connection to non-blocking state, so .recv() call won;t block, just return some exception we'll handle
         self.client_socket.setblocking(False)
 
-        # Prepare username and header and send them
-        # We need to encode username to bytes, then count number of bytes and prepare header of fixed size, that we encode to bytes as well
         username = self.my_username.encode('utf-8')
         username_header = f"{len(username):<{self.HEADER_LENGTH}}".encode(
             'utf-8')
