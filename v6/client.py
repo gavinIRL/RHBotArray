@@ -145,19 +145,6 @@ class ClientKeypressListener():
         raty = rely/(self.game_wincap.h*self.scaling)
         return ratx, raty
 
-    def convert_ratio_to_click(self, ratx, raty):
-        # This will grab the current rectangle coords of game window
-        # and then turn the ratio of positions versus the game window
-        # into true x,y coords
-        self.game_wincap.update_window_position(border=False)
-        # Turn the ratios into relative
-        relx = int(ratx * self.game_wincap.w)
-        rely = int(raty * self.game_wincap.h)
-        # Turn the relative into true
-        truex = int((relx + self.game_wincap.window_rect[0]) * self.scaling)
-        truey = int((rely + self.game_wincap.window_rect[1]) * self.scaling)
-        return truex, truey
-
     def on_click_test(self, x, y, button, pressed):
         # when pressed is False, that means it's a release event.
         # let's listen only to mouse click releases
