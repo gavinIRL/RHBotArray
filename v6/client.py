@@ -60,7 +60,8 @@ class RHBotClientConnection():
 
 
 class ClientKeypressListener():
-    def __init__(self, list_servers) -> None:
+    def __init__(self, list_servers, test=False) -> None:
+        self.test = test
         self.list_servers = list_servers
         self.listener = None
         self.unreleased_keys = []
@@ -68,8 +69,12 @@ class ClientKeypressListener():
             self.gamename = f.readline()
 
     def start_mouse_listener(self):
-        self.mouse_listener = mouse.Listener(
-            on_click=self.on_click)
+        if not self.test:
+            self.mouse_listener = mouse.Listener(
+                on_click=self.on_click)
+        else:
+            self.mouse_listener = mouse.Listener(
+                on_click=self.on_click_test)
         self.mouse_listener.start()
 
     def on_click(self, x, y, button, pressed):
@@ -87,8 +92,12 @@ class ClientKeypressListener():
 
     def start_keypress_listener(self):
         if self.listener == None:
-            self.listener = Listener(on_press=self.on_press,
-                                     on_release=self.on_release)
+            if not self.test:
+                self.listener = Listener(on_press=self.on_press,
+                                         on_release=self.on_release)
+            else:
+                self.listener = Listener(on_press=self.on_press_test,
+                                         on_release=self.on_release_test)
             self.listener.start()
 
     def on_press(self, key):
@@ -110,6 +119,33 @@ class ClientKeypressListener():
                 server.send_message(str(key)+",up")
             self.unreleased_keys.remove(str(key))
 
+    def on_click_test(self, x, y, button, pressed):
+        # when pressed is False, that means it's a release event.
+        # let's listen only to mouse click releases
+        if not pressed:
+            # Need to get the ratio compared to window top left
+            # This will allow common usage on other size monitors
+            # xratio, yratio = self.convert_click_to_ratio(x, y)
+            for server in self.list_servers:
+                server.send_message("click,"+str(x)+"|"+str(y))
+
+    def on_press_test(self, key):
+        if key == keyboard.Key.f4:
+            print("Exiting bot")
+            for server in self.list_servers:
+                server.delay = 0
+                server.send_message("quit,1")
+            os._exit(1)
+        if str(key) not in self.unreleased_keys:
+            for server in self.list_servers:
+                server.send_message(str(key)+",down")
+            self.unreleased_keys.append(str(key))
+
+    def on_release_test(self, key):
+        for server in self.list_servers:
+            server.send_message(str(key)+",up")
+        self.unreleased_keys.remove(str(key))
+
 
 class ClientUtils():
     def grab_online_servers():
@@ -128,7 +164,7 @@ class ClientUtils():
 
 
 class RHBotClient():
-    def start(delay_min=0, delay_spacing=5):
+    def start(delay_min=0, delay_spacing=5, test=False):
         list_ips = ClientUtils.grab_online_servers()
         list_servers = []
         for i, ip in enumerate(list_ips):
@@ -137,7 +173,7 @@ class RHBotClient():
             else:
                 list_servers.append(RHBotClientConnection(
                     ip, delay_min+i*delay_spacing))
-        ckl = ClientKeypressListener(list_servers)
+        ckl = ClientKeypressListener(list_servers, test)
         ckl.start_mouse_listener()
         ckl.start_keypress_listener()
         for server in list_servers:
@@ -147,4 +183,4 @@ class RHBotClient():
 
 
 if __name__ == "__main__":
-    RHBotClient.start()
+    RHBotClient.start(test=True)
