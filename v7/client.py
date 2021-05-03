@@ -194,7 +194,7 @@ class ClientUtils():
         t = threading.Thread(target=server.main_loop(), daemon=True)
         t.start()
 
-    def get_monitor_scaling(self):
+    def get_monitor_scaling():
         user32 = ctypes.windll.user32
         w_orig = GetSystemMetrics(0)
         user32.SetProcessDPIAware()
@@ -222,4 +222,4 @@ class RHBotClient():
 
 
 if __name__ == "__main__":
-    RHBotClient.start(test=False)
+    RHBotClient.start(test=True)
