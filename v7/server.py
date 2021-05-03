@@ -8,6 +8,7 @@ import os
 from win32api import GetSystemMetrics
 from windowcapture import WindowCapture
 import ctypes
+from cryptography.fernet import Fernet
 
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
@@ -34,6 +35,10 @@ class ListenServerTest2():
         self.sockets_list = [self.server_socket]
         self.clients = {}
         print(f'Listening for connections on {self.IP}:{self.PORT}...')
+
+        with open("key.key") as f:
+            key = f.read()
+        self.fern = Fernet(key)
 
     def grab_current_lan_ip(self):
         output = subprocess.run(
@@ -121,12 +126,12 @@ class ListenServerTest2():
                         self.sockets_list.remove(notified_socket)
                         del self.clients[notified_socket]
                         continue
-
+                    decrypted = self.fern.decrypt(message["data"])
                     if self.print_only:
-                        print(message["data"].decode())
+                        print(decrypted.decode())
                     else:
                         button, direction = str(
-                            message["data"].decode("utf-8")).split(",")
+                            decrypted.decode("utf-8")).split(",")
                         if button == "click":
                             xrat, yrat = direction.split("|")
                             # Need to convert from ratio to click
