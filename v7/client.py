@@ -13,13 +13,13 @@ import subprocess
 import threading
 import time
 import os
+from cryptography.fernet import Fernet
 
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 
 class RHBotClientConnection():
     def __init__(self, ip, delay=0) -> None:
-
         self.delay = delay
         self.HEADER_LENGTH = 10
         self.IP = ip
@@ -37,11 +37,16 @@ class RHBotClientConnection():
             'utf-8')
         self.client_socket.send(username_header + username)
 
+        with open("key.key") as f:
+            key = f.read()
+        self.fern = Fernet(key)
+
     def send_message(self, message):
         if self.delay > 0:
             self.send_message_delayed(message, self.delay)
         else:
             message = message.encode('utf-8')
+            message = self.fern.encrypt(message)
             message_header = f"{len(message):<{self.HEADER_LENGTH}}".encode(
                 'utf-8')
             self.client_socket.send(message_header + message)
@@ -54,6 +59,7 @@ class RHBotClientConnection():
 
     def delay_thread(self, message, delay, start_time):
         message = message.encode('utf-8')
+        message = self.fern.encrypt(message)
         message_header = f"{len(message):<{self.HEADER_LENGTH}}".encode(
             'utf-8')
         time.sleep(delay - (time.time()-start_time))
