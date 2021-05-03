@@ -128,6 +128,7 @@ class RHBotClient():
                 list_servers.append(RHBotClientConnection(
                     ip, delay_min+i*delay_spacing))
         ckl = ClientKeypressListener(list_servers)
+        ckl.start_mouse_listener()
         ckl.start_keypress_listener()
         for server in list_servers:
             ClientUtils.start_server_thread(server)
