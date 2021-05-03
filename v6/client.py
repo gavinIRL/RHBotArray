@@ -2,6 +2,7 @@ import socket
 import select
 import errno
 import sys
+from win32gui import GetWindowText, GetForegroundWindow
 from pynput.keyboard import Key, Listener, KeyCode
 from pynput import mouse, keyboard
 from random import randint
@@ -63,6 +64,8 @@ class ClientKeypressListener():
         self.list_servers = list_servers
         self.listener = None
         self.unreleased_keys = []
+        with open("gamename.txt") as f:
+            self.gamename = f.readline()
 
     def start_mouse_listener(self):
         self.mouse_listener = mouse.Listener(
@@ -70,14 +73,17 @@ class ClientKeypressListener():
         self.mouse_listener.start()
 
     def on_click(self, x, y, button, pressed):
-        # when pressed is False, that means it's a release event.
-        # let's listen only to mouse click releases
-        if not pressed:
-            # Need to get the ratio compared to window top left
-            # This will allow common usage on other size monitors
-            # xratio, yratio = self.convert_click_to_ratio(x, y)
-            for server in self.list_servers:
-                server.send_message("click,"+str(x)+"|"+str(y))
+        # Need to first check if the click was in the right window
+        # Do this by checking if window focused
+        if GetWindowText(GetForegroundWindow()) == self.gamename:
+            # when pressed is False, that means it's a release event.
+            # let's listen only to mouse click releases
+            if not pressed:
+                # Need to get the ratio compared to window top left
+                # This will allow common usage on other size monitors
+                # xratio, yratio = self.convert_click_to_ratio(x, y)
+                for server in self.list_servers:
+                    server.send_message("click,"+str(x)+"|"+str(y))
 
     def start_keypress_listener(self):
         if self.listener == None:
