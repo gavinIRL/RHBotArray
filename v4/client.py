@@ -5,13 +5,15 @@ import sys
 from pynput.keyboard import Key, Listener, KeyCode
 from pynput import mouse, keyboard
 from random import randint
+import subprocess
+import threading
+import time
 
 
-class ListenClientTest():
-    def __init__(self) -> None:
+class RHBotClientConnection():
+    def __init__(self, ip) -> None:
         self.HEADER_LENGTH = 10
-        with open("ip.txt") as f:
-            self.IP = f.readline()
+        self.IP = ip
         self.PORT = 1351
         self.my_username = "Testy Test "+str(randint(100, 1000))
 
@@ -97,8 +99,8 @@ class ListenClientTest():
 
 
 class ClientKeypressListener():
-    def __init__(self, client) -> None:
-        self.client = client
+    def __init__(self, list_servers) -> None:
+        self.list_servers = list_servers
         self.listener = None
         self.unreleased_keys = []
 
@@ -110,16 +112,40 @@ class ClientKeypressListener():
 
     def on_press(self, key):
         if str(key) not in self.unreleased_keys:
-            self.client.send_message(str(key)+",down")
+            for server in self.list_servers:
+                server.send_message(str(key)+",down")
             self.unreleased_keys.append(str(key))
 
     def on_release(self, key):
-        self.client.send_message(str(key)+",up")
+        for server in self.list_servers:
+            server.send_message(str(key)+",up")
         self.unreleased_keys.remove(str(key))
 
 
+class ClientUtils():
+    def grab_online_servers():
+        output = subprocess.run("arp -a", capture_output=True).stdout.decode()
+        list_ips = []
+        with open("servers.txt", "r") as f:
+            lines = f.readlines()
+            for ip in lines:
+                if ip.strip() in output:
+                    list_ips.append(ip.strip())
+        return list_ips
+
+    def start_server_thread(server):
+        t = threading.Thread(target=server.main_loop(), daemon=True)
+        t.start()
+
+
 if __name__ == "__main__":
-    lct = ListenClientTest()
-    ckl = ClientKeypressListener(lct)
+    list_ips = ClientUtils.grab_online_servers()
+    list_servers = []
+    for ip in list_ips:
+        list_servers.append(RHBotClientConnection(ip))
+    ckl = ClientKeypressListener(list_servers)
     ckl.start_keypress_listener()
-    lct.main_loop()
+    for server in list_servers:
+        ClientUtils.start_server_thread(server)
+    while True:
+        time.sleep(1)
