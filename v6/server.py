@@ -5,11 +5,22 @@ import pyautogui
 import time
 import subprocess
 import os
+from win32api import GetSystemMetrics
+from windowcapture import WindowCapture
+import ctypes
+
+os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 
 class ListenServerTest2():
     def __init__(self, print_only=False) -> None:
         self.print_only = print_only
+
+        self.scaling = self.get_monitor_scaling()
+        with open("gamename.txt") as f:
+            self.gamename = f.readline()
+        if not self.print_only:
+            self.game_wincap = WindowCapture(self.gamename)
 
         self.HEADER_LENGTH = 10
         self.IP = self.grab_current_lan_ip()
@@ -56,6 +67,26 @@ class ListenServerTest2():
             return PYNPUT_SPECIAL_CASE_MAP[cleaned_key]
 
         return cleaned_key
+
+    def convert_ratio_to_click(self, ratx, raty):
+        # This will grab the current rectangle coords of game window
+        # and then turn the ratio of positions versus the game window
+        # into true x,y coords
+        self.game_wincap.update_window_position(border=False)
+        # Turn the ratios into relative
+        relx = int(ratx * self.game_wincap.w)
+        rely = int(raty * self.game_wincap.h)
+        # Turn the relative into true
+        truex = int((relx + self.game_wincap.window_rect[0]) * self.scaling)
+        truey = int((rely + self.game_wincap.window_rect[1]) * self.scaling)
+        return truex, truey
+
+    def get_monitor_scaling(self):
+        user32 = ctypes.windll.user32
+        w_orig = GetSystemMetrics(0)
+        user32.SetProcessDPIAware()
+        [w, h] = [user32.GetSystemMetrics(0), user32.GetSystemMetrics(1)]
+        return float(("{:.2f}".format(w/w_orig)))
 
     def receive_message(self, client_socket):
         try:
@@ -104,7 +135,6 @@ class ListenServerTest2():
                             x = int(x/self.scaling)
                             y = int(y/self.scaling)
                             pydirectinput.click(x, y, duration=0.025)
-                            pass
                         elif button == "quit":
                             print("Shutting down server")
                             os._exit(1)
