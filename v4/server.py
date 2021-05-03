@@ -7,7 +7,9 @@ import subprocess
 
 
 class ListenServerTest2():
-    def __init__(self) -> None:
+    def __init__(self, print_only=False) -> None:
+        self.print_only = print_only
+
         self.HEADER_LENGTH = 10
         self.IP = self.grab_current_lan_ip()
         self.PORT = 1351
@@ -87,17 +89,21 @@ class ListenServerTest2():
                         self.sockets_list.remove(notified_socket)
                         del self.clients[notified_socket]
                         continue
-                    button, direction = str(
-                        message["data"].decode("utf-8")).split(",")
-                    if direction == "down":
-                        key = self.convert_pynput_to_pag(
-                            button.replace("'", ""))
-                        print(key)
-                        pyautogui.keyDown(key)
-                    elif direction == "up":
-                        key = self.convert_pynput_to_pag(
-                            button.replace("'", ""))
-                        pyautogui.keyUp(key)
+
+                    if self.print_only:
+                        print(message["data"].decode())
+                    else:
+                        button, direction = str(
+                            message["data"].decode("utf-8")).split(",")
+                        if direction == "down":
+                            key = self.convert_pynput_to_pag(
+                                button.replace("'", ""))
+                            print(key)
+                            pyautogui.keyDown(key)
+                        elif direction == "up":
+                            key = self.convert_pynput_to_pag(
+                                button.replace("'", ""))
+                            pyautogui.keyUp(key)
 
             for notified_socket in exception_sockets:
                 self.sockets_list.remove(notified_socket)
@@ -105,5 +111,5 @@ class ListenServerTest2():
 
 
 if __name__ == "__main__":
-    lst = ListenServerTest2()
+    lst = ListenServerTest2(print_only=True)
     lst.start()
