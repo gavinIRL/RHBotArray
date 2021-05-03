@@ -97,6 +97,13 @@ class ListenServerTest2():
                         button, direction = str(
                             message["data"].decode("utf-8")).split(",")
                         if button == "click":
+                            xrat, yrat = direction.split("|")
+                            # Need to convert from ratio to click
+                            x, y = self.convert_ratio_to_click(xrat, yrat)
+                            # and then click at that location
+                            x = int(x/self.scaling)
+                            y = int(y/self.scaling)
+                            pydirectinput.click(x, y, duration=0.025)
                             pass
                         elif button == "quit":
                             print("Shutting down server")
