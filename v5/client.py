@@ -11,7 +11,9 @@ import time
 
 
 class RHBotClientConnection():
-    def __init__(self, ip) -> None:
+    def __init__(self, ip, delay=0) -> None:
+
+        self.delay = delay
         self.HEADER_LENGTH = 10
         self.IP = ip
         self.PORT = 1351
@@ -36,10 +38,13 @@ class RHBotClientConnection():
         self.client_socket.send(username_header + username)
 
     def send_message(self, message):
-        message = message.encode('utf-8')
-        message_header = f"{len(message):<{self.HEADER_LENGTH}}".encode(
-            'utf-8')
-        self.client_socket.send(message_header + message)
+        if self.delay > 0:
+            self.send_message_delayed(message, self.delay)
+        else:
+            message = message.encode('utf-8')
+            message_header = f"{len(message):<{self.HEADER_LENGTH}}".encode(
+                'utf-8')
+            self.client_socket.send(message_header + message)
 
     def send_message_delayed(self, message, delay):
         start_time = time.time()
