@@ -4,6 +4,7 @@ import pydirectinput
 import pyautogui
 import time
 import subprocess
+import os
 
 
 class ListenServerTest2():
@@ -95,7 +96,12 @@ class ListenServerTest2():
                     else:
                         button, direction = str(
                             message["data"].decode("utf-8")).split(",")
-                        if direction == "down":
+                        if button == "click":
+                            pass
+                        elif button == "quit":
+                            print("Shutting down server")
+                            os._exit(1)
+                        elif direction == "down":
                             key = self.convert_pynput_to_pag(
                                 button.replace("'", ""))
                             print(key)
