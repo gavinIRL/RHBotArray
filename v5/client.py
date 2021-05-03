@@ -71,6 +71,10 @@ class ClientKeypressListener():
             self.listener.start()
 
     def on_press(self, key):
+        if key == keyboard.Key.f4:
+            print("Exiting bot")
+            os._exit(1)
+
         if str(key) not in self.unreleased_keys:
             for server in self.list_servers:
                 server.send_message(str(key)+",down")
@@ -80,15 +84,6 @@ class ClientKeypressListener():
         for server in self.list_servers:
             server.send_message(str(key)+",up")
         self.unreleased_keys.remove(str(key))
-
-        if key == keyboard.Key.f4:
-            self.bot_running = False
-            # self.combatbat.running = False
-            # Need to pause for 1 second and then clear all keypresses
-            time.sleep(0.5)
-            # self.combatbat.remove_all_keypresses()
-            print("Exiting bot")
-            os._exit(1)
 
 
 class ClientUtils():
