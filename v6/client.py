@@ -77,7 +77,7 @@ class ClientKeypressListener():
             # This will allow common usage on other size monitors
             # xratio, yratio = self.convert_click_to_ratio(x, y)
             for server in self.list_servers:
-                server.send_message("click,"+x+"|"+y)
+                server.send_message("click,"+str(x)+"|"+str(y))
 
     def start_keypress_listener(self):
         if self.listener == None:
