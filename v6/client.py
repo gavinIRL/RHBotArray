@@ -74,7 +74,7 @@ class ClientKeypressListener():
         self.scaling = ClientUtils.get_monitor_scaling()
         with open("gamename.txt") as f:
             self.gamename = f.readline()
-        if self.test:
+        if not self.test:
             self.game_wincap = WindowCapture(self.gamename)
 
     def start_mouse_listener(self):
