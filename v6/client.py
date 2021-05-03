@@ -94,17 +94,21 @@ class ClientKeypressListener():
     def on_press(self, key):
         if key == keyboard.Key.f4:
             print("Exiting bot")
-            os._exit(1)
-
-        if str(key) not in self.unreleased_keys:
             for server in self.list_servers:
-                server.send_message(str(key)+",down")
-            self.unreleased_keys.append(str(key))
+                server.delay = 0
+                server.send_message("quit,1")
+            os._exit(1)
+        elif GetWindowText(GetForegroundWindow()) == self.gamename:
+            if str(key) not in self.unreleased_keys:
+                for server in self.list_servers:
+                    server.send_message(str(key)+",down")
+                self.unreleased_keys.append(str(key))
 
     def on_release(self, key):
-        for server in self.list_servers:
-            server.send_message(str(key)+",up")
-        self.unreleased_keys.remove(str(key))
+        if GetWindowText(GetForegroundWindow()) == self.gamename:
+            for server in self.list_servers:
+                server.send_message(str(key)+",up")
+            self.unreleased_keys.remove(str(key))
 
 
 class ClientUtils():
