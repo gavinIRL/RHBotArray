@@ -156,14 +156,23 @@ class ClientUtils():
         t.start()
 
 
+class RHBotClient():
+    def start(delay_min=0, delay_spacing=5):
+        list_ips = ClientUtils.grab_online_servers()
+        list_servers = []
+        for i, ip in enumerate(list_ips):
+            if delay_min == 0:
+                list_servers.append(RHBotClientConnection(ip))
+            else:
+                list_servers.append(RHBotClientConnection(
+                    ip, delay_min+i*delay_spacing))
+        ckl = ClientKeypressListener(list_servers)
+        ckl.start_keypress_listener()
+        for server in list_servers:
+            ClientUtils.start_server_thread(server)
+        while True:
+            time.sleep(1)
+
+
 if __name__ == "__main__":
-    list_ips = ClientUtils.grab_online_servers()
-    list_servers = []
-    for ip in list_ips:
-        list_servers.append(RHBotClientConnection(ip))
-    ckl = ClientKeypressListener(list_servers)
-    ckl.start_keypress_listener()
-    for server in list_servers:
-        ClientUtils.start_server_thread(server)
-    while True:
-        time.sleep(1)
+    RHBotClient.start()
