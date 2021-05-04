@@ -88,6 +88,7 @@ class ClientKeypressListener():
             self.delay_enabled = True
 
         self.scaling = ClientUtils.get_monitor_scaling()
+        # print("Scaling={}".format(self.scaling))
         with open("gamename.txt") as f:
             self.gamename = f.readline()
         if not self.test:
@@ -113,7 +114,9 @@ class ClientKeypressListener():
                 if not pressed:
                     # Need to get the ratio compared to window top left
                     # This will allow common usage on other size monitors
+                    # print("x={}, y={}".format(x, y))
                     xratio, yratio = self.convert_click_to_ratio(x, y)
+                    # print("xrat={}, yrat={}".format(xratio, yratio))
                     for server in self.list_servers:
                         server.send_message(
                             "click,"+str(xratio)+"|"+str(yratio))
@@ -172,8 +175,8 @@ class ClientKeypressListener():
         # versus the game window
         self.game_wincap.update_window_position(border=False)
         # Turn the screen pos into window pos
-        relx = truex - self.game_wincap.window_rect[0] * self.scaling
-        rely = truey - self.game_wincap.window_rect[1] * self.scaling
+        relx = (truex - self.game_wincap.window_rect[0]) * self.scaling
+        rely = (truey - self.game_wincap.window_rect[1]) * self.scaling
         # print("relx={}, rely={}".format(relx, rely))
         # print("winx={}, winy={}".format(
         #     self.game_wincap.window_rect[0], self.game_wincap.window_rect[1]))
@@ -258,4 +261,4 @@ class RHBotClient():
 
 
 if __name__ == "__main__":
-    RHBotClient.start(test=True)
+    RHBotClient.start(test=False)
