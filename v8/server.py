@@ -148,11 +148,11 @@ class ListenServerTest2():
                             key = self.convert_pynput_to_pag(
                                 button.replace("'", ""))
                             print(key)
-                            pyautogui.keyDown(key)
+                            pydirectinput.keyDown(key)
                         elif direction == "up":
                             key = self.convert_pynput_to_pag(
                                 button.replace("'", ""))
-                            pyautogui.keyUp(key)
+                            pydirectinput.keyUp(key)
 
             for notified_socket in exception_sockets:
                 self.sockets_list.remove(notified_socket)
