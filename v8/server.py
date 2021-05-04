@@ -137,8 +137,8 @@ class ListenServerTest2():
                             # Need to convert from ratio to click
                             x, y = self.convert_ratio_to_click(xrat, yrat)
                             # and then click at that location
-                            x = int(x/self.scaling)
-                            y = int(y/self.scaling)
+                            x = int(x)
+                            y = int(y)
                             pydirectinput.click(x, y, duration=0.025)
                         elif button == "quit":
                             print("Shutting down server")
