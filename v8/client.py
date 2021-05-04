@@ -77,6 +77,10 @@ class ClientKeypressListener():
         self.listener = None
         self.unreleased_keys = []
 
+        # Hotkey handling
+        self.transmitting = True
+        self.single_server = None
+
         self.scaling = ClientUtils.get_monitor_scaling()
         with open("gamename.txt") as f:
             self.gamename = f.readline()
@@ -93,17 +97,20 @@ class ClientKeypressListener():
         self.mouse_listener.start()
 
     def on_click(self, x, y, button, pressed):
-        # Need to first check if the click was in the right window
-        # Do this by checking if window focused
-        if GetWindowText(GetForegroundWindow()) == self.gamename:
-            # when pressed is False, that means it's a release event.
-            # let's listen only to mouse click releases
-            if not pressed:
-                # Need to get the ratio compared to window top left
-                # This will allow common usage on other size monitors
-                xratio, yratio = self.convert_click_to_ratio(x, y)
-                for server in self.list_servers:
-                    server.send_message("click,"+str(xratio)+"|"+str(yratio))
+        # First off need to check if transmitting is enabled
+        if self.transmitting:
+            # Need to then check if the click was in the right window
+            # Do this by checking if window focused
+            if GetWindowText(GetForegroundWindow()) == self.gamename:
+                # when pressed is False, that means it's a release event.
+                # let's listen only to mouse click releases
+                if not pressed:
+                    # Need to get the ratio compared to window top left
+                    # This will allow common usage on other size monitors
+                    xratio, yratio = self.convert_click_to_ratio(x, y)
+                    for server in self.list_servers:
+                        server.send_message(
+                            "click,"+str(xratio)+"|"+str(yratio))
 
     def start_keypress_listener(self):
         if self.listener == None:
@@ -122,17 +129,19 @@ class ClientKeypressListener():
                 server.delay = 0
                 server.send_message("quit,1")
             os._exit(1)
-        elif GetWindowText(GetForegroundWindow()) == self.gamename:
-            if str(key) not in self.unreleased_keys:
-                for server in self.list_servers:
-                    server.send_message(str(key)+",down")
-                self.unreleased_keys.append(str(key))
+        if self.transmitting:
+            if GetWindowText(GetForegroundWindow()) == self.gamename:
+                if str(key) not in self.unreleased_keys:
+                    for server in self.list_servers:
+                        server.send_message(str(key)+",down")
+                    self.unreleased_keys.append(str(key))
 
     def on_release(self, key):
-        if GetWindowText(GetForegroundWindow()) == self.gamename:
-            for server in self.list_servers:
-                server.send_message(str(key)+",up")
-            self.unreleased_keys.remove(str(key))
+        if self.transmitting:
+            if GetWindowText(GetForegroundWindow()) == self.gamename:
+                for server in self.list_servers:
+                    server.send_message(str(key)+",up")
+                self.unreleased_keys.remove(str(key))
 
     def convert_click_to_ratio(self, truex, truey):
         # This will grab the current rectangle coords of game window
@@ -154,12 +163,13 @@ class ClientKeypressListener():
     def on_click_test(self, x, y, button, pressed):
         # when pressed is False, that means it's a release event.
         # let's listen only to mouse click releases
-        if not pressed:
-            # Need to get the ratio compared to window top left
-            # This will allow common usage on other size monitors
-            # xratio, yratio = self.convert_click_to_ratio(x, y)
-            for server in self.list_servers:
-                server.send_message("click,"+str(x)+"|"+str(y))
+        if self.transmitting:
+            if not pressed:
+                # Need to get the ratio compared to window top left
+                # This will allow common usage on other size monitors
+                # xratio, yratio = self.convert_click_to_ratio(x, y)
+                for server in self.list_servers:
+                    server.send_message("click,"+str(x)+"|"+str(y))
 
     def on_press_test(self, key):
         if key == keyboard.Key.f4:
@@ -168,15 +178,17 @@ class ClientKeypressListener():
                 server.delay = 0
                 server.send_message("quit,1")
             os._exit(1)
-        if str(key) not in self.unreleased_keys:
-            for server in self.list_servers:
-                server.send_message(str(key)+",down")
-            self.unreleased_keys.append(str(key))
+        if self.transmitting:
+            if str(key) not in self.unreleased_keys:
+                for server in self.list_servers:
+                    server.send_message(str(key)+",down")
+                self.unreleased_keys.append(str(key))
 
     def on_release_test(self, key):
-        for server in self.list_servers:
-            server.send_message(str(key)+",up")
-        self.unreleased_keys.remove(str(key))
+        if self.transmitting:
+            for server in self.list_servers:
+                server.send_message(str(key)+",up")
+            self.unreleased_keys.remove(str(key))
 
 
 class ClientUtils():
