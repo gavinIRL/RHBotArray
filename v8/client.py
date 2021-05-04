@@ -169,6 +169,19 @@ class ClientKeypressListener():
                     server.send_message(str(key)+",up")
                 self.unreleased_keys.remove(str(key))
 
+    # def convert_ratio_to_click(self, ratx, raty):
+    #     # This will grab the current rectangle coords of game window
+    #     # and then turn the ratio of positions versus the game window
+    #     # into true x,y coords
+    #     self.game_wincap.update_window_position(border=False)
+    #     # Turn the ratios into relative
+    #     relx = int(ratx * self.game_wincap.w)
+    #     rely = int(raty * self.game_wincap.h)
+    #     # Turn the relative into true
+    #     truex = int((relx + self.game_wincap.window_rect[0]))
+    #     truey = int((rely + self.game_wincap.window_rect[1]))
+    #     return truex, truey
+
     def convert_click_to_ratio(self, truex, truey):
         # This will grab the current rectangle coords of game window
         # and then turn the click values into a ratio of positions
@@ -184,6 +197,9 @@ class ClientKeypressListener():
         # Then convert to a ratio
         ratx = relx/(self.game_wincap.w*self.scaling)
         raty = rely/(self.game_wincap.h*self.scaling)
+        # Test convert back to a click
+        # convx, convy = self.convert_ratio_to_click(ratx, raty)
+        # print("convx={}, convy={}".format(convx, convy))
         return ratx, raty
 
     def on_click_test(self, x, y, button, pressed):
