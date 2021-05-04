@@ -130,14 +130,20 @@ class ClientKeypressListener():
                 server.send_message("quit,1")
             os._exit(1)
         if self.transmitting:
-            if GetWindowText(GetForegroundWindow()) == self.gamename:
+            if key == keyboard.Key.f1:
+                self.transmitting = False
+            elif GetWindowText(GetForegroundWindow()) == self.gamename:
                 if str(key) not in self.unreleased_keys:
                     for server in self.list_servers:
                         server.send_message(str(key)+",down")
                     self.unreleased_keys.append(str(key))
+        elif key == keyboard.Key.f1:
+            self.transmitting = True
 
     def on_release(self, key):
-        if self.transmitting:
+        if key == keyboard.Key.f1:
+            pass
+        elif self.transmitting:
             if GetWindowText(GetForegroundWindow()) == self.gamename:
                 for server in self.list_servers:
                     server.send_message(str(key)+",up")
