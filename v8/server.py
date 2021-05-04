@@ -82,8 +82,8 @@ class ListenServerTest2():
         relx = int(ratx * self.game_wincap.w)
         rely = int(raty * self.game_wincap.h)
         # Turn the relative into true
-        truex = int((relx + self.game_wincap.window_rect[0]) * self.scaling)
-        truey = int((rely + self.game_wincap.window_rect[1]) * self.scaling)
+        truex = int((relx + self.game_wincap.window_rect[0]))
+        truey = int((rely + self.game_wincap.window_rect[1]))
         return truex, truey
 
     def get_monitor_scaling(self):
