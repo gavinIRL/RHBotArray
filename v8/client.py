@@ -71,7 +71,7 @@ class RHBotClientConnection():
 
 
 class ClientKeypressListener():
-    def __init__(self, list_servers, test=False) -> None:
+    def __init__(self, list_servers, test=False, delay_min=0, delay_spacing=5) -> None:
         self.test = test
         self.list_servers = list_servers
         self.listener = None
@@ -80,6 +80,12 @@ class ClientKeypressListener():
         # Hotkey handling
         self.transmitting = True
         self.single_server = None
+        self.delay_min = delay_min
+        self.delay_spacing = delay_spacing
+        if self.delay_min == 0:
+            self.delay_enabled = False
+        else:
+            self.delay_enabled = True
 
         self.scaling = ClientUtils.get_monitor_scaling()
         with open("gamename.txt") as f:
@@ -132,6 +138,14 @@ class ClientKeypressListener():
         if self.transmitting:
             if key == keyboard.Key.f1:
                 self.transmitting = False
+            if key == keyboard.Key.f2:
+                self.delay_enabled = not self.delay_enabled
+                if self.delay_enabled:
+                    for i, server in enumerate(self.list_servers):
+                        server.delay = self.delay_min+i*self.delay_spacing
+                else:
+                    for server in self.list_servers:
+                        server.delay = 0
             elif GetWindowText(GetForegroundWindow()) == self.gamename:
                 if str(key) not in self.unreleased_keys:
                     for server in self.list_servers:
@@ -139,6 +153,7 @@ class ClientKeypressListener():
                     self.unreleased_keys.append(str(key))
         elif key == keyboard.Key.f1:
             self.transmitting = True
+            self.delay_enabled = False
             for server in self.list_servers:
                 server.delay = 0
 
@@ -232,7 +247,8 @@ class RHBotClient():
             else:
                 list_servers.append(RHBotClientConnection(
                     ip, delay_min+i*delay_spacing))
-        ckl = ClientKeypressListener(list_servers, test)
+        ckl = ClientKeypressListener(
+            list_servers, test, delay_min, delay_spacing)
         ckl.start_mouse_listener()
         ckl.start_keypress_listener()
         for server in list_servers:
