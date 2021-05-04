@@ -135,7 +135,8 @@ class ListenServerTest2():
                         if button == "click":
                             xrat, yrat = direction.split("|")
                             # Need to convert from ratio to click
-                            x, y = self.convert_ratio_to_click(xrat, yrat)
+                            x, y = self.convert_ratio_to_click(
+                                float(xrat), float(yrat))
                             # and then click at that location
                             x = int(x)
                             y = int(y)
@@ -159,5 +160,5 @@ class ListenServerTest2():
 
 
 if __name__ == "__main__":
-    lst = ListenServerTest2(print_only=True)
+    lst = ListenServerTest2(print_only=False)
     lst.start()
