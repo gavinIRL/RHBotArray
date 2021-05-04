@@ -139,6 +139,8 @@ class ClientKeypressListener():
                     self.unreleased_keys.append(str(key))
         elif key == keyboard.Key.f1:
             self.transmitting = True
+            for server in self.list_servers:
+                server.delay = 0
 
     def on_release(self, key):
         if key == keyboard.Key.f1:
