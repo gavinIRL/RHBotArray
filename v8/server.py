@@ -20,8 +20,15 @@ class ListenServerTest2():
         self.scaling = self.get_monitor_scaling()
         with open("gamename.txt") as f:
             self.gamename = f.readline()
+        # initialise the window centre for the mouse resetter
+        self.centre_x = 900
+        self.centre_y = 500
         if not self.print_only:
             self.game_wincap = WindowCapture(self.gamename)
+            self.centre_x = int(0.5 * self.game_wincap.w +
+                                self.game_wincap.window_rect[0])
+            self.centre_y = int(0.5 * self.game_wincap.h +
+                                self.game_wincap.window_rect[1])
 
         self.HEADER_LENGTH = 10
         self.IP = self.grab_current_lan_ip()
@@ -39,6 +46,9 @@ class ListenServerTest2():
         with open("key.key") as f:
             key = f.read()
         self.fern = Fernet(key)
+
+    def move_mouse_centre(self):
+        pydirectinput.moveTo(self.centre_x, self.centre_y)
 
     def grab_current_lan_ip(self):
         output = subprocess.run(
@@ -130,6 +140,7 @@ class ListenServerTest2():
                     if self.print_only:
                         print(decrypted.decode())
                     else:
+                        self.move_mouse_centre()
                         button, direction = str(
                             decrypted.decode("utf-8")).split(",")
                         if button == "click":
