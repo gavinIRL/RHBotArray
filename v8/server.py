@@ -147,7 +147,7 @@ class ListenServerTest2():
                         elif direction == "down":
                             key = self.convert_pynput_to_pag(
                                 button.replace("'", ""))
-                            print(key)
+                            # print(key)
                             pydirectinput.keyDown(key)
                         elif direction == "up":
                             key = self.convert_pynput_to_pag(
