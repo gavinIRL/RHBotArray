@@ -47,6 +47,8 @@ class ListenServerTest2():
             key = f.read()
         self.fern = Fernet(key)
 
+        self.last_mouse_move = time.time() - 10
+
     def move_mouse_centre(self):
         ctypes.windll.user32.SetCursorPos(self.centre_x, self.centre_y)
 
@@ -147,7 +149,9 @@ class ListenServerTest2():
         if self.print_only:
             print(decrypted.decode())
         else:
-            self.move_mouse_centre()
+            if (time.time() - self.last_mouse_move) >= 10:
+                self.move_mouse_centre()
+                self.last_mouse_move = time.time()
             button, direction = str(
                 decrypted.decode("utf-8")).split(",")
             if button == "click":
