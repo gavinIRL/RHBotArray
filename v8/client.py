@@ -142,22 +142,27 @@ class ClientKeypressListener():
         if self.transmitting:
             if key == keyboard.Key.f1:
                 self.transmitting = False
+                print("TRANSMIT OFF")
             if key == keyboard.Key.f2:
                 self.delay_enabled = not self.delay_enabled
                 if self.delay_enabled:
                     for i, server in enumerate(self.list_servers):
                         server.delay = self.delay_min+i*self.delay_spacing
+                    print("DELAY ON")
                 else:
                     for server in self.list_servers:
                         server.delay = 0
+                    print("DELAY OFF")
             if key == keyboard.Key.f3:
                 self.x_loot_only = not self.x_loot_only
                 if self.x_loot_only:
                     for server in self.list_servers:
                         server.send_message("xlootonly,on")
+                    print("LOOT ON")
                 else:
                     for server in self.list_servers:
                         server.send_message("xlootonly,off")
+                    print("LOOT OFF")
             elif GetWindowText(GetForegroundWindow()) == self.gamename:
                 if str(key) not in self.unreleased_keys:
                     for server in self.list_servers:
@@ -168,6 +173,7 @@ class ClientKeypressListener():
             self.delay_enabled = False
             for server in self.list_servers:
                 server.delay = 0
+            print("TRANSMIT ON")
 
     def on_release(self, key):
         if key == keyboard.Key.f1:
