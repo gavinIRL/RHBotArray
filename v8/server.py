@@ -48,7 +48,7 @@ class ListenServerTest2():
         self.fern = Fernet(key)
 
     def move_mouse_centre(self):
-        pydirectinput.moveTo(self.centre_x, self.centre_y)
+        pydirectinput.moveTo(self.centre_x, self.centre_y, 0.0)
 
     def grab_current_lan_ip(self):
         output = subprocess.run(
@@ -140,9 +140,10 @@ class ListenServerTest2():
                     if self.print_only:
                         print(decrypted.decode())
                     else:
-                        self.move_mouse_centre()
                         button, direction = str(
                             decrypted.decode("utf-8")).split(",")
+                        if button == "center":
+                            self.move_mouse_centre()
                         if button == "click":
                             xrat, yrat = direction.split("|")
                             # Need to convert from ratio to click
