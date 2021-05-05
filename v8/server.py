@@ -1,7 +1,6 @@
 import socket
 import select
 import pydirectinput
-import pyautogui
 import time
 import subprocess
 import os
@@ -9,6 +8,8 @@ from win32api import GetSystemMetrics
 from windowcapture import WindowCapture
 import ctypes
 from cryptography.fernet import Fernet
+from vision import Vision
+from hsvfilter import grab_object_preset
 
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
@@ -50,6 +51,14 @@ class ListenServerTest2():
         self.last_mouse_move = time.time() - 10
 
         self.x_loot_only = True
+        self.xprompt_filter, xprompt_custom_rect = grab_object_preset(
+            object_name="prompt_press_x_pickup")
+        self.xprompt_wincap = WindowCapture(
+            self.gamename, xprompt_custom_rect)
+        if self.controller.scaling == 1.5:
+            self.xprompt_vision = Vision("xprompt67filtv2.jpg")
+        elif self.controller.scaling == 1.0:
+            self.xprompt_vision = Vision("xprompt100filtv2.jpg")
 
     def move_mouse_centre(self):
         ctypes.windll.user32.SetCursorPos(self.centre_x, self.centre_y)
@@ -101,9 +110,18 @@ class ListenServerTest2():
         return truex, truey
 
     def loot_if_available(self):
-        # Need to first check if there is an xprompt
-        # And then press x if is the case
-        pass
+        # get an updated image of the game at specified area
+        xprompt_screenshot = self.xprompt_wincap.get_screenshot()
+        # pre-process the image to help with detection
+        xprompt_output_image = self.xprompt_vision.apply_hsv_filter(
+            xprompt_screenshot, self.xprompt_filter)
+        # do object detection, this time grab rectangles
+        xprompt_rectangles = self.xprompt_vision.find(
+            xprompt_output_image, threshold=0.61, epsilon=0.5)
+        # then return answer to whether currently in dungeon
+        if len(xprompt_rectangles) == 1:
+            pydirectinput.keyDown("x")
+            # keyup performed in main loop
 
     def get_monitor_scaling(self):
         user32 = ctypes.windll.user32
@@ -185,7 +203,10 @@ class ListenServerTest2():
                     self.x_loot_only = False
             elif button == "'x'":
                 if self.x_loot_only:
-                    self.loot_if_available()
+                    if direction == "down":
+                        self.loot_if_available()
+                    else:
+                        pydirectinput.keyUp("x")
                 elif direction == "down":
                     key = self.convert_pynput_to_pag(
                         button.replace("'", ""))
