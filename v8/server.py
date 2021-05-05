@@ -48,7 +48,7 @@ class ListenServerTest2():
         self.fern = Fernet(key)
 
     def move_mouse_centre(self):
-        pydirectinput.moveTo(self.centre_x, self.centre_y, 0.0)
+        ctypes.windll.user32.SetCursorPos(self.centre_x, self.centre_y)
 
     def grab_current_lan_ip(self):
         output = subprocess.run(
