@@ -55,9 +55,9 @@ class ListenServerTest2():
             object_name="prompt_press_x_pickup")
         self.xprompt_wincap = WindowCapture(
             self.gamename, xprompt_custom_rect)
-        if self.controller.scaling == 1.5:
+        if self.scaling == 1.5:
             self.xprompt_vision = Vision("xprompt67filtv2.jpg")
-        elif self.controller.scaling == 1.0:
+        elif self.scaling == 1.0:
             self.xprompt_vision = Vision("xprompt100filtv2.jpg")
 
     def move_mouse_centre(self):
