@@ -86,6 +86,7 @@ class ClientKeypressListener():
             self.delay_enabled = False
         else:
             self.delay_enabled = True
+        self.x_loot_only = True
 
         self.scaling = ClientUtils.get_monitor_scaling()
         # print("Scaling={}".format(self.scaling))
@@ -149,6 +150,14 @@ class ClientKeypressListener():
                 else:
                     for server in self.list_servers:
                         server.delay = 0
+            if key == keyboard.Key.f3:
+                self.x_loot_only = not self.x_loot_only
+                if self.x_loot_only:
+                    for server in self.list_servers:
+                        server.send_message("xlootonly,on")
+                else:
+                    for server in self.list_servers:
+                        server.send_message("xlootonly,off")
             elif GetWindowText(GetForegroundWindow()) == self.gamename:
                 if str(key) not in self.unreleased_keys:
                     for server in self.list_servers:
@@ -277,4 +286,4 @@ class RHBotClient():
 
 
 if __name__ == "__main__":
-    RHBotClient.start(test=False)
+    RHBotClient.start(test=True)
