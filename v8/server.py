@@ -140,10 +140,9 @@ class ListenServerTest2():
                     if self.print_only:
                         print(decrypted.decode())
                     else:
+                        self.move_mouse_centre()
                         button, direction = str(
                             decrypted.decode("utf-8")).split(",")
-                        if button == "center":
-                            self.move_mouse_centre()
                         if button == "click":
                             xrat, yrat = direction.split("|")
                             # Need to convert from ratio to click
@@ -152,7 +151,12 @@ class ListenServerTest2():
                             # and then click at that location
                             x = int(x)
                             y = int(y)
-                            pydirectinput.click(x, y, duration=0.025)
+                            # pydirectinput.click(x, y, duration=0.025)
+                            ctypes.windll.user32.SetCursorPos(x, y)
+                            ctypes.windll.user32.mouse_event(
+                                0x0002, 0, 0, 0, 0)
+                            ctypes.windll.user32.mouse_event(
+                                0x0004, 0, 0, 0, 0)
                         elif button == "quit":
                             print("Shutting down server")
                             os._exit(1)
