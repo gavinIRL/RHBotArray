@@ -49,6 +49,8 @@ class ListenServerTest2():
 
         self.last_mouse_move = time.time() - 10
 
+        self.x_loot_only = True
+
     def move_mouse_centre(self):
         ctypes.windll.user32.SetCursorPos(self.centre_x, self.centre_y)
 
@@ -97,6 +99,11 @@ class ListenServerTest2():
         truex = int((relx + self.game_wincap.window_rect[0]))
         truey = int((rely + self.game_wincap.window_rect[1]))
         return truex, truey
+
+    def loot_if_available(self):
+        # Need to first check if there is an xprompt
+        # And then press x if is the case
+        pass
 
     def get_monitor_scaling(self):
         user32 = ctypes.windll.user32
@@ -171,6 +178,24 @@ class ListenServerTest2():
             elif button == "quit":
                 print("Shutting down server")
                 os._exit(1)
+            elif button == "xlootonly":
+                if direction == "on":
+                    self.x_loot_only = True
+                else:
+                    self.x_loot_only = False
+            elif button == "'x'":
+                if self.x_loot_only:
+                    self.loot_if_available()
+                elif direction == "down":
+                    key = self.convert_pynput_to_pag(
+                        button.replace("'", ""))
+                    # print(key)
+                    pydirectinput.keyDown(key)
+                elif direction == "up":
+                    key = self.convert_pynput_to_pag(
+                        button.replace("'", ""))
+                    pydirectinput.keyUp(key)
+
             elif direction == "down":
                 key = self.convert_pynput_to_pag(
                     button.replace("'", ""))
