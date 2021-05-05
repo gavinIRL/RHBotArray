@@ -137,42 +137,45 @@ class ListenServerTest2():
                         del self.clients[notified_socket]
                         continue
                     decrypted = self.fern.decrypt(message["data"])
-                    if self.print_only:
-                        print(decrypted.decode())
-                    else:
-                        self.move_mouse_centre()
-                        button, direction = str(
-                            decrypted.decode("utf-8")).split(",")
-                        if button == "click":
-                            xrat, yrat = direction.split("|")
-                            # Need to convert from ratio to click
-                            x, y = self.convert_ratio_to_click(
-                                float(xrat), float(yrat))
-                            # and then click at that location
-                            x = int(x)
-                            y = int(y)
-                            # pydirectinput.click(x, y, duration=0.025)
-                            ctypes.windll.user32.SetCursorPos(x, y)
-                            ctypes.windll.user32.mouse_event(
-                                0x0002, 0, 0, 0, 0)
-                            ctypes.windll.user32.mouse_event(
-                                0x0004, 0, 0, 0, 0)
-                        elif button == "quit":
-                            print("Shutting down server")
-                            os._exit(1)
-                        elif direction == "down":
-                            key = self.convert_pynput_to_pag(
-                                button.replace("'", ""))
-                            # print(key)
-                            pydirectinput.keyDown(key)
-                        elif direction == "up":
-                            key = self.convert_pynput_to_pag(
-                                button.replace("'", ""))
-                            pydirectinput.keyUp(key)
+                    self.do_message_checks(decrypted)
 
             for notified_socket in exception_sockets:
                 self.sockets_list.remove(notified_socket)
                 del self.clients[notified_socket]
+
+    def do_message_checks(self, decrypted: bytes):
+        if self.print_only:
+            print(decrypted.decode())
+        else:
+            self.move_mouse_centre()
+            button, direction = str(
+                decrypted.decode("utf-8")).split(",")
+            if button == "click":
+                xrat, yrat = direction.split("|")
+                # Need to convert from ratio to click
+                x, y = self.convert_ratio_to_click(
+                    float(xrat), float(yrat))
+                # and then click at that location
+                x = int(x)
+                y = int(y)
+                # pydirectinput.click(x, y, duration=0.025)
+                ctypes.windll.user32.SetCursorPos(x, y)
+                ctypes.windll.user32.mouse_event(
+                    0x0002, 0, 0, 0, 0)
+                ctypes.windll.user32.mouse_event(
+                    0x0004, 0, 0, 0, 0)
+            elif button == "quit":
+                print("Shutting down server")
+                os._exit(1)
+            elif direction == "down":
+                key = self.convert_pynput_to_pag(
+                    button.replace("'", ""))
+                # print(key)
+                pydirectinput.keyDown(key)
+            elif direction == "up":
+                key = self.convert_pynput_to_pag(
+                    button.replace("'", ""))
+                pydirectinput.keyUp(key)
 
 
 if __name__ == "__main__":
