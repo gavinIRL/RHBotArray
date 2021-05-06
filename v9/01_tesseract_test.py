@@ -6,5 +6,5 @@ from PIL import Image
 import os
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
-print(pytesseract.image_to_string('test.png'))
+print(pytesseract.image_to_string('test_ideal.png'))
 # print(pytesseract.image_to_string(Image.open('test.png')))
