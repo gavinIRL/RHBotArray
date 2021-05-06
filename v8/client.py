@@ -71,7 +71,7 @@ class RHBotClientConnection():
 
 
 class ClientKeypressListener():
-    def __init__(self, list_servers, test=False, delay_min=0, delay_spacing=5) -> None:
+    def __init__(self, list_servers, test=False, delay_min=0, delay_spacing=8) -> None:
         self.test = test
         self.list_servers = list_servers
         self.listener = None
@@ -133,27 +133,31 @@ class ClientKeypressListener():
             self.listener.start()
 
     def on_press(self, key):
-        if key == keyboard.Key.f4:
+        if key == KeyCode(char='r'):
             print("Exiting bot")
             for server in self.list_servers:
                 server.delay = 0
                 server.send_message("quit,1")
             os._exit(1)
         if self.transmitting:
-            if key == keyboard.Key.f1:
+            if key == KeyCode(char='q'):
                 self.transmitting = False
                 print("TRANSMIT OFF")
-            elif key == keyboard.Key.f2:
+            elif key == KeyCode(char='w'):
                 self.delay_enabled = not self.delay_enabled
                 if self.delay_enabled:
-                    for i, server in enumerate(self.list_servers):
-                        server.delay = self.delay_min+i*self.delay_spacing
+                    if self.delay_min == 0:
+                        for i, server in enumerate(self.list_servers):
+                            server.delay = 8+i*self.delay_spacing
+                    else:
+                        for i, server in enumerate(self.list_servers):
+                            server.delay = self.delay_min+i*self.delay_spacing
                     print("DELAY ON")
                 else:
                     for server in self.list_servers:
                         server.delay = 0
                     print("DELAY OFF")
-            elif key == keyboard.Key.f3:
+            elif key == KeyCode(char='e'):
                 self.x_loot_only = not self.x_loot_only
                 if self.x_loot_only:
                     for server in self.list_servers:
@@ -168,7 +172,7 @@ class ClientKeypressListener():
                     for server in self.list_servers:
                         server.send_message(str(key)+",down")
                     self.unreleased_keys.append(str(key))
-        elif key == keyboard.Key.f1:
+        elif key == KeyCode(char='q'):
             self.transmitting = True
             self.delay_enabled = False
             for server in self.list_servers:
@@ -176,11 +180,11 @@ class ClientKeypressListener():
             print("TRANSMIT ON")
 
     def on_release(self, key):
-        if key == keyboard.Key.f1:
+        if key == KeyCode(char='q'):
             pass
-        elif key == keyboard.Key.f2:
+        elif key == KeyCode(char='w'):
             pass
-        elif key == keyboard.Key.f3:
+        elif key == KeyCode(char='e'):
             pass
         elif self.transmitting:
             if GetWindowText(GetForegroundWindow()) == self.gamename:
@@ -276,7 +280,7 @@ class ClientUtils():
 
 
 class RHBotClient():
-    def start(delay_min=0, delay_spacing=5, test=False):
+    def start(delay_min=0, delay_spacing=8, test=False):
         list_ips = ClientUtils.grab_online_servers()
         list_servers = []
         for i, ip in enumerate(list_ips):
