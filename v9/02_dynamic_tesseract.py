@@ -8,6 +8,7 @@ import pytesseract
 from PIL import Image
 import os
 import cv2
+from time import time
 
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
@@ -15,6 +16,9 @@ os.chdir(os.path.dirname(os.path.abspath(__file__)))
 # # print(pytesseract.image_to_string(Image.open('test.png')))
 
 # print(pytesseract.image_to_boxes(Image.open('test_ideal.png')))
+
+loop_time = time()
+
 with open("gamename.txt") as f:
     gamename = f.readline()
 with open("player.txt") as f:
@@ -25,7 +29,9 @@ vision_limestone = Vision('xprompt67filtv2.jpg')
 # initialize the trackbar window
 # vision_limestone.init_control_gui()
 hsv_filter = HsvFilter(0, 0, 176, 48, 55, 255, 0, 0, 0, 0)
+print("Setup time: {}s".format(time()-loop_time))
 
+loop_time = time()
 while(True):
 
     # get an updated image of the game
@@ -56,11 +62,12 @@ while(True):
                           (tmp_br_x, tmp_br_y), (0, 0, 255), 1)
 
     #cv2.imshow('Filtered', image)
-    break
+
     # debug the loop rate
     # print('FPS {}'.format(1 / (time() - loop_time)))
+    print("Calc time: {}s".format(time()-loop_time))
     # loop_time = time()
-
+    break
     # press 'q' with the output window focused to exit.
     # waits 1 ms every loop to process key presses
     if cv2.waitKey(1) == ord('q'):
