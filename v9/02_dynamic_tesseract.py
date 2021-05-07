@@ -28,7 +28,7 @@ wincap = WindowCapture(gamename, [510, 260, 755, 450])
 vision_limestone = Vision('xprompt67filtv2.jpg')
 # initialize the trackbar window
 # vision_limestone.init_control_gui()
-hsv_filter = HsvFilter(0, 0, 176, 48, 55, 255, 0, 0, 0, 0)
+hsv_filter = HsvFilter(94, 188, 255, 137, 255, 255, 0, 0, 0, 0)
 print("Setup time: {}s".format(time()-loop_time))
 
 loop_time = time()
@@ -61,13 +61,13 @@ while(True):
             cv2.rectangle(image, (tmp_tl_x, tmp_tl_y),
                           (tmp_br_x, tmp_br_y), (0, 0, 255), 1)
 
-    #cv2.imshow('Filtered', image)
+    cv2.imshow('Filtered', image)
 
     # debug the loop rate
     # print('FPS {}'.format(1 / (time() - loop_time)))
     print("Calc time: {}s".format(time()-loop_time))
-    # loop_time = time()
-    break
+    loop_time = time()
+    # break
     # press 'q' with the output window focused to exit.
     # waits 1 ms every loop to process key presses
     if cv2.waitKey(1) == ord('q'):
