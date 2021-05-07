@@ -17,6 +17,8 @@ os.chdir(os.path.dirname(os.path.abspath(__file__)))
 # print(pytesseract.image_to_boxes(Image.open('test_ideal.png')))
 with open("gamename.txt") as f:
     gamename = f.readline()
+with open("player.txt") as f:
+    main_player = f.readline()
 wincap = WindowCapture(gamename, [510, 260, 755, 450])
 # initialize the Vision class
 vision_limestone = Vision('xprompt67filtv2.jpg')
@@ -64,7 +66,8 @@ while(True):
     if cv2.waitKey(1) == ord('q'):
         cv2.destroyAllWindows()
         break
-print(text)
+# print(text)
+print("Main player detected: {}".format(main_player in results["text"]))
 
 # print("Done")
 os._exit(1)
