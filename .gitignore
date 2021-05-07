@@ -1,5 +1,10 @@
 __pycache__/
 ip.txt
+# this will hold the ip addresses of all servers
 servers.txt
+# this will hold the game window name
 gamename.txt
+# this will be the decryption key
 key.key
+# this will hold the main player name
+player.txt
