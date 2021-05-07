@@ -8,3 +8,5 @@ gamename.txt
 key.key
 # this will hold the main player name
 player.txt
+# this will hold the bot player name
+currplayer.txt
