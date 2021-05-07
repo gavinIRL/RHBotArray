@@ -20,7 +20,7 @@ with open("player.txt") as f:
     main_player = f.readline()
 with open("currplayer.txt") as f:
     curr_player = f.readline()
-wincap = WindowCapture(gamename, [210, 260, 955, 450])
+wincap = WindowCapture(gamename, [210, 60, 1455, 650])
 # initialize the Vision class
 vision_limestone = Vision('xprompt67filtv2.jpg')
 # initialize the trackbar window
@@ -83,8 +83,8 @@ while(True):
     cv2.imshow('Filtered', image)
 
     # debug the loop rate
-    # print('FPS {}'.format(1 / (time() - loop_time)))
-    # loop_time = time()
+    print('FPS {}'.format(1 / (time() - loop_time)))
+    loop_time = time()
     # press 'q' with the output window focused to exit.
     # waits 1 ms every loop to process key presses
     if cv2.waitKey(1) == ord('q'):
