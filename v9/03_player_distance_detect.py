@@ -12,13 +12,15 @@ import os
 import cv2
 from time import time
 
+os.chdir(os.path.dirname(os.path.abspath(__file__)))
+
 with open("gamename.txt") as f:
     gamename = f.readline()
 with open("player.txt") as f:
     main_player = f.readline()
 with open("currplayer.txt") as f:
     curr_player = f.readline()
-wincap = WindowCapture(gamename, [510, 260, 755, 450])
+wincap = WindowCapture(gamename, [210, 260, 955, 450])
 # initialize the Vision class
 vision_limestone = Vision('xprompt67filtv2.jpg')
 # initialize the trackbar window
@@ -43,12 +45,32 @@ while(True):
     positions = [0, 0, 0, 0]
 
     for i in range(0, len(results["text"])):
-        if results["text"][i] == main_player:
+        # extract the bounding box coordinates of the text region from the current result
+        tmp_tl_x = results["left"][i]
+        tmp_tl_y = results["top"][i]
+        tmp_br_x = tmp_tl_x + results["width"][i]
+        tmp_br_y = tmp_tl_y + results["height"][i]
+        tmp_level = results["level"][i]
+        conf = results["conf"][i]
+        text = results["text"][i]
+
+        if(tmp_level == 5):
+            cv2.putText(image, text, (tmp_tl_x, tmp_tl_y - 10),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 1)
+            cv2.rectangle(image, (tmp_tl_x, tmp_tl_y),
+                          (tmp_br_x, tmp_br_y), (0, 0, 255), 1)
+
+    for i in range(0, len(results["text"])):
+        if main_player in results["text"][i]:
             positions[2] = results["left"][i] + (results["width"][i]/2)
             positions[3] = results["top"][i] + (results["height"][i]/2)
-        elif results["text"][i] == curr_player:
-            positions[2] = results["left"][i] + (results["width"][i]/2)
-            positions[3] = results["top"][i] + (results["height"][i]/2)
+            # print("found main player at {},{}".format(
+            #     positions[2], positions[3]))
+        elif curr_player in results["text"][i]:
+            positions[0] = results["left"][i] + (results["width"][i]/2)
+            positions[1] = results["top"][i] + (results["height"][i]/2)
+            # print("found current player at {},{}".format(
+            #     positions[0], positions[1]))
 
         # if(tmp_level == 5):
         #     cv2.putText(image, text, (tmp_tl_x, tmp_tl_y - 10),
@@ -56,9 +78,9 @@ while(True):
         #     cv2.rectangle(image, (tmp_tl_x, tmp_tl_y),
         #                   (tmp_br_x, tmp_br_y), (0, 0, 255), 1)
     xrel = positions[2] - positions[0]
-    yrel = positions[3] - positions[1]
+    yrel = positions[1] - positions[3]
     print("xrel: {}, yrel: {}".format(xrel, yrel))
-    #cv2.imshow('Filtered', image)
+    cv2.imshow('Filtered', image)
 
     # debug the loop rate
     # print('FPS {}'.format(1 / (time() - loop_time)))
