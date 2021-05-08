@@ -10,3 +10,5 @@ key.key
 player.txt
 # this will hold the bot player name
 currplayer.txt
+# vscode settings
+.vscode/
