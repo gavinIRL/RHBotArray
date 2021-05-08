@@ -133,17 +133,17 @@ class ClientKeypressListener():
             self.listener.start()
 
     def on_press(self, key):
-        if key == KeyCode(char='r'):
+        if key == KeyCode(char='4'):
             print("Exiting bot")
             for server in self.list_servers:
                 server.delay = 0
                 server.send_message("quit,1")
             os._exit(1)
         if self.transmitting:
-            if key == KeyCode(char='q'):
+            if key == KeyCode(char='1'):
                 self.transmitting = False
                 print("TRANSMIT OFF")
-            elif key == KeyCode(char='w'):
+            elif key == KeyCode(char='2'):
                 self.delay_enabled = not self.delay_enabled
                 if self.delay_enabled:
                     if self.delay_min == 0:
@@ -157,7 +157,7 @@ class ClientKeypressListener():
                     for server in self.list_servers:
                         server.delay = 0
                     print("DELAY OFF")
-            elif key == KeyCode(char='e'):
+            elif key == KeyCode(char='3'):
                 self.x_loot_only = not self.x_loot_only
                 if self.x_loot_only:
                     for server in self.list_servers:
@@ -172,7 +172,7 @@ class ClientKeypressListener():
                     for server in self.list_servers:
                         server.send_message(str(key)+",down")
                     self.unreleased_keys.append(str(key))
-        elif key == KeyCode(char='q'):
+        elif key == KeyCode(char='1'):
             self.transmitting = True
             self.delay_enabled = False
             for server in self.list_servers:
@@ -180,11 +180,11 @@ class ClientKeypressListener():
             print("TRANSMIT ON")
 
     def on_release(self, key):
-        if key == KeyCode(char='q'):
+        if key == KeyCode(char='1'):
             pass
-        elif key == KeyCode(char='w'):
+        elif key == KeyCode(char='2'):
             pass
-        elif key == KeyCode(char='e'):
+        elif key == KeyCode(char='3'):
             pass
         elif self.transmitting:
             if GetWindowText(GetForegroundWindow()) == self.gamename:
