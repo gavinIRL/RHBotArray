@@ -64,7 +64,7 @@ class ListenServerTest2():
         output = subprocess.run(
             "ipconfig", capture_output=True).stdout.decode()
         _, output = output.split("IPv4 Address. . . . . . . . . . . : 169")
-        output, _ = output.split("Subnet Mask")
+        output, _ = output.split("Subnet Mask", maxsplit=1)
         current_lan_ip = "169" + output.strip()
         return current_lan_ip
 
@@ -105,6 +105,15 @@ class ListenServerTest2():
         truex = int((relx + self.game_wincap.window_rect[0]))
         truey = int((rely + self.game_wincap.window_rect[1]))
         return truex, truey
+
+    def regroup(self):
+        # This will calculate the relative position of main player
+        # relative to the current bot player
+        # and then move towards the main player
+        # This will use dynamic velocity calculation to determine
+        # time at which bot will arrive at target
+        # trialling a potential upgrade to standard follower bot
+        pass
 
     def loot_if_available(self):
         # get an updated image of the game at specified area
@@ -213,7 +222,8 @@ class ListenServerTest2():
                     key = self.convert_pynput_to_pag(
                         button.replace("'", ""))
                     pydirectinput.keyUp(key)
-
+            elif button == "regroup":
+                self.regroup()
             elif direction == "down":
                 key = self.convert_pynput_to_pag(
                     button.replace("'", ""))
