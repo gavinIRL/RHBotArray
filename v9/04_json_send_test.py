@@ -8,6 +8,7 @@ import sys
 from pynput.keyboard import Key, Listener, KeyCode
 from pynput import mouse, keyboard
 from random import randint
+import json
 
 
 class ListenClientTest():
@@ -105,6 +106,10 @@ class ClientKeypressListener():
         self.listener = None
         self.unreleased_keys = []
 
+        with open("13.json", 'r') as jsonfile:
+            # parse the json
+            self.data = json.load(jsonfile)
+
     def start_keypress_listener(self):
         if self.listener == None:
             self.listener = Listener(on_press=self.on_press,
@@ -113,12 +118,12 @@ class ClientKeypressListener():
 
     def on_press(self, key):
         if str(key) not in self.unreleased_keys:
-            self.client.send_message(str(key)+",down")
-            self.unreleased_keys.append(str(key))
+            if key == KeyCode(char='1'):
+                self.client.send_message(self.data)
+                self.unreleased_keys.append(str(key))
 
     def on_release(self, key):
-        self.client.send_message(str(key)+",up")
-        self.unreleased_keys.remove(str(key))
+        pass
 
 
 if __name__ == "__main__":
