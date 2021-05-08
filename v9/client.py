@@ -167,6 +167,8 @@ class ClientKeypressListener():
                     for server in self.list_servers:
                         server.send_message("xlootonly,off")
                     print("LOOT OFF")
+            elif key == KeyCode(char='5'):
+                server.send_message("regroup,1")
             elif GetWindowText(GetForegroundWindow()) == self.gamename:
                 if str(key) not in self.unreleased_keys:
                     for server in self.list_servers:
@@ -185,6 +187,8 @@ class ClientKeypressListener():
         elif key == KeyCode(char='2'):
             pass
         elif key == KeyCode(char='3'):
+            pass
+        elif key == KeyCode(char='5'):
             pass
         elif self.transmitting:
             if GetWindowText(GetForegroundWindow()) == self.gamename:
