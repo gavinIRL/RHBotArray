@@ -63,9 +63,9 @@ class ListenServerTest2():
     def grab_current_lan_ip(self):
         output = subprocess.run(
             "ipconfig", capture_output=True).stdout.decode()
-        _, output = output.split("IPv4 Address. . . . . . . . . . . : 192")
+        _, output = output.split("IPv4 Address. . . . . . . . . . . : 169")
         output, _ = output.split("Subnet Mask")
-        current_lan_ip = "192" + output.strip()
+        current_lan_ip = "169" + output.strip()
         return current_lan_ip
 
     def convert_pynput_to_pag(self, button):
