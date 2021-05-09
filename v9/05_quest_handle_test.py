@@ -9,6 +9,8 @@ from windowcapture import WindowCapture
 from vision import Vision
 import cv2
 import pytesseract
+import ctypes
+import pydirectinput
 
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
@@ -19,6 +21,8 @@ class QuestHandleTest():
 
         with open("gamename.txt") as f:
             gamename = f.readline()
+        self.game_wincap = WindowCapture(self.gamename)
+
         self.white_text_filter = HsvFilter(
             0, 0, 102, 45, 65, 255, 0, 0, 0, 0)
         self.yellow_text_filter = HsvFilter(
@@ -55,11 +59,12 @@ class QuestHandleTest():
 
     def on_press(self, key):
         if key == keyboard.Key.f12:
-            while not self.check_for_accept():
-                # this will loop through checking for everything
-                # until it finds something, otherwise sleeps
-                # the full loops themselves make the sleep time redundant
-                time.sleep(0.01)
+            if self.check_for_accept():
+                print("Found and clicked")
+            else:
+                print("Didn't find anything")
+            # while not self.check_for_accept():
+            #     time.sleep(0.01)
 
     def on_release(self, key):
         if key == keyboard.Key.f11:
@@ -68,7 +73,14 @@ class QuestHandleTest():
     def convert_and_click(self, x, y, rect):
         # this will convert a click at a specific subrectangle point
         # into a proper click point and then click it
-        pass
+        self.game_wincap.update_window_position(border=False)
+        truex = int(x + self.game_wincap.window_rect[0] + rect[0])
+        truey = int(y + self.game_wincap.window_rect[1] + rect[1])
+        ctypes.windll.user32.SetCursorPos(truex, truey)
+        ctypes.windll.user32.mouse_event(
+            0x0002, 0, 0, 0, 0)
+        ctypes.windll.user32.mouse_event(
+            0x0004, 0, 0, 0, 0)
 
     def check_for_accept(self):
         # Copy-paste checklist:
@@ -198,11 +210,9 @@ class QuestHandleTest():
         detection = False
         for i in range(0, len(results["text"])):
             if "Press" in results["text"][i]:
-                # at this point need to grab the centre of the rect
-                x = results["left"][i] + (results["width"][i]/2)
-                y = results["top"][i] + (results["height"][i]/2)
-                # and then click at this position
-                self.convert_and_click(x, y, self.xprompt_rect)
+                pydirectinput.keyDown("x")
+                time.sleep(0.1)
+                pydirectinput.keyUp("x")
                 detection = True
                 break
         # If didn't find an accept then go to the next one
