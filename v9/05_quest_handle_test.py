@@ -32,19 +32,19 @@ class QuestHandleTest():
 
         self.vision = Vision('xprompt67filtv2.jpg')
 
-        self.accept_rect = [210, 60, 1455, 650]
+        self.accept_rect = [725, 525, 925, 595]
         self.accept_wincap = WindowCapture(gamename, self.accept_rect)
 
-        self.skip_rect = [210, 60, 1455, 650]
+        self.skip_rect = [730, 740, 890, 780]
         self.skip_wincap = WindowCapture(gamename, self.skip_rect)
 
-        self.next_rect = [210, 60, 1455, 650]
+        self.next_rect = [880, 740, 1040, 780]
         self.next_wincap = WindowCapture(gamename, self.next_rect)
 
         self.quest_rect = [210, 60, 1455, 650]
         self.quest_wincap = WindowCapture(gamename, self.quest_rect)
 
-        self.xprompt_rect = [210, 60, 1455, 650]
+        self.xprompt_rect = [1130, 670, 1250, 720]
         self.xprompt_wincap = WindowCapture(gamename, self.xprompt_rect)
 
     def start(self):
