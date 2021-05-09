@@ -336,11 +336,10 @@ class ListenServerTest2():
             elif button == "quit":
                 print("Shutting down server")
                 os._exit(1)
-            elif button == "xlootonly":
-                if direction == "on":
-                    self.x_loot_only = True
-                else:
-                    self.x_loot_only = False
+            elif button == "revive":
+                pydirectinput.keyDown("x")
+                time.sleep(0.1)
+                pydirectinput.keyUp("x")
             elif button == "'x'":
                 if self.x_loot_only:
                     if direction == "down":
