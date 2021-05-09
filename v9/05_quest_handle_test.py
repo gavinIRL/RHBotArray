@@ -17,11 +17,11 @@ os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 class QuestHandleTest():
     def __init__(self) -> None:
-        self.listener == None
+        self.listener = None
 
         with open("gamename.txt") as f:
             gamename = f.readline()
-        self.game_wincap = WindowCapture(self.gamename)
+        self.game_wincap = WindowCapture(gamename)
 
         self.white_text_filter = HsvFilter(
             0, 0, 102, 45, 65, 255, 0, 0, 0, 0)
@@ -29,6 +29,8 @@ class QuestHandleTest():
             16, 71, 234, 33, 202, 255, 0, 0, 0, 0)
         self.blue_text_filter = HsvFilter(
             94, 188, 255, 137, 255, 255, 0, 0, 0, 0)
+        self.all_text_filter = HsvFilter(
+            0, 0, 61, 78, 255, 255, 0, 255, 0, 0)
 
         self.vision = Vision('xprompt67filtv2.jpg')
 
@@ -44,10 +46,15 @@ class QuestHandleTest():
         self.quest_rect = [210, 60, 1455, 650]
         self.quest_wincap = WindowCapture(gamename, self.quest_rect)
 
+        self.questlist_rect = [740, 240, 1050, 580]
+        self.questlist_wincap = WindowCapture(gamename, self.questlist_rect)
+
         self.xprompt_rect = [1130, 670, 1250, 720]
         self.xprompt_wincap = WindowCapture(gamename, self.xprompt_rect)
 
     def start(self):
+        time.sleep(2)
+        self.start_keypress_listener()
         while True:
             time.sleep(0.5)
 
@@ -68,7 +75,7 @@ class QuestHandleTest():
 
     def on_release(self, key):
         if key == keyboard.Key.f11:
-            os._exit()
+            os._exit(1)
 
     def convert_and_click(self, x, y, rect):
         # this will convert a click at a specific subrectangle point
@@ -194,6 +201,35 @@ class QuestHandleTest():
             # at which point it will return true and satisfy the listener condition
             # However if it goes through all the checks and doesn't find anything
             # it will return false which will cause the listener condition to loop again
+            return self.check_for_questlist()
+        else:
+            return True
+
+    def check_for_questlist(self):
+        # Copy-paste checklist:
+        # wincap, filter, phrase, rect, return
+        image = self.questlist_wincap.get_screenshot()
+        image = self.vision.apply_hsv_filter(
+            image, self.all_text_filter)
+        rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        results = pytesseract.image_to_data(
+            rgb, output_type=pytesseract.Output.DICT, lang='eng')
+        detection = False
+        for i in range(0, len(results["text"])):
+            if "LV" in results["text"][i]:
+                # at this point need to grab the centre of the rect
+                x = results["left"][i] + (results["width"][i]/2)
+                y = results["top"][i] + (results["height"][i]/2)
+                # and then click at this position
+                self.convert_and_click(x, y, self.questlist_rect)
+                detection = True
+                break
+        # If didn't find an accept then go to the next one
+        if not detection:
+            # This will branch downwards until eventually detects something
+            # at which point it will return true and satisfy the listener condition
+            # However if it goes through all the checks and doesn't find anything
+            # it will return false which will cause the listener condition to loop again
             return self.check_for_xprompt()
         else:
             return True
@@ -224,3 +260,8 @@ class QuestHandleTest():
             return False
         else:
             return True
+
+
+if __name__ == "__main__":
+    qht = QuestHandleTest()
+    qht.start()
