@@ -87,6 +87,7 @@ class ClientKeypressListener():
         else:
             self.delay_enabled = True
         self.x_loot_only = True
+        self.autoloot_enabled = False
 
         self.scaling = ClientUtils.get_monitor_scaling()
         # print("Scaling={}".format(self.scaling))
@@ -169,11 +170,19 @@ class ClientKeypressListener():
                     print("LOOT OFF")
             elif key == KeyCode(char='5'):
                 server.send_message("regroup,1")
+                print("Regrouping...")
             elif GetWindowText(GetForegroundWindow()) == self.gamename:
                 if str(key) not in self.unreleased_keys:
                     for server in self.list_servers:
                         server.send_message(str(key)+",down")
                     self.unreleased_keys.append(str(key))
+            elif key == KeyCode(char='6'):
+                if self.autoloot_enabled:
+                    server.send_message("autoloot,on")
+                    print("AUTOLOOT ON")
+                else:
+                    server.send_message("autoloot,off")
+                    print("AUTOLOOT OFF")
         elif key == KeyCode(char='1'):
             self.transmitting = True
             self.delay_enabled = False
