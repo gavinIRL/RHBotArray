@@ -159,15 +159,9 @@ class ClientKeypressListener():
                         server.delay = 0
                     print("DELAY OFF")
             elif key == KeyCode(char='3'):
-                self.x_loot_only = not self.x_loot_only
-                if self.x_loot_only:
-                    for server in self.list_servers:
-                        server.send_message("xlootonly,on")
-                    print("LOOT ON")
-                else:
-                    for server in self.list_servers:
-                        server.send_message("xlootonly,off")
-                    print("LOOT OFF")
+                for server in self.list_servers:
+                    server.send_message("revive,1")
+                print("Reviving...")
             elif key == KeyCode(char='5'):
                 server.send_message("regroup,1")
                 print("Regrouping...")
@@ -177,11 +171,14 @@ class ClientKeypressListener():
                         server.send_message(str(key)+",down")
                     self.unreleased_keys.append(str(key))
             elif key == KeyCode(char='6'):
+                self.autoloot_enabled = not self.autoloot_enabled
                 if self.autoloot_enabled:
-                    server.send_message("autoloot,on")
+                    for server in self.list_servers:
+                        server.send_message("autoloot,on")
                     print("AUTOLOOT ON")
                 else:
-                    server.send_message("autoloot,off")
+                    for server in self.list_servers:
+                        server.send_message("autoloot,off")
                     print("AUTOLOOT OFF")
         elif key == KeyCode(char='1'):
             self.transmitting = True
@@ -198,6 +195,8 @@ class ClientKeypressListener():
         elif key == KeyCode(char='3'):
             pass
         elif key == KeyCode(char='5'):
+            pass
+        elif key == KeyCode(char='6'):
             pass
         elif self.transmitting:
             if GetWindowText(GetForegroundWindow()) == self.gamename:
