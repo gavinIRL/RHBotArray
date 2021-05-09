@@ -1,0 +1,22 @@
+wantedboard,850, 430
+gate1,715, 720
+gate2,875, 435
+elma,815, 595
+ryan,770, 710
+georg,750, 580
+gina,795, 535
+ruska,835, 500
+dismantler,825, 490
+ruben,710, 560
+estel,705, 530
+alain,685, 530
+gorgon,660, 505
+patricia,640, 460
+gustav,635, 420
+winger,675, 420
+joheim,755, 410
+mayor,785, 480
+nadia,720, 320
+unoa,735, 465
+dog,720,495
+cathedralarea,565,475
