@@ -28,7 +28,7 @@ class QuestHandleTest():
         self.yellow_text_filter = HsvFilter(
             16, 71, 234, 33, 202, 255, 0, 0, 0, 0)
         self.blue_text_filter = HsvFilter(
-            94, 188, 255, 137, 255, 255, 0, 0, 0, 0)
+            83, 126, 85, 102, 255, 255, 0, 0, 0, 0)
         self.all_text_filter = HsvFilter(
             0, 0, 61, 78, 255, 255, 0, 255, 0, 0)
 
@@ -48,6 +48,8 @@ class QuestHandleTest():
 
         self.questlist_rect = [740, 240, 1050, 580]
         self.questlist_wincap = WindowCapture(gamename, self.questlist_rect)
+
+        self.complete_wincap = WindowCapture(gamename, self.next_rect)
 
         self.xprompt_rect = [1130, 670, 1250, 720]
         self.xprompt_wincap = WindowCapture(gamename, self.xprompt_rect)
@@ -222,6 +224,35 @@ class QuestHandleTest():
                 y = results["top"][i] + (results["height"][i]/2)
                 # and then click at this position
                 self.convert_and_click(x, y, self.questlist_rect)
+                detection = True
+                break
+        # If didn't find an accept then go to the next one
+        if not detection:
+            # This will branch downwards until eventually detects something
+            # at which point it will return true and satisfy the listener condition
+            # However if it goes through all the checks and doesn't find anything
+            # it will return false which will cause the listener condition to loop again
+            return self.check_for_complete()
+        else:
+            return True
+
+    def check_for_complete(self):
+        # Copy-paste checklist:
+        # wincap, filter, phrase, rect, return
+        image = self.complete_wincap.get_screenshot()
+        image = self.vision.apply_hsv_filter(
+            image, self.white_text_filter)
+        rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        results = pytesseract.image_to_data(
+            rgb, output_type=pytesseract.Output.DICT, lang='eng')
+        detection = False
+        for i in range(0, len(results["text"])):
+            if "Com" in results["text"][i]:
+                # at this point need to grab the centre of the rect
+                x = results["left"][i] + (results["width"][i]/2)
+                y = results["top"][i] + (results["height"][i]/2)
+                # and then click at this position
+                self.convert_and_click(x, y, self.next_rect)
                 detection = True
                 break
         # If didn't find an accept then go to the next one
