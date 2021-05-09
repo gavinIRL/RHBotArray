@@ -23,12 +23,15 @@ with open("gamename.txt") as f:
     gamename = f.readline()
 with open("player.txt") as f:
     main_player = f.readline()
-wincap = WindowCapture(gamename, [510, 260, 755, 450])
+x = 880
+y = 740
+wincap = WindowCapture(gamename, [x, y, x+160, y+40])
 # initialize the Vision class
 vision_limestone = Vision('xprompt67filtv2.jpg')
 # initialize the trackbar window
-# vision_limestone.init_control_gui()
-hsv_filter = HsvFilter(94, 188, 255, 137, 255, 255, 0, 0, 0, 0)
+vision_limestone.init_control_gui()
+# hsv_filter = HsvFilter(0, 0, 0, 255, 255, 255, 0, 0, 0, 0)
+hsv_filter = HsvFilter(0, 0, 102, 45, 65, 255, 0, 0, 0, 0)
 print("Setup time: {}s".format(time()-loop_time))
 
 loop_time = time()
@@ -55,6 +58,9 @@ while(True):
         conf = results["conf"][i]
         text = results["text"][i]
 
+        if "Next" in results["text"][i]:
+            print("Found it")
+
         if(tmp_level == 5):
             cv2.putText(image, text, (tmp_tl_x, tmp_tl_y - 10),
                         cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 1)
@@ -74,7 +80,6 @@ while(True):
         cv2.destroyAllWindows()
         break
 # print(text)
-print("Main player detected: {}".format(main_player in results["text"]))
 
 # print("Done")
 os._exit(1)
