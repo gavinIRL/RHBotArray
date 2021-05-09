@@ -1,5 +1,10 @@
-Fixed Buff
+Fixed
 Poor
 Decent
 Wiseman
+Enchant
 Voucher
+Key
+Consumable
+Special
+Gem
