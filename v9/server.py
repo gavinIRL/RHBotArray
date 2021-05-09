@@ -53,7 +53,6 @@ class ListenServerTest2():
 
         self.last_mouse_move = time.time() - 10
 
-        self.x_loot_only = True
         self.xprompt_filter, xprompt_custom_rect = grab_object_preset(
             object_name="prompt_press_x_pickup")
         self.xprompt_wincap = WindowCapture(
@@ -341,20 +340,10 @@ class ListenServerTest2():
                 time.sleep(0.1)
                 pydirectinput.keyUp("x")
             elif button == "'x'":
-                if self.x_loot_only:
-                    if direction == "down":
-                        self.loot_if_available()
-                    else:
-                        pydirectinput.keyUp("x")
-                elif direction == "down":
-                    key = self.convert_pynput_to_pag(
-                        button.replace("'", ""))
-                    # print(key)
-                    pydirectinput.keyDown(key)
-                elif direction == "up":
-                    key = self.convert_pynput_to_pag(
-                        button.replace("'", ""))
-                    pydirectinput.keyUp(key)
+                if direction == "down":
+                    self.loot_if_available()
+                else:
+                    pydirectinput.keyUp("x")
             elif button == "regroup":
                 self.regroup()
             elif button == "autoloot":
