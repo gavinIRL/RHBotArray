@@ -9,7 +9,9 @@ from windowcapture import WindowCapture
 import ctypes
 from cryptography.fernet import Fernet
 from vision import Vision
-from hsvfilter import grab_object_preset
+from hsvfilter import grab_object_preset, HsvFilter
+import cv2
+import pytesseract
 
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
@@ -56,6 +58,17 @@ class ListenServerTest2():
         self.xprompt_wincap = WindowCapture(
             self.gamename, xprompt_custom_rect)
         self.xprompt_vision = Vision("xprompt67filtv2.jpg")
+
+        # These are related to the regroup command
+        with open("player.txt") as f:
+            self.main_player = f.readline()
+        with open("currplayer.txt") as f:
+            self.curr_player = f.readline()
+        self.regroup_wincap = WindowCapture(
+            self.gamename, [210, 60, 1455, 650])
+        self.regroup_vision = Vision('xprompt67filtv2.jpg')
+        self.regroup_filter = HsvFilter(
+            94, 188, 255, 137, 255, 255, 0, 0, 0, 0)
 
     def move_mouse_centre(self):
         ctypes.windll.user32.SetCursorPos(self.centre_x, self.centre_y)
@@ -106,14 +119,117 @@ class ListenServerTest2():
         truey = int((rely + self.game_wincap.window_rect[1]))
         return truex, truey
 
+    def get_relative_dists(self):
+        # format is currplayer x, y, mainplayer x, y
+        positions = [0, 0, 0, 0]
+        # get an updated image of the game
+        image = self.regroup_wincap.get_screenshot()
+        # pre-process the image
+        image = self.regroup_vision.apply_hsv_filter(
+            image, self.regroup_filter)
+        rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        results = pytesseract.image_to_data(
+            rgb, output_type=pytesseract.Output.DICT, lang='eng')
+
+        no_find_curr = True
+        no_find_main = True
+        for i in range(0, len(results["text"])):
+            if self.main_player in results["text"][i]:
+                no_find_main = False
+                positions[2] = results["left"][i] + (results["width"][i]/2)
+                positions[3] = results["top"][i] + (results["height"][i]/2)
+            elif self.curr_player in results["text"][i]:
+                no_find_curr = False
+                positions[0] = results["left"][i] + (results["width"][i]/2)
+                positions[1] = results["top"][i] + (results["height"][i]/2)
+        xrel = positions[2] - positions[0]
+        yrel = positions[1] - positions[3]
+        if no_find_curr or no_find_main:
+            return False
+        else:
+            return[xrel, yrel]
+
+    def move_towards(self, dir, dists):
+        if dir == "x":
+            dist = dists[0]
+            if dist > 0:
+                key = "left"
+            else:
+                key = "right"
+        elif dir == "y":
+            dist = dists[1]
+            if dist > 0:
+                key = "down"
+            else:
+                key = "up"
+        if abs(dist) > 5:
+            pydirectinput.keyDown(key)
+
+    def resolve_direction(self, dir):
+        if dir == "x":
+            key1 = "left"
+            key2 = "right"
+            index = 0
+        elif dir == "y":
+            key1 = "down"
+            key2 = "up"
+            index = 1
+        else:
+            return False
+        # grab the first relative distance values
+        first_rel_dists = self.get_relative_dists()
+        # if was able to detect both
+        if first_rel_dists:
+            # then start resolving the x direction
+            self.move_towards(dir, first_rel_dists)
+            # perform another couple checks, timing the second
+            last_rel_dists = self.get_relative_dists()
+            # if can't detect player then stop moving
+            if not last_rel_dists:
+                # cancel all keypresses and break out
+                pydirectinput.keyUp(key1)
+                pydirectinput.keyUp(key2)
+                return False
+            start_time = time.time()
+            last_rel_dists = self.get_relative_dists()
+            # if can't detect player then stop moving
+            if not last_rel_dists:
+                # cancel all keypresses and break out
+                pydirectinput.keyUp(key1)
+                pydirectinput.keyUp(key2)
+                return False
+            end_time = time.time()
+            # now check if have overshot the target
+            dist_moved = abs(last_rel_dists[index] - first_rel_dists[index])
+            percent_moved = dist_moved / abs(first_rel_dists[index])
+            if percent_moved >= 1:
+                # in which case need to stop moving
+                pydirectinput.keyUp(key1)
+                pydirectinput.keyUp(key2)
+                # and if above a certain threshold then move back
+                if percent_moved >= 1.25:
+                    if first_rel_dists[index] > 0:
+                        pydirectinput.keyDown(key1)
+                        time.sleep(end_time-start_time)
+                        pydirectinput.keyUp(key1)
+                    else:
+                        pydirectinput.keyDown(key2)
+                        time.sleep(end_time-start_time)
+                        pydirectinput.keyUp(key2)
+            # otherwise calculate how much longer need to travel
+            else:
+                # doubled as only timed the second, will tweak this later
+                # suspect something like 1.8 may be more suitable
+                time_left = 2*((end_time-start_time)/percent_moved)
+                time.sleep(time_left)
+                pydirectinput.keyUp(key1)
+                pydirectinput.keyUp(key2)
+
     def regroup(self):
-        # This will calculate the relative position of main player
-        # relative to the current bot player
-        # and then move towards the main player
-        # This will use dynamic velocity calculation to determine
-        # time at which bot will arrive at target
-        # trialling a potential upgrade to standard follower bot
-        pass
+        # first resolve the x direction
+        self.resolve_direction("x")
+        # and now resolve the y direction
+        self.resolve_direction("y")
 
     def loot_if_available(self):
         # get an updated image of the game at specified area
