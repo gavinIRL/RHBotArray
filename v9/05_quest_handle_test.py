@@ -20,13 +20,28 @@ class QuestHandleTest():
         with open("gamename.txt") as f:
             gamename = f.readline()
         self.white_text_filter = HsvFilter(
-            0, 0, 176, 48, 55, 255, 0, 0, 0, 0)
+            0, 0, 102, 45, 65, 255, 0, 0, 0, 0)
         self.yellow_text_filter = HsvFilter(
             16, 71, 234, 33, 202, 255, 0, 0, 0, 0)
+        self.blue_text_filter = HsvFilter(
+            94, 188, 255, 137, 255, 255, 0, 0, 0, 0)
+
+        self.vision = Vision('xprompt67filtv2.jpg')
 
         self.accept_rect = [210, 60, 1455, 650]
         self.accept_wincap = WindowCapture(gamename, self.accept_rect)
-        self.accept_vision = Vision('xprompt67filtv2.jpg')
+
+        self.skip_rect = [210, 60, 1455, 650]
+        self.skip_wincap = WindowCapture(gamename, self.skip_rect)
+
+        self.next_rect = [210, 60, 1455, 650]
+        self.next_wincap = WindowCapture(gamename, self.next_rect)
+
+        self.quest_rect = [210, 60, 1455, 650]
+        self.quest_wincap = WindowCapture(gamename, self.quest_rect)
+
+        self.xprompt_rect = [210, 60, 1455, 650]
+        self.xprompt_wincap = WindowCapture(gamename, self.xprompt_rect)
 
     def start(self):
         while True:
@@ -59,14 +74,14 @@ class QuestHandleTest():
         # Copy-paste checklist:
         # wincap, vision, filter, phrase, rect, return
         image = self.accept_wincap.get_screenshot()
-        image = self.accept_vision.apply_hsv_filter(
+        image = self.vision.apply_hsv_filter(
             image, self.white_text_filter)
         rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         results = pytesseract.image_to_data(
             rgb, output_type=pytesseract.Output.DICT, lang='eng')
         detection = False
         for i in range(0, len(results["text"])):
-            if "accept" in results["text"][i]:
+            if "Accept" in results["text"][i]:
                 # at this point need to grab the centre of the rect
                 x = results["left"][i] + (results["width"][i]/2)
                 y = results["top"][i] + (results["height"][i]/2)
@@ -85,13 +100,117 @@ class QuestHandleTest():
             return True
 
     def check_for_skip(self):
-        pass
+        # Copy-paste checklist:
+        # wincap, filter, phrase, rect, return
+        image = self.skip_wincap.get_screenshot()
+        image = self.vision.apply_hsv_filter(
+            image, self.white_text_filter)
+        rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        results = pytesseract.image_to_data(
+            rgb, output_type=pytesseract.Output.DICT, lang='eng')
+        detection = False
+        for i in range(0, len(results["text"])):
+            if "Skip" in results["text"][i]:
+                # at this point need to grab the centre of the rect
+                x = results["left"][i] + (results["width"][i]/2)
+                y = results["top"][i] + (results["height"][i]/2)
+                # and then click at this position
+                self.convert_and_click(x, y, self.skip_rect)
+                detection = True
+                break
+        # If didn't find an accept then go to the next one
+        if not detection:
+            # This will branch downwards until eventually detects something
+            # at which point it will return true and satisfy the listener condition
+            # However if it goes through all the checks and doesn't find anything
+            # it will return false which will cause the listener condition to loop again
+            return self.check_for_next()
+        else:
+            return True
 
     def check_for_next(self):
-        pass
-
-    def check_for_xprompt(self):
-        pass
+        # Copy-paste checklist:
+        # wincap, filter, phrase, rect, return
+        image = self.next_wincap.get_screenshot()
+        image = self.vision.apply_hsv_filter(
+            image, self.white_text_filter)
+        rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        results = pytesseract.image_to_data(
+            rgb, output_type=pytesseract.Output.DICT, lang='eng')
+        detection = False
+        for i in range(0, len(results["text"])):
+            if "Next" in results["text"][i]:
+                # at this point need to grab the centre of the rect
+                x = results["left"][i] + (results["width"][i]/2)
+                y = results["top"][i] + (results["height"][i]/2)
+                # and then click at this position
+                self.convert_and_click(x, y, self.next_rect)
+                detection = True
+                break
+        # If didn't find an accept then go to the next one
+        if not detection:
+            # This will branch downwards until eventually detects something
+            # at which point it will return true and satisfy the listener condition
+            # However if it goes through all the checks and doesn't find anything
+            # it will return false which will cause the listener condition to loop again
+            return self.check_for_quest()
+        else:
+            return True
 
     def check_for_quest(self):
-        pass
+        # Copy-paste checklist:
+        # wincap, filter, phrase, rect, return
+        image = self.quest_wincap.get_screenshot()
+        image = self.vision.apply_hsv_filter(
+            image, self.white_text_filter)
+        rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        results = pytesseract.image_to_data(
+            rgb, output_type=pytesseract.Output.DICT, lang='eng')
+        detection = False
+        for i in range(0, len(results["text"])):
+            if "Quest" in results["text"][i]:
+                # at this point need to grab the centre of the rect
+                x = results["left"][i] + (results["width"][i]/2)
+                y = results["top"][i] + (results["height"][i]/2)
+                # and then click at this position
+                self.convert_and_click(x, y, self.quest_rect)
+                detection = True
+                break
+        # If didn't find an accept then go to the next one
+        if not detection:
+            # This will branch downwards until eventually detects something
+            # at which point it will return true and satisfy the listener condition
+            # However if it goes through all the checks and doesn't find anything
+            # it will return false which will cause the listener condition to loop again
+            return self.check_for_xprompt()
+        else:
+            return True
+
+    def check_for_xprompt(self):
+        # Copy-paste checklist:
+        # wincap, filter, phrase, rect, return
+        image = self.xprompt_wincap.get_screenshot()
+        image = self.vision.apply_hsv_filter(
+            image, self.blue_text_filter)
+        rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        results = pytesseract.image_to_data(
+            rgb, output_type=pytesseract.Output.DICT, lang='eng')
+        detection = False
+        for i in range(0, len(results["text"])):
+            if "Press" in results["text"][i]:
+                # at this point need to grab the centre of the rect
+                x = results["left"][i] + (results["width"][i]/2)
+                y = results["top"][i] + (results["height"][i]/2)
+                # and then click at this position
+                self.convert_and_click(x, y, self.xprompt_rect)
+                detection = True
+                break
+        # If didn't find an accept then go to the next one
+        if not detection:
+            # This will branch downwards until eventually detects something
+            # at which point it will return true and satisfy the listener condition
+            # However if it goes through all the checks and doesn't find anything
+            # it will return false which will cause the listener condition to loop again
+            return False
+        else:
+            return True
