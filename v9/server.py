@@ -1,5 +1,6 @@
 import socket
 import select
+import threading
 import pydirectinput
 import time
 import subprocess
@@ -69,6 +70,9 @@ class ListenServerTest2():
         self.regroup_vision = Vision('xprompt67filtv2.jpg')
         self.regroup_filter = HsvFilter(
             94, 188, 255, 137, 255, 255, 0, 0, 0, 0)
+
+        # These are related to the autoloot function
+        self.autoloot_enabled = False
 
     def move_mouse_centre(self):
         ctypes.windll.user32.SetCursorPos(self.centre_x, self.centre_y)
@@ -231,6 +235,18 @@ class ListenServerTest2():
         # and now resolve the y direction
         self.resolve_direction("y")
 
+    def auto_loot(self):
+        while self.autoloot_enabled:
+            if self.loot_if_available():
+                time.sleep(0.01)
+                pydirectinput.keyUp("x")
+                time.sleep(0.15)
+
+    def autoloot_thread_start(self):
+        t = threading.Thread(target=self.auto_loot, daemon=True)
+        self.autoloot_enabled = True
+        t.start()
+
     def loot_if_available(self):
         # get an updated image of the game at specified area
         xprompt_screenshot = self.xprompt_wincap.get_screenshot()
@@ -244,6 +260,8 @@ class ListenServerTest2():
         if len(xprompt_rectangles) == 1:
             pydirectinput.keyDown("x")
             # keyup performed in main loop
+            # return True for autoloot
+            return True
 
     def get_monitor_scaling(self):
         user32 = ctypes.windll.user32
@@ -340,6 +358,11 @@ class ListenServerTest2():
                     pydirectinput.keyUp(key)
             elif button == "regroup":
                 self.regroup()
+            elif button == "autoloot":
+                if direction == "on":
+                    self.autoloot_thread_start()
+                else:
+                    self.autoloot_enabled = False
             elif direction == "down":
                 key = self.convert_pynput_to_pag(
                     button.replace("'", ""))
