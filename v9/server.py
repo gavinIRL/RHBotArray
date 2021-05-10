@@ -13,6 +13,7 @@ from vision import Vision
 from hsvfilter import grab_object_preset, HsvFilter
 import cv2
 import pytesseract
+from quest_handle import QuestHandle
 
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
@@ -72,6 +73,9 @@ class ListenServerTest2():
 
         # These are related to the autoloot function
         self.autoloot_enabled = False
+
+        # These are related to the questhandling
+        self.quest_handle = QuestHandle()
 
     def move_mouse_centre(self):
         ctypes.windll.user32.SetCursorPos(self.centre_x, self.centre_y)
@@ -351,6 +355,8 @@ class ListenServerTest2():
                     self.autoloot_thread_start()
                 else:
                     self.autoloot_enabled = False
+            elif button == "questhandle":
+                self.quest_handle.start_quest_handle()
             elif direction == "down":
                 key = self.convert_pynput_to_pag(
                     button.replace("'", ""))
