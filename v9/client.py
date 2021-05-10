@@ -14,6 +14,7 @@ import threading
 import time
 import os
 from cryptography.fernet import Fernet
+from quest_handle import QuestHandle
 
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
@@ -88,6 +89,8 @@ class ClientKeypressListener():
             self.delay_enabled = True
         self.x_loot_only = True
         self.autoloot_enabled = False
+
+        self.quest_handle = QuestHandle()
 
         self.scaling = ClientUtils.get_monitor_scaling()
         # print("Scaling={}".format(self.scaling))
@@ -180,6 +183,11 @@ class ClientKeypressListener():
                     for server in self.list_servers:
                         server.send_message("autoloot,off")
                     print("AUTOLOOT OFF")
+            elif key == KeyCode(char='8'):
+                for server in self.list_servers:
+                    server.send_message("questhandle,1")
+                self.quest_handle.start_quest_handle()
+
         elif key == KeyCode(char='1'):
             self.transmitting = True
             self.delay_enabled = False
@@ -197,6 +205,8 @@ class ClientKeypressListener():
         elif key == KeyCode(char='5'):
             pass
         elif key == KeyCode(char='6'):
+            pass
+        elif key == KeyCode(char='8'):
             pass
         elif self.transmitting:
             if GetWindowText(GetForegroundWindow()) == self.gamename:
