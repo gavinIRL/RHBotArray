@@ -14,11 +14,13 @@ Version 9 has resolved a number of the problems (along with a network switch for
 With the completion of Version 8 it has become clear that this method of botting is definitely viable despite having a few minor quirks and issues. Levelling with 2 sidekick bots has been much much faster than solo thereby increasing the power compared to solo rather than being a distraction. However there are some minor annoyances that need to be addressed.
 
 ### List of current problems and annoyances
-* When in town and completing or starting questlines there is an inconsistency between the player actions and the bot actions which snowballs if an issue arises, in particular if delay is enabled. UPDATE: it has been observed that part of the reason for this is that events (text readout, loading) happen a lot quicker on the main PC compared to the other, even though the "slower" PCs actually have faster storage and better processors. The difference is actually ~5 times for certain events and therefore not negligible.
+* When in town and completing or starting questlines there is an inconsistency between the player actions and the bot actions which snowballs if an issue arises, in particular if delay is enabled. To maintain a natural-looking group, delayed movement is required. UPDATE: it has been observed that part of the reason for this is that events (text readout, loading) happen a lot quicker on the main PC compared to the other, even though the "slower" PCs actually have faster storage and better processors. The difference is actually ~5 times for certain events and therefore not negligible.
+
 * There is a not-insignificant amount of time spending selling the useless loot that each bot has collected at the end of each level which has resulted in a tendency to wait multiple levels and then sell all at once.
 
 ### Proposed solutions to problems and annoyances
-* In-town actions (i.e. "delay" mode) could be transmitted as a block of actions with recorded spacing rather than either time-delayed or instant. This should hopefully reduce the issues arising from communication lag.
+* In-town actions (i.e. "delay" mode) could be transmitted as a block of actions with recorded spacing rather than either time-delayed or instant. This should hopefully reduce the issues arising from communication lag. The addition of a "quest handler" button has also helped immensely so far.
+
 * Developing an automated loot-selling hotkey to speed up end-of-level actions would save even more time.
 
 ## Current Status
