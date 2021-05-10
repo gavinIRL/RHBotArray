@@ -23,6 +23,11 @@ class BatchRecordTest():
         self.start_time = 0
         self.batch = ""
 
+    def start(self):
+        self.start_keypress_listener()
+        while True:
+            time.sleep(0.5)
+
     def start_keypress_listener(self):
         if self.listener == None:
             self.listener = Listener(on_press=self.on_press,
@@ -33,6 +38,7 @@ class BatchRecordTest():
         if key == keyboard.Key.f12:
             self.recording_ongoing = not self.recording_ongoing
             if self.recording_ongoing:
+                print("Starting recording...")
                 self.start_time = time.time()
             if not self.recording_ongoing:
                 # would send the batch at this point
@@ -40,11 +46,11 @@ class BatchRecordTest():
                 print(self.batch)
                 # and then clear the batch
                 self.batch = ""
-                pass
+                print("Batch finished")
         elif self.recording_ongoing:
             # Need to log the action and add to batch for sending later
             self.batch += str(key) + "|keyDown|" + \
-                str(time.time() - self.start_time) + "|0,0\n"
+                "{:.3f}".format((time.time() - self.start_time)) + "|0,0\n"
 
     def on_release(self, key):
         if key == keyboard.Key.f12:
@@ -54,4 +60,9 @@ class BatchRecordTest():
         elif self.recording_ongoing:
             # log the key release also
             self.batch += str(key) + "|keyUp|" + \
-                str(time.time() - self.start_time) + "|0,0\n"
+                "{:.3f}".format((time.time() - self.start_time)) + "|0,0\n"
+
+
+if __name__ == "__main__":
+    brt = BatchRecordTest()
+    brt.start()
