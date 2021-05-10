@@ -55,7 +55,7 @@ class QuestHandle():
 
     def start_quest_handle(self):
         start_time = time.time()
-        while time.time() < start_time + 3:
+        while time.time() < start_time + 2:
             if self.check_for_accept():
                 break
 
