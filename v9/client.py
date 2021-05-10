@@ -186,12 +186,7 @@ class ClientKeypressListener():
             elif key == KeyCode(char='8'):
                 for server in self.list_servers:
                     server.send_message("questhandle,1")
-                start_time = time.time()
                 self.quest_handle.start_quest_handle()
-                end_time = time.time()
-                if end_time - start_time < 2:
-                    time.sleep(2-(end_time-start_time))
-                print("Quest handle done")
 
         elif key == KeyCode(char='1'):
             self.transmitting = True
