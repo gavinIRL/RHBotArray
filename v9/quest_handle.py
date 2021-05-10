@@ -17,7 +17,6 @@ os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 class QuestHandle():
     def __init__(self) -> None:
-        self.listener = None
 
         with open("gamename.txt") as f:
             gamename = f.readline()
