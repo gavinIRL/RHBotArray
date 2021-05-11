@@ -33,6 +33,7 @@ class BatchRecordTest():
                     # need to first check if there are still keys pressed down
                     if len(self.pressed_keys) == 0:
                         print("Sending batch now due to time")
+                        self.start_time = time.time()
                         # print(self.batch)
                         self.batch = ""
 
@@ -80,6 +81,7 @@ class BatchRecordTest():
                 # need to first check if there are still keys pressed down
                 if len(self.pressed_keys) == 0:
                     print("Sending batch now due to size")
+                    self.start_time = time.time()
                     # print(self.batch)
                     self.batch = ""
 
