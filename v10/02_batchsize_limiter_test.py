@@ -22,6 +22,7 @@ class BatchRecordTest():
         self.recording_ongoing = False
         self.start_time = 0
         self.batch = ""
+        self.pressed_keys = []
 
     def start(self):
         self.start_keypress_listener()
@@ -61,6 +62,21 @@ class BatchRecordTest():
             # log the key release also
             self.batch += str(key) + "|keyUp|" + \
                 "{:.3f}".format((time.time() - self.start_time)) + "|0,0\n"
+            # if batch goes on for too long then stop and send
+            if time.time > self.start_time + 10:
+                # need to first check if there are still keys pressed down
+                if len(self.pressed_keys) == 0:
+                    self.recording_ongoing = False
+                    print("Sending batch now due to time")
+                    print(self.batch)
+                    self.batch = ""
+            elif len(self.batch) > 2500:
+                # need to first check if there are still keys pressed down
+                if len(self.pressed_keys) == 0:
+                    self.recording_ongoing = False
+                    print("Sending batch now due to size")
+                    print(self.batch)
+                    self.batch = ""
 
 
 if __name__ == "__main__":
