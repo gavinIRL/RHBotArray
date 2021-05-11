@@ -79,7 +79,6 @@ class BatchRecordTest():
                     print("Sending batch now due to size")
                     print(self.batch)
                     self.batch = ""
-        else:
             try:
                 self.pressed_keys.remove(key)
             except:
