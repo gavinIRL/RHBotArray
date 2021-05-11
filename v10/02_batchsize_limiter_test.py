@@ -64,6 +64,10 @@ class BatchRecordTest():
             # log the key release also
             self.batch += str(key) + "|keyUp|" + \
                 "{:.3f}".format((time.time() - self.start_time)) + "|0,0\n"
+            try:
+                self.pressed_keys.remove(key)
+            except:
+                print("Error in key release of "+str(key))
             # if batch goes on for too long then stop and send
             if time.time() > self.start_time + 10:
                 # need to first check if there are still keys pressed down
@@ -79,10 +83,6 @@ class BatchRecordTest():
                     print("Sending batch now due to size")
                     print(self.batch)
                     self.batch = ""
-            try:
-                self.pressed_keys.remove(key)
-            except:
-                print("Error in key release of "+str(key))
 
 
 if __name__ == "__main__":
