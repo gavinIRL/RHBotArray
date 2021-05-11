@@ -50,8 +50,10 @@ class BatchRecordTest():
                 print("Batch finished")
         elif self.recording_ongoing:
             # Need to log the action and add to batch for sending later
-            self.batch += str(key) + "|keyDown|" + \
-                "{:.3f}".format((time.time() - self.start_time)) + "|0,0\n"
+            if key not in self.pressed_keys:
+                self.batch += str(key) + "|keyDown|" + \
+                    "{:.3f}".format((time.time() - self.start_time)) + "|0,0\n"
+                self.pressed_keys.append(key)
 
     def on_release(self, key):
         if key == keyboard.Key.f12:
@@ -77,6 +79,11 @@ class BatchRecordTest():
                     print("Sending batch now due to size")
                     print(self.batch)
                     self.batch = ""
+        else:
+            try:
+                self.pressed_keys.remove(key)
+            except:
+                print("Error in key release of "+str(key))
 
 
 if __name__ == "__main__":
