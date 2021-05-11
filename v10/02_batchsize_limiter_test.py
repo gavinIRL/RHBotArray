@@ -28,6 +28,13 @@ class BatchRecordTest():
         self.start_keypress_listener()
         while True:
             time.sleep(0.5)
+            if self.recording_ongoing:
+                if time.time() > self.start_time + 10:
+                    # need to first check if there are still keys pressed down
+                    if len(self.pressed_keys) == 0:
+                        print("Sending batch now due to time")
+                        # print(self.batch)
+                        self.batch = ""
 
     def start_keypress_listener(self):
         if self.listener == None:
@@ -68,20 +75,12 @@ class BatchRecordTest():
                 self.pressed_keys.remove(key)
             except:
                 print("Error in key release of "+str(key))
-            # if batch goes on for too long then stop and send
-            if time.time() > self.start_time + 10:
+            # if batch gets too big then send
+            if len(self.batch) > 2500:
                 # need to first check if there are still keys pressed down
                 if len(self.pressed_keys) == 0:
-                    self.recording_ongoing = False
-                    print("Sending batch now due to time")
-                    print(self.batch)
-                    self.batch = ""
-            elif len(self.batch) > 2500:
-                # need to first check if there are still keys pressed down
-                if len(self.pressed_keys) == 0:
-                    self.recording_ongoing = False
                     print("Sending batch now due to size")
-                    print(self.batch)
+                    # print(self.batch)
                     self.batch = ""
 
 
