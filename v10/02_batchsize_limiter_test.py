@@ -65,7 +65,7 @@ class BatchRecordTest():
             self.batch += str(key) + "|keyUp|" + \
                 "{:.3f}".format((time.time() - self.start_time)) + "|0,0\n"
             # if batch goes on for too long then stop and send
-            if time.time > self.start_time + 10:
+            if time.time() > self.start_time + 10:
                 # need to first check if there are still keys pressed down
                 if len(self.pressed_keys) == 0:
                     self.recording_ongoing = False
