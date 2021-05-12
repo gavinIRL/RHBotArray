@@ -31,6 +31,7 @@ class BatchRecordTest():
         self.scaling = ClientUtils.get_monitor_scaling()
 
     def start(self):
+        self.start_mouse_listener()
         self.start_keypress_listener()
         while True:
             time.sleep(0.5)
@@ -49,20 +50,21 @@ class BatchRecordTest():
         self.mouse_listener.start()
 
     def on_click(self, x, y, button, pressed):
-        # Need to then check if the click was in the right window
-        # Do this by checking if window focused
-        if GetWindowText(GetForegroundWindow()) == self.gamename:
-            # when pressed is False, that means it's a release event.
-            # let's listen only to mouse click releases
-            if not pressed:
-                # Need to get the ratio compared to window top left
-                # This will allow common usage on other size monitors
-                # print("x={}, y={}".format(x, y))
-                xratio, yratio = self.convert_click_to_ratio(x, y)
-                # print("xrat={}, yrat={}".format(xratio, yratio))
-                self.batch += str(button) + "|click|" + \
-                    "{:.3f}".format((time.time() - self.start_time)) + \
-                    "|"+"{},{}\n".format(xratio, yratio)
+        if self.recording_ongoing:
+            # Need to then check if the click was in the right window
+            # Do this by checking if window focused
+            if GetWindowText(GetForegroundWindow()) == self.gamename:
+                # when pressed is False, that means it's a release event.
+                # let's listen only to mouse click releases
+                if not pressed:
+                    # Need to get the ratio compared to window top left
+                    # This will allow common usage on other size monitors
+                    # print("x={}, y={}".format(x, y))
+                    xratio, yratio = self.convert_click_to_ratio(x, y)
+                    # print("xrat={}, yrat={}".format(xratio, yratio))
+                    self.batch += str(button) + "|click|" + \
+                        "{:.3f}".format((time.time() - self.start_time)) + \
+                        "|"+"{:.5f},{:.5f}\n".format(xratio, yratio)
 
     def start_keypress_listener(self):
         if self.listener == None:
