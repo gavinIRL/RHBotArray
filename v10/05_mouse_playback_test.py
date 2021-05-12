@@ -15,7 +15,22 @@ os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 class BatchPlaybackTest():
     def __init__(self) -> None:
-        pass
+        with open("gamename.txt") as f:
+            self.gamename = f.readline()
+        self.game_wincap = WindowCapture(self.gamename)
+
+    def convert_ratio_to_click(self, ratx, raty):
+        # This will grab the current rectangle coords of game window
+        # and then turn the ratio of positions versus the game window
+        # into true x,y coords
+        self.game_wincap.update_window_position(border=False)
+        # Turn the ratios into relative
+        relx = int(ratx * self.game_wincap.w)
+        rely = int(raty * self.game_wincap.h)
+        # Turn the relative into true
+        truex = int((relx + self.game_wincap.window_rect[0]))
+        truey = int((rely + self.game_wincap.window_rect[1]))
+        return truex, truey
 
     def play_actions(self):
         with open("playback1.txt", 'r') as file:
