@@ -34,6 +34,9 @@ class BatchPlaybackTest():
                 # do the action
                 if line[1] == "keyDown":
                     print("Would press {} down now".format(line[0]))
+                elif line[1] == "click":
+                    x, y = line[3].split(",")
+                    print("Would click at {},{} now".format(x, y))
                 try:
                     next_action = converted[idx + 1]
                 except IndexError:
