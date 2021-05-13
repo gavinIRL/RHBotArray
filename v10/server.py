@@ -275,7 +275,7 @@ class ListenServerTest2():
 
     def batch_handle(self, lines: str):
         data = lines.split("\n")
-        data.pop[0]
+        data.pop(0)
         converted = []
         # now convert each line into a list
         for line in data:
@@ -293,6 +293,8 @@ class ListenServerTest2():
                 print("Would click at {},{} now".format(x, y))
             try:
                 next_action = converted[idx + 1]
+                if next_action[0] == "":
+                    break
             except IndexError:
                 # this was the last action in the list
                 break
