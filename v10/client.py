@@ -99,6 +99,11 @@ class ClientKeypressListener():
         if not self.test:
             self.game_wincap = WindowCapture(self.gamename)
 
+        # These are for batch recording and sending
+        self.batch_recording_ongoing = False
+        self.batch_start_time = 0
+        self.batch = ""
+
     def start_mouse_listener(self):
         if not self.test:
             self.mouse_listener = mouse.Listener(
@@ -122,9 +127,14 @@ class ClientKeypressListener():
                     # print("x={}, y={}".format(x, y))
                     xratio, yratio = self.convert_click_to_ratio(x, y)
                     # print("xrat={}, yrat={}".format(xratio, yratio))
-                    for server in self.list_servers:
-                        server.send_message(
-                            "click,"+str(xratio)+"|"+str(yratio))
+                    if self.batch_recording_ongoing:
+                        self.batch += str(button) + "|click|" + \
+                            "{:.3f}".format((time.time() - self.batch_start_time)) + \
+                            "|"+"{:.5f},{:.5f}\n".format(xratio, yratio)
+                    else:
+                        for server in self.list_servers:
+                            server.send_message(
+                                "click,"+str(xratio)+"|"+str(yratio))
 
     def start_keypress_listener(self):
         if self.listener == None:
