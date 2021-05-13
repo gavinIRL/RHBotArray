@@ -158,19 +158,16 @@ class ClientKeypressListener():
                 self.transmitting = False
                 print("TRANSMIT OFF")
             elif key == KeyCode(char='2'):
-                self.delay_enabled = not self.delay_enabled
-                if self.delay_enabled:
-                    if self.delay_min == 0:
-                        for i, server in enumerate(self.list_servers):
-                            server.delay = 8+i*self.delay_spacing
-                    else:
-                        for i, server in enumerate(self.list_servers):
-                            server.delay = self.delay_min+i*self.delay_spacing
-                    print("DELAY ON")
+                self.batch_recording_ongoing = not self.batch_recording_ongoing
+                if self.batch_recording_ongoing:
+                    print("Starting batch record")
                 else:
-                    for server in self.list_servers:
-                        server.delay = 0
-                    print("DELAY OFF")
+                    # todo - create threads to send the batches
+                    for i, server in enumerate(self.list_servers):
+                        t = threading.Thread(
+                            target=self.send_batch, args=(server, self.batch, i))
+                        t.start()
+                    print("Ending batch record")
             elif key == KeyCode(char='3'):
                 for server in self.list_servers:
                     server.send_message("revive,1")
@@ -178,11 +175,6 @@ class ClientKeypressListener():
             elif key == KeyCode(char='5'):
                 server.send_message("regroup,1")
                 print("Regrouping...")
-            elif GetWindowText(GetForegroundWindow()) == self.gamename:
-                if str(key) not in self.unreleased_keys:
-                    for server in self.list_servers:
-                        server.send_message(str(key)+",down")
-                    self.unreleased_keys.append(str(key))
             elif key == KeyCode(char='6'):
                 self.autoloot_enabled = not self.autoloot_enabled
                 if self.autoloot_enabled:
@@ -197,6 +189,17 @@ class ClientKeypressListener():
                 for server in self.list_servers:
                     server.send_message("questhandle,1")
                 self.quest_handle.start_quest_handle()
+            elif GetWindowText(GetForegroundWindow()) == self.gamename:
+                if str(key) not in self.unreleased_keys:
+                    if not self.batch_recording_ongoing:
+                        for server in self.list_servers:
+                            server.send_message(str(key)+",down")
+                        self.unreleased_keys.append(str(key))
+                    else:
+                        self.batch += str(key) + "|keyDown|" + \
+                            "{:.3f}".format(
+                                (time.time() - self.start_time)) + "|0,0\n"
+                        self.unreleased_keys.append(key)
 
         elif key == KeyCode(char='1'):
             self.transmitting = True
@@ -220,8 +223,13 @@ class ClientKeypressListener():
             pass
         elif self.transmitting:
             if GetWindowText(GetForegroundWindow()) == self.gamename:
-                for server in self.list_servers:
-                    server.send_message(str(key)+",up")
+                if not self.batch_recording_ongoing:
+                    for server in self.list_servers:
+                        server.send_message(str(key)+",up")
+                else:
+                    self.batch += str(key) + "|keyUp|" + \
+                        "{:.3f}".format(
+                            (time.time() - self.batch_start_time)) + "|0,0\n"
                 self.unreleased_keys.remove(str(key))
 
     # def convert_ratio_to_click(self, ratx, raty):
@@ -236,6 +244,9 @@ class ClientKeypressListener():
     #     truex = int((relx + self.game_wincap.window_rect[0]))
     #     truey = int((rely + self.game_wincap.window_rect[1]))
     #     return truex, truey
+
+    def send_batch(self, server, batch, index):
+        pass
 
     def convert_click_to_ratio(self, truex, truey):
         # This will grab the current rectangle coords of game window
@@ -328,7 +339,11 @@ class RHBotClient():
         for server in list_servers:
             ClientUtils.start_server_thread(server)
         while True:
-            time.sleep(1)
+            time.sleep(0.5)
+            # for i, server in enumerate(self.list_servers):
+            #     t = threading.Thread(
+            #         target=self.send_batch, args=(server, self.batch, i))
+            #     t.start()
 
 
 if __name__ == "__main__":
