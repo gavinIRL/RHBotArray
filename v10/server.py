@@ -174,12 +174,12 @@ class ListenServerTest2():
 
     def resolve_direction(self, dir):
         if dir == "x":
-            key1 = "left"
-            key2 = "right"
+            key1 = "right"
+            key2 = "left"
             index = 0
         elif dir == "y":
-            key1 = "down"
-            key2 = "up"
+            key1 = "up"
+            key2 = "down"
             index = 1
         else:
             return False
