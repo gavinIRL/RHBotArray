@@ -273,6 +273,36 @@ class ListenServerTest2():
         [w, h] = [user32.GetSystemMetrics(0), user32.GetSystemMetrics(1)]
         return float(("{:.2f}".format(w/w_orig)))
 
+    def batch_handle(self, lines: str):
+        data = lines.split("\n")
+        data.pop[0]
+        converted = []
+        # now convert each line into a list
+        for line in data:
+            converted.append(line.rstrip('\n').split("|"))
+        # first sleep until the first action time
+        # print(converted)
+        time.sleep(float(converted[0][2]))
+        for idx, line in enumerate(converted):
+            action_start_time = time.time()
+            # do the action
+            if line[1] == "keyDown":
+                print("Would press {} down now".format(line[0]))
+            elif line[1] == "click":
+                x, y = line[3].split(",")
+                print("Would click at {},{} now".format(x, y))
+            try:
+                next_action = converted[idx + 1]
+            except IndexError:
+                # this was the last action in the list
+                break
+            elapsed_time = float(next_action[2]) - float(line[2])
+            elapsed_time -= (time.time() - action_start_time)
+            if elapsed_time < 0:
+                elapsed_time = 0
+
+            time.sleep(elapsed_time)
+
     def receive_message(self, client_socket):
         try:
             message_header = client_socket.recv(self.HEADER_LENGTH)
@@ -321,7 +351,7 @@ class ListenServerTest2():
                 self.move_mouse_centre()
                 self.last_mouse_move = time.time()
             button, direction = str(
-                decrypted.decode("utf-8")).split(",")
+                decrypted.decode("utf-8")).split(",", 1)
             if button == "click":
                 xrat, yrat = direction.split("|")
                 # Need to convert from ratio to click
@@ -357,6 +387,8 @@ class ListenServerTest2():
                     self.autoloot_enabled = False
             elif button == "questhandle":
                 self.quest_handle.start_quest_handle()
+            elif button == "batch":
+                self.batch_handle(direction)
             elif direction == "down":
                 key = self.convert_pynput_to_pag(
                     button.replace("'", ""))
