@@ -336,8 +336,11 @@ class RHBotClient():
             list_servers, test, delay_min, delay_spacing)
         ckl.start_mouse_listener()
         ckl.start_keypress_listener()
+        with open("mainplayer.txt") as f:
+            mainplayer = f.readline()
         for server in list_servers:
             ClientUtils.start_server_thread(server)
+            server.send_message("mainplayer,"+mainplayer)
         while True:
             time.sleep(0.5)
             if ckl.batch_recording_ongoing:
