@@ -8,7 +8,7 @@ from windowcapture import WindowCapture
 import ctypes
 from pynput.keyboard import Key, Listener, KeyCode
 from pynput import mouse, keyboard
-from random import randint
+from random import randint, random, uniform
 import subprocess
 import threading
 import time
@@ -72,7 +72,7 @@ class RHBotClientConnection():
 
 
 class ClientKeypressListener():
-    def __init__(self, list_servers, test=False, delay_min=0, delay_spacing=8) -> None:
+    def __init__(self, list_servers, test=False, delay_spacing=12) -> None:
         self.test = test
         self.list_servers = list_servers
         self.listener = None
@@ -81,12 +81,7 @@ class ClientKeypressListener():
         # Hotkey handling
         self.transmitting = True
         self.single_server = None
-        self.delay_min = delay_min
         self.delay_spacing = delay_spacing
-        if self.delay_min == 0:
-            self.delay_enabled = False
-        else:
-            self.delay_enabled = True
         self.x_loot_only = True
         self.autoloot_enabled = False
 
@@ -103,6 +98,8 @@ class ClientKeypressListener():
         self.batch_recording_ongoing = False
         self.batch_start_time = 0
         self.batch = ""
+        self.delay_spread = []
+        self.create_random_delays()
 
     def start_mouse_listener(self):
         if not self.test:
@@ -203,9 +200,12 @@ class ClientKeypressListener():
 
         elif key == KeyCode(char='1'):
             self.transmitting = True
-            self.delay_enabled = False
-            for server in self.list_servers:
-                server.delay = 0
+            if self.batch_recording_ongoing:
+                for i, server in enumerate(self.list_servers):
+                    t = threading.Thread(
+                        target=self.send_batch, args=(server, self.batch, i))
+                    t.start()
+            self.batch_recording_ongoing = False
             print("TRANSMIT ON")
 
     def on_release(self, key):
@@ -245,8 +245,15 @@ class ClientKeypressListener():
     #     truey = int((rely + self.game_wincap.window_rect[1]))
     #     return truex, truey
 
+    def create_random_delays(self):
+        for index, _ in enumerate(self.list_servers):
+            self.delay_spread.append(
+                self.delay_spacing + (index * self.delay_spacing * uniform(0.6, 1.8)))
+
     def send_batch(self, server, batch, index):
-        pass
+        delay = self.delay_spread[index]
+        time.sleep(delay)
+        server.send_message("batch,1\n"+batch)
 
     def convert_click_to_ratio(self, truex, truey):
         # This will grab the current rectangle coords of game window
@@ -323,17 +330,13 @@ class ClientUtils():
 
 
 class RHBotClient():
-    def start(delay_min=0, delay_spacing=8, test=False):
+    def start(delay_spacing=12, test=False):
         list_ips = ClientUtils.grab_online_servers()
         list_servers = []
-        for i, ip in enumerate(list_ips):
-            if delay_min == 0:
-                list_servers.append(RHBotClientConnection(ip))
-            else:
-                list_servers.append(RHBotClientConnection(
-                    ip, delay_min+i*delay_spacing))
+        for ip in list_ips:
+            list_servers.append(RHBotClientConnection(ip))
         ckl = ClientKeypressListener(
-            list_servers, test, delay_min, delay_spacing)
+            list_servers, test, delay_spacing)
         ckl.start_mouse_listener()
         ckl.start_keypress_listener()
         with open("mainplayer.txt") as f:
