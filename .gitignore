@@ -12,3 +12,5 @@ player.txt
 currplayer.txt
 # vscode settings
 .vscode/
+# new file to send main player name
+mainplayer.txt
