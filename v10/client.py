@@ -340,10 +340,15 @@ class RHBotClient():
             ClientUtils.start_server_thread(server)
         while True:
             time.sleep(0.5)
-            # for i, server in enumerate(self.list_servers):
-            #     t = threading.Thread(
-            #         target=self.send_batch, args=(server, self.batch, i))
-            #     t.start()
+            if ckl.batch_recording_ongoing:
+                if time.time() > ckl.batch_start_time + 10:
+                    if len(ckl.unreleased_keys) == 0:
+                        ckl.batch_start_time = time.time()
+                        for i, server in enumerate(list_servers):
+                            t = threading.Thread(
+                                target=ckl.send_batch, args=(server, ckl.batch, i))
+                            t.start()
+                        ckl.batch = ""
 
 
 if __name__ == "__main__":
