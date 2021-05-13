@@ -33,7 +33,7 @@ class BatchPlaybackTest():
         return truex, truey
 
     def play_actions(self):
-        with open("playback1.txt", 'r') as file:
+        with open("playback2.txt", 'r') as file:
             # parse the file
             data = file.readlines()
             converted = []
