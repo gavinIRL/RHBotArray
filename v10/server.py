@@ -389,6 +389,8 @@ class ListenServerTest2():
                 self.quest_handle.start_quest_handle()
             elif button == "batch":
                 self.batch_handle(direction)
+            elif button == "mainplayer":
+                self.main_player = direction
             elif direction == "down":
                 key = self.convert_pynput_to_pag(
                     button.replace("'", ""))
