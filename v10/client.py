@@ -170,7 +170,8 @@ class ClientKeypressListener():
                     server.send_message("revive,1")
                 print("Reviving...")
             elif key == KeyCode(char='5'):
-                server.send_message("regroup,1")
+                for server in self.list_servers:
+                    server.send_message("regroup,1")
                 print("Regrouping...")
             elif key == KeyCode(char='6'):
                 self.autoloot_enabled = not self.autoloot_enabled
