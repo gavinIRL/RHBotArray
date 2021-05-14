@@ -189,7 +189,7 @@ class ClientKeypressListener():
                     for server in self.list_servers:
                         server.send_message("questhandle,1")
                 else:
-                    self.batch += str(key) + "|batchhandle|" + \
+                    self.batch += str(key) + "|questhandle|" + \
                         "{:.3f}".format(
                             (time.time() - self.batch_start_time)) + "|0,0\n"
                 self.quest_handle.start_quest_handle()
