@@ -287,10 +287,26 @@ class ListenServerTest2():
             action_start_time = time.time()
             # do the action
             if line[1] == "keyDown":
-                print("Would press {} down now".format(line[0]))
+                # print("Would press {} down now".format(line[0]))
+                pydirectinput.keyDown(line[0])
+            elif line[1] == "keyUp":
+                # print("Would press {} down now".format(line[0]))
+                pydirectinput.keyUp(line[0])
             elif line[1] == "click":
-                x, y = line[3].split(",")
-                print("Would click at {},{} now".format(x, y))
+                xrat, yrat = line[3].split(",")
+                # print("Would click at {},{} now".format(x, y))
+                x, y = self.convert_ratio_to_click(
+                    float(xrat), float(yrat))
+                x = int(x)
+                y = int(y)
+                # pydirectinput.click(x, y, duration=0.025)
+                ctypes.windll.user32.SetCursorPos(x, y)
+                ctypes.windll.user32.mouse_event(
+                    0x0002, 0, 0, 0, 0)
+                ctypes.windll.user32.mouse_event(
+                    0x0004, 0, 0, 0, 0)
+            if line[1] == "questhandle":
+                self.quest_handle.start_quest_handle()
             try:
                 next_action = converted[idx + 1]
                 if next_action[0] == "":
