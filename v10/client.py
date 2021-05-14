@@ -185,8 +185,13 @@ class ClientKeypressListener():
                         server.send_message("autoloot,off")
                     print("AUTOLOOT OFF")
             elif key == KeyCode(char='8'):
-                for server in self.list_servers:
-                    server.send_message("questhandle,1")
+                if not self.batch_recording_ongoing:
+                    for server in self.list_servers:
+                        server.send_message("questhandle,1")
+                else:
+                    self.batch += str(key) + "|batchhandle|" + \
+                        "{:.3f}".format(
+                            (time.time() - self.batch_start_time)) + "|0,0\n"
                 self.quest_handle.start_quest_handle()
             elif GetWindowText(GetForegroundWindow()) == self.gamename:
                 if str(key) not in self.unreleased_keys:
