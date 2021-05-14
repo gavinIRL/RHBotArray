@@ -131,7 +131,7 @@ class ClientKeypressListener():
                     else:
                         for server in self.list_servers:
                             server.send_message(
-                                "click,"+str(xratio)+"|"+str(yratio))
+                                str(button) + ","+str(xratio)+"|"+str(yratio))
 
     def start_keypress_listener(self):
         if self.listener == None:
