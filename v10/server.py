@@ -292,10 +292,16 @@ class ListenServerTest2():
                 y = int(y)
                 # pydirectinput.click(x, y, duration=0.025)
                 ctypes.windll.user32.SetCursorPos(x, y)
-                ctypes.windll.user32.mouse_event(
-                    0x0002, 0, 0, 0, 0)
-                ctypes.windll.user32.mouse_event(
-                    0x0004, 0, 0, 0, 0)
+                if line[0] == "Button.left":
+                    ctypes.windll.user32.mouse_event(
+                        0x0002, 0, 0, 0, 0)
+                    ctypes.windll.user32.mouse_event(
+                        0x0004, 0, 0, 0, 0)
+                elif line[0] == "Button.right":
+                    ctypes.windll.user32.mouse_event(
+                        0x0008, 0, 0, 0, 0)
+                    ctypes.windll.user32.mouse_event(
+                        0x0010, 0, 0, 0, 0)
             if line[1] == "questhandle":
                 self.quest_handle.start_quest_handle()
             try:
@@ -361,7 +367,7 @@ class ListenServerTest2():
                 self.last_mouse_move = time.time()
             button, direction = str(
                 decrypted.decode("utf-8")).split(",", 1)
-            if button == "click":
+            if button == "Button.left":
                 xrat, yrat = direction.split("|")
                 # Need to convert from ratio to click
                 x, y = self.convert_ratio_to_click(
@@ -375,6 +381,17 @@ class ListenServerTest2():
                     0x0002, 0, 0, 0, 0)
                 ctypes.windll.user32.mouse_event(
                     0x0004, 0, 0, 0, 0)
+            elif button == "Button.right":
+                xrat, yrat = direction.split("|")
+                x, y = self.convert_ratio_to_click(
+                    float(xrat), float(yrat))
+                x = int(x)
+                y = int(y)
+                ctypes.windll.user32.SetCursorPos(x, y)
+                ctypes.windll.user32.mouse_event(
+                    0x0008, 0, 0, 0, 0)
+                ctypes.windll.user32.mouse_event(
+                    0x00010, 0, 0, 0, 0)
             elif button == "quit":
                 print("Shutting down server")
                 os._exit(1)
