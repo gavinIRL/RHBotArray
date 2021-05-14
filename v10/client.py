@@ -158,6 +158,7 @@ class ClientKeypressListener():
                 self.batch_recording_ongoing = not self.batch_recording_ongoing
                 if self.batch_recording_ongoing:
                     print("Starting batch record")
+                    self.batch_start_time = time.time()
                 else:
                     # todo - create threads to send the batches
                     for i, server in enumerate(self.list_servers):
@@ -196,7 +197,7 @@ class ClientKeypressListener():
                     else:
                         self.batch += str(key) + "|keyDown|" + \
                             "{:.3f}".format(
-                                (time.time() - self.start_time)) + "|0,0\n"
+                                (time.time() - self.batch_start_time)) + "|0,0\n"
                         self.unreleased_keys.append(key)
 
         elif key == KeyCode(char='1'):
@@ -231,7 +232,17 @@ class ClientKeypressListener():
                     self.batch += str(key) + "|keyUp|" + \
                         "{:.3f}".format(
                             (time.time() - self.batch_start_time)) + "|0,0\n"
-                self.unreleased_keys.remove(str(key))
+                try:
+                    self.unreleased_keys.remove(str(key))
+                except:
+                    pass
+                if len(self.batch) > 2500:
+                    # need to first check if there are still keys pressed down
+                    if len(self.unreleased_keys) == 0:
+                        print("Sending batch now due to size")
+                        self.batch_start_time = time.time()
+                        # print(self.batch)
+                        self.batch = ""
 
     # def convert_ratio_to_click(self, ratx, raty):
     #     # This will grab the current rectangle coords of game window
