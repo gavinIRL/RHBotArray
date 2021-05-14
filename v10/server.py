@@ -188,49 +188,40 @@ class ListenServerTest2():
         # if was able to detect both
         if first_rel_dists:
             # then start resolving the x direction
-            self.move_towards(dir, first_rel_dists)
-            # perform another couple checks, timing the second
-            last_rel_dists = self.get_relative_dists()
-            # if can't detect player then stop moving
-            if not last_rel_dists:
-                # cancel all keypresses and break out
-                pydirectinput.keyUp(key1)
-                pydirectinput.keyUp(key2)
-                return False
             start_time = time.time()
+            self.move_towards(dir, first_rel_dists)
+            move_time = time.time() - start_time()
+            if not move_time < 0.1:
+                time.sleep(0.1-move_time)
+            for key in ["up", "down", "left", "right"]:
+                pydirectinput.keyUp(key)
+            end_time = time.time() - start_time()
+
             last_rel_dists = self.get_relative_dists()
-            # if can't detect player then stop moving
             if not last_rel_dists:
-                # cancel all keypresses and break out
-                pydirectinput.keyUp(key1)
-                pydirectinput.keyUp(key2)
                 return False
-            end_time = time.time()
-            # now check if have overshot the target
             dist_moved = abs(last_rel_dists[index] - first_rel_dists[index])
             percent_moved = dist_moved / abs(first_rel_dists[index])
-            if percent_moved >= 1:
-                # in which case need to stop moving
-                pydirectinput.keyUp(key1)
-                pydirectinput.keyUp(key2)
-                # and if above a certain threshold then move back
-                if percent_moved >= 1.25:
-                    if first_rel_dists[index] > 0:
-                        pydirectinput.keyDown(key1)
-                        time.sleep(end_time-start_time)
-                        pydirectinput.keyUp(key1)
-                    else:
-                        pydirectinput.keyDown(key2)
-                        time.sleep(end_time-start_time)
-                        pydirectinput.keyUp(key2)
-            # otherwise calculate how much longer need to travel
-            else:
-                # doubled as only timed the second, will tweak this later
-                # suspect something like 1.8 may be more suitable
-                time_left = 2*((end_time-start_time)/percent_moved)
-                time.sleep(time_left)
-                pydirectinput.keyUp(key1)
-                pydirectinput.keyUp(key2)
+            if percent_moved > 1.1:
+                # Need to reverse direction
+                if first_rel_dists[index] > 0:
+                    pydirectinput.keyDown(key1)
+                    time.sleep((end_time-start_time)/percent_moved)
+                    pydirectinput.keyUp(key1)
+                else:
+                    pydirectinput.keyDown(key2)
+                    time.sleep((end_time-start_time)/percent_moved)
+                    pydirectinput.keyUp(key2)
+            elif percent_moved < 0.9:
+                # Need to continue
+                travel_time_reqd = (1-percent_moved)*(end_time-start_time)
+                start_time = time.time()
+                self.move_towards(dir, last_rel_dists)
+                move_time = time.time() - start_time()
+                if not move_time < travel_time_reqd:
+                    time.sleep(travel_time_reqd-move_time)
+                for key in ["up", "down", "left", "right"]:
+                    pydirectinput.keyUp(key)
 
     def regroup(self):
         # first resolve the x direction
