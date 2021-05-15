@@ -63,8 +63,13 @@ class RHBotArrayServer():
         self.xprompt_vision = Vision("xprompt67filtv2.jpg")
 
         # These are related to the regroup command
-        with open("player.txt") as f:
-            self.main_player = f.readline()
+        if not self.print_only:
+            # These are related to auto playername detect
+            plyrname_rect = [165, 45, 320, 65]
+            self.plyrname_wincap = WindowCapture(self.gamename, plyrname_rect)
+            self.plyrname_filt = HsvFilter(0, 0, 103, 89, 104, 255, 0, 0, 0, 0)
+            self.plyrmname_vision = Vision('xprompt67filtv2.jpg')
+            self.main_player = self.detect_name()
         with open("currplayer.txt") as f:
             self.curr_player = f.readline()
         self.regroup_wincap = WindowCapture(
@@ -81,6 +86,17 @@ class RHBotArrayServer():
 
     def move_mouse_centre(self):
         ctypes.windll.user32.SetCursorPos(self.centre_x, self.centre_y)
+
+    def detect_name(self):
+        # get an updated image of the game
+        image = self.plyrname_wincap.get_screenshot()
+        # pre-process the image
+        image = self.plyrmname_vision.apply_hsv_filter(
+            image, self.plyrname_filt)
+        rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        results = pytesseract.image_to_data(
+            rgb, output_type=pytesseract.Output.DICT, lang='eng')
+        return results["text"][4]
 
     def grab_current_lan_ip(self):
         output = subprocess.run(
