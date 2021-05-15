@@ -33,28 +33,38 @@ class LootIdentTest():
         return truex, truey
 
     def start(self):
-        xratlist = [0.12856, 0.15189, 0.17522, 0.19855, 0.21928, 0.24520]
-        yratlist = [0.12458, 0.16221, 0.19983, 0.23328]
+        xratlist = [0.41929, 0.45472, 0.49016, 0.52165, 0.55709, 0.59252]
+        yratlist = [0.36332, 0.42161, 0.47431, 0.53360]
         loot_vision = Vision("xprompt67filtv2.jpg")
-        filt = HsvFilter(0, 0, 0, 25, 82, 71, 0, 0, 0, 0)
+        filt = HsvFilter(0, 0, 102, 45, 65, 255, 0, 0, 0, 0)
         start_time = time.time()
         for i, x in enumerate(xratlist):
             for j, y in enumerate(yratlist):
-                truex, truey = self.convert_ratio_to_click(x, y)
+                relx = int(self.game_wincap.w * x)
+                rely = int(self.game_wincap.h * y)
+                truex = relx + self.game_wincap.window_rect[0]
+                truey = rely + self.game_wincap.window_rect[1]
+                ctypes.windll.user32.SetCursorPos(truex, truey)
+                time.sleep(0.05)
+                y2 = rely+180
+                if y2 > 465:
+                    y2 = 465
                 wincap = WindowCapture(
-                    self.gamename, [truex-25, truey-25, truex+25, truey+25])
+                    self.gamename, [relx+35, rely+10, relx+310, y2])
                 image = wincap.get_screenshot()
                 # cv2.imshow('Filtered', image)
                 image = loot_vision.apply_hsv_filter(
                     image, filt)
-                image = cv2.bitwise_not(image)
                 rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
                 results = pytesseract.image_to_data(
                     rgb, output_type=pytesseract.Output.DICT, lang='eng')
                 # if not "empty" in results["text"]:
                 #     print("Found non-empty cell at {},{}".format(i, j))
                 res = list(filter(None, results["text"]))
-                print(res)
+                if res:
+                    print("Found non-empty cell at {},{}".format(i, j))
+                    print(res)
+                # time.sleep(0.1)
 
         end_time = time.time()
         print("Time taken: {}s".format(end_time-start_time))
