@@ -91,6 +91,7 @@ def convert_ratio_to_click(ratx, raty):
 
 def on_press(key):
     global wincap
+    global game_wincap
     global x
     global y
     global x2
@@ -114,9 +115,10 @@ def on_press(key):
         wincap = WindowCapture(gamename, [x, y, x2, y2])
     if key == KeyCode(char='p'):
         print("x={}, y={}, x2={}, y2={}".format(x, y, x2, y2))
-        rect = [[x, y, x2-x, y2-y]]
-        xrat, yrat = vision_limestone.get_click_points(rect)[0]
-        xrat, yrat = convert_click_to_ratio(xrat, yrat)
+        xmid = (x2+x)/2
+        ymid = (y2+y)/2
+        xrat = xmid/game_wincap.w
+        yrat = ymid/game_wincap.h
         print("Centre_ratio={},{}".format(xrat, yrat))
     if str(key) == "<100>":
         x2 = x2 - sensitivity
