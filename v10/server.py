@@ -18,9 +18,11 @@ from quest_handle import QuestHandle
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 
-class ListenServerTest2():
-    def __init__(self, print_only=False) -> None:
+class RHBotArrayServer():
+    def __init__(self, print_only=False, move_only=False) -> None:
         self.print_only = print_only
+        self.move_only = move_only
+        self.move_only_exclude_keys = ["a", "s", "d", "f", "g", "h"]
 
         self.scaling = self.get_monitor_scaling()
         with open("gamename.txt") as f:
@@ -420,14 +422,21 @@ class ListenServerTest2():
             elif direction == "down":
                 key = self.convert_pynput_to_pag(
                     button.replace("'", ""))
-                # print(key)
-                pydirectinput.keyDown(key)
+                if self.move_only:
+                    if button in self.move_only_exclude_keys:
+                        pydirectinput.keyDown(key)
+                else:
+                    pydirectinput.keyDown(key)
             elif direction == "up":
                 key = self.convert_pynput_to_pag(
                     button.replace("'", ""))
-                pydirectinput.keyUp(key)
+                if self.move_only:
+                    if button in self.move_only_exclude_keys:
+                        pydirectinput.keyUp(key)
+                else:
+                    pydirectinput.keyUp(key)
 
 
 if __name__ == "__main__":
-    lst = ListenServerTest2(print_only=False)
+    lst = RHBotArrayServer(print_only=False)
     lst.start()
