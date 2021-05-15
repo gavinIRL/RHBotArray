@@ -41,6 +41,7 @@ vision_limestone.init_control_gui()
 # print("Setup time: {}s".format(time()-loop_time))
 game_wincap = WindowCapture(gamename)
 scaling = ClientUtils.get_monitor_scaling()
+# print(scaling)
 
 
 def start_keypress_listener():
@@ -67,9 +68,25 @@ def convert_click_to_ratio(truex, truey):
     ratx = relx/(game_wincap.w*scaling)
     raty = rely/(game_wincap.h*scaling)
     # Test convert back to a click
-    # convx, convy = self.convert_ratio_to_click(ratx, raty)
-    # print("convx={}, convy={}".format(convx, convy))
+    convx, convy = convert_ratio_to_click(ratx, raty)
+    print("convx={}, convy={}".format(convx, convy))
     return ratx, raty
+
+
+def convert_ratio_to_click(ratx, raty):
+    global game_wincap
+    global scaling
+    # This will grab the current rectangle coords of game window
+    # and then turn the ratio of positions versus the game window
+    # into true x,y coords
+    game_wincap.update_window_position(border=False)
+    # Turn the ratios into relative
+    relx = int(ratx * game_wincap.w)
+    rely = int(raty * game_wincap.h)
+    # Turn the relative into true
+    truex = int((relx + game_wincap.window_rect[0]))
+    truey = int((rely + game_wincap.window_rect[1]))
+    return truex, truey
 
 
 def on_press(key):
@@ -97,7 +114,9 @@ def on_press(key):
         wincap = WindowCapture(gamename, [x, y, x2, y2])
     if key == KeyCode(char='p'):
         print("x={}, y={}, x2={}, y2={}".format(x, y, x2, y2))
-        xrat, yrat = convert_click_to_ratio((x2+x)/2, (y2+y)/2)
+        rect = [[x, y, x2-x, y2-y]]
+        xrat, yrat = vision_limestone.get_click_points(rect)[0]
+        xrat, yrat = convert_click_to_ratio(xrat, yrat)
         print("Centre_ratio={},{}".format(xrat, yrat))
     if str(key) == "<100>":
         x2 = x2 - sensitivity
