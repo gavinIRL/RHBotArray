@@ -27,10 +27,10 @@ with open("gamename.txt") as f:
     gamename = f.readline()
 with open("player.txt") as f:
     main_player = f.readline()
-x = 880
-y = 740
-x2 = x + 160
-y2 = y + 40
+x = 505
+y = 250
+x2 = x + 245
+y2 = y + 180
 wincap = WindowCapture(gamename, [x, y, x2, y2])
 # initialize the Vision class
 vision_limestone = Vision('xprompt67filtv2.jpg')
