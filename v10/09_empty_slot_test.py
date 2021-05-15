@@ -15,12 +15,12 @@ with open("gamename.txt") as f:
 game_wincap = WindowCapture(gamename)
 
 # The next block of code is for detecting the object in question
-object_filter = HsvFilter(0, 0, 0, 255, 255, 255, 0, 0, 0, 0)
+object_filter = HsvFilter(0, 79, 0, 255, 255, 255, 0, 0, 0, 0)
 # WindowCapture.list_window_names()
 # initialize the WindowCapture class for object detection
-object_wincap = WindowCapture(gamename, [505, 250, 750, 430])
+object_wincap = WindowCapture(gamename, [510, 250, 775, 430])
 # initialize the Vision class
-object_vision = Vision('emptyslot.jpg')
+object_vision = Vision('emptyslot67filt.jpg')
 # initialize the trackbar window
 # object_vision.init_control_gui()
 
@@ -34,23 +34,26 @@ while(True):
     output_image = object_vision.apply_hsv_filter(
         screenshot, object_filter)
     # filter_image = output_image.copy()
+    # invert image
+    # output_image = cv.bitwise_not(output_image)
     # do object detection, this time grab the points
     rectangles = object_vision.find(
-        output_image, threshold=0.41, epsilon=0.5)
+        output_image, threshold=0.51, epsilon=0.9)
     # draw the detection results onto the original image
     points = object_vision.get_click_points(rectangles)
     if len(points) >= 1:
-        output_image = object_vision.draw_crosshairs(screenshot, points)
+        # output_image = object_vision.draw_crosshairs(screenshot, points)
+        output_image = object_vision.draw_crosshairs(output_image, points)
         # If there is only one value found
         # i.e. no false positives and players are not on top of each other
         # Then figure out keypresses required to move towards other player
         # And then implement
-        print("Other player is located relatively x={} y={}".format(
-            points[0][0]-131, 107-points[0][1]))
-        sleep(1)
+        # print("Other player is located relatively x={} y={}".format(
+        #     points[0][0]-131, 107-points[0][1]))
+        # sleep(1)
     else:
         # Clear all keypresses
-        print("Can't detect other player, stopping movement")
+        print("Can't detect slots")
     # display the processed image
     cv.imshow('Matches', output_image)
     # cv.imshow('Filtered', filter_image)
@@ -61,6 +64,7 @@ while(True):
 
     # press 'q' with the output window focused to exit.
     # waits 1 ms every loop to process key presses
+    sleep(0.15)
     if cv.waitKey(1) == ord('q'):
         cv.destroyAllWindows()
         break
