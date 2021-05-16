@@ -37,6 +37,24 @@ class IdentSellTest():
         self.shop_check_wincap = WindowCapture(
             self.gamename, [274, 207, 444, 208])
 
+        # These are for holding reference rgb values
+        # Using sets as can then compare easily to other sets
+        self.empty = {41, 45, 50}
+        self.rar_green = {2, 204, 43}
+        self.rar_blue = {232, 144, 5}
+        self.rar_none = {24, 33, 48}
+        self.junk_list = self.grab_junk_list()
+
+    def grab_junk_list(self):
+        jl = []
+        with open("itemrgb.txt") as f:
+            lines = f.readlines()
+            for line in lines:
+                _, rgb = line.split("|")
+                r, g, b = rgb.split(",")
+                jl.append({int(r), int(g), int(b)})
+        return jl
+
     def ident_sell_repair(self):
         self.open_store_if_necessary()
         # First go through all the equipment
@@ -44,15 +62,17 @@ class IdentSellTest():
         screenshot = self.inventory_wincap.get_screenshot()
         self.hover_mouse_all()
         non_empty = self.remove_empty(screenshot)
-        rarities = self.identify_rarities_equip(non_empty)
-        self.sell_equip(rarities)
+        junk_list = self.identify_rarities_equip(non_empty, screenshot)
+        self.sell(junk_list)
         # Then go through all the other loot
         self.change_tab("Other")
         screenshot = self.inventory_wincap.get_screenshot()
         self.hover_mouse_all()
         non_empty = self.remove_empty(screenshot)
-        junk_list = self.identify_items_other(non_empty)
-        self.sell_other(junk_list)
+        junk_list = self.identify_items_other(non_empty, screenshot)
+        self.sell(junk_list)
+        # and finally repair gear
+        self.repair()
 
     def open_store_if_necessary(self):
         # This will search to see if the inventory is open
@@ -105,23 +125,23 @@ class IdentSellTest():
 
     def remove_empty(self, screenshot):
         non_empty = []
+        for i in range(4):
+            for j in range(6):
+                colour = screenshot[i*44, 22+j*44]
         # format will be as follows of return list
         # x,y,r,g,b
         return non_empty
 
-    def identify_rarities_equip(self, rowcol_list):
-        rarities = []
+    def identify_rarities_equip(self, rowcol_list, screenshot):
+        junk = []
         # format will be as follows of return list
-        # x,y,rarity
-        return rarities
+        # x,y
+        return junk
 
-    def sell_equip(self, pixel_list):
+    def identify_items_other(self, rowcol_list, screenshot):
         pass
 
-    def identify_items_other(self, rowcol_list):
-        pass
-
-    def sell_other(self, pixel_list):
+    def sell(self, rowcol_list):
         pass
 
     def repair(self):
@@ -149,5 +169,5 @@ class IdentSellTest():
 if __name__ == "__main__":
     ist = IdentSellTest()
     # ist.ident_sell_repair()
-    ist.hover_mouse_all()
-    # ist.open_store_if_necessary()
+    # ist.hover_mouse_all()
+    ist.open_store_if_necessary()
