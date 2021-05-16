@@ -12,10 +12,10 @@ Cheese|117,208,226
 Worst Steel|67,57,25
 Worst Linen|76,59,93
 Olive|75,66,103
-Garlic Sauce|
-Mushroom|
-Whole Potato|
-Cream Powder|
+Garlic Sauce|186,207,243
+Mushroom|6,15,23
+Whole Potato|44,52,98
+Cream Powder|206,230,254
 Salted Bacon|41,48,141
 Curry Powder|195,250,253
 Seafood Sauce|153,189,226
