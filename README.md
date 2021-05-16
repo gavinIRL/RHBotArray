@@ -3,18 +3,9 @@
 ## Summary
 A family of socket-controlled video game bots derived from https://github.com/gavinIRL/RHBot. See the parent repo for details on the game in question, etc. Each version is more autonomous with more features than the last. Goal is for fully autonomous bots.
 
-## Current Status and Thoughts
+## Current Status
 ### 16th May 2021
 Version 10 is now almost completed, the successful test code for the auto-sell-and-repair feature needs to be implemented into both server and client and then I can move on to Version 11. To recap on Version 10: a lot of lessons have been learned in particular approaches to identifying semi-standardised images i.e. images whereby you expect a portion of it to be the same periodically which you require. The time taken to complete Version 10 has been almost double the expected duration however this was due to exploring and eventually finding a much more efficient (over 100x faster) approach in comparison to the initial base plan. Looking forward to the next planned version I feel I have a much better way of developing some features in image identification. The near-term focus the next week will be to polish the features of Version 10 and include all of the required features for convenient fully-managed mtuli-bot gameplay. Note that all annoyances have been resolved.
-
-### 10th May 2021
-Version 9 has been completed and now moving on to Version 10 which has the intent of including the delayed batch recordings feature, and also the loot identification tests and auto-sell-and-repair. The regroup command has been successfully implemented and there has been a major step forward in bot accuracy thanks to Tesseract. The quest handler has been implemented also. For the most part there aren't really any pressing issues with the bot, most of the work in the near future is dedicated to adding additional bot capabilities rather than fixing issues and annoyances. The short-to-medium term (i.e. next 3-7 days) focus is on semi-automation of in-town and end-of-dungeon events, beyond that it will be more aimed at fully autonomous actions e.g. solo clear a full level, autonomously hand-in quests upon completion and find and accept new quests, etc.
-
-### 8th May 2021
-Version 9 has resolved a number of the problems (along with a network switch for <1ms command latency) however there are still quite a few left. The experiments with Tesseract have shown a much better way of detecting certain features and events moving forward especially once I move more into scripted events. The main priorities in the near term are implementing the "regroup" command, and identifying (and eventually automatically selling) disposable loot at the end of a level.
-
-### 6th May 2021
-With the completion of Version 8 it has become clear that this method of botting is definitely viable despite having a few minor quirks and issues. Levelling with 2 sidekick bots has been much much faster than solo thereby increasing the power compared to solo rather than being a distraction. However there are some minor annoyances that need to be addressed.
 
 ### List of current problems and annoyances
 * None for now
@@ -51,3 +42,14 @@ With the completion of Version 8 it has become clear that this method of botting
 * Version 11 - Far loot finding and navigation, enemy nametag detection
 * Version 12 - Quest identification and seeking, Contract mission identification and logging
 * Version 13 - Automatic combat, automatic level navigation
+
+
+## Previous Status Updates
+### 10th May 2021
+Version 9 has been completed and now moving on to Version 10 which has the intent of including the delayed batch recordings feature, and also the loot identification tests and auto-sell-and-repair. The regroup command has been successfully implemented and there has been a major step forward in bot accuracy thanks to Tesseract. The quest handler has been implemented also. For the most part there aren't really any pressing issues with the bot, most of the work in the near future is dedicated to adding additional bot capabilities rather than fixing issues and annoyances. The short-to-medium term (i.e. next 3-7 days) focus is on semi-automation of in-town and end-of-dungeon events, beyond that it will be more aimed at fully autonomous actions e.g. solo clear a full level, autonomously hand-in quests upon completion and find and accept new quests, etc.
+
+### 8th May 2021
+Version 9 has resolved a number of the problems (along with a network switch for <1ms command latency) however there are still quite a few left. The experiments with Tesseract have shown a much better way of detecting certain features and events moving forward especially once I move more into scripted events. The main priorities in the near term are implementing the "regroup" command, and identifying (and eventually automatically selling) disposable loot at the end of a level.
+
+### 6th May 2021
+With the completion of Version 8 it has become clear that this method of botting is definitely viable despite having a few minor quirks and issues. Levelling with 2 sidekick bots has been much much faster than solo thereby increasing the power compared to solo rather than being a distraction. However there are some minor annoyances that need to be addressed.
