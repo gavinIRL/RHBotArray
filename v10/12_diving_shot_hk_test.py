@@ -16,6 +16,8 @@ from client import ClientUtils
 class DSTest():
     def __init__(self) -> None:
         self.start_keypress_listener()
+        while True:
+            time.sleep(0.5)
 
     def start_keypress_listener(self):
         self.listener = Listener(
@@ -23,9 +25,25 @@ class DSTest():
         self.listener.start()
 
     def on_press(self, key):
-        print(key)
+        if key == keyboard.Key.ctrl_l:
+            time.sleep(0.01)
+            pydirectinput.keyDown("x")
+            time.sleep(0.05)
+            pydirectinput.keyUp("x")
+            time.sleep(0.01)
+            pydirectinput.keyDown("x")
+            time.sleep(0.05)
+            pydirectinput.keyUp("x")
+            time.sleep(0.01)
+            pydirectinput.keyDown("x")
+            time.sleep(0.05)
+            pydirectinput.keyUp("x")
         if key == keyboard.Key.f12:
             os._exit(1)
 
     def on_release(self, key):
         pass
+
+
+if __name__ == "__main__":
+    dst = DSTest()
