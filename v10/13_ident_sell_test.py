@@ -59,15 +59,17 @@ class IdentSellTest():
         self.open_store_if_necessary()
         # First go through all the equipment
         self.change_tab("Equipment")
+        time.sleep(0.1)
         screenshot = self.inventory_wincap.get_screenshot()
-        self.hover_mouse_all()
+        # self.hover_mouse_all()
         non_empty = self.remove_empty(screenshot)
         junk_list = self.identify_rarities_equip(non_empty, screenshot)
         self.sell(junk_list)
         # Then go through all the other loot
         self.change_tab("Other")
+        time.sleep(0.1)
         screenshot = self.inventory_wincap.get_screenshot()
-        self.hover_mouse_all()
+        # self.hover_mouse_all()
         non_empty = self.remove_empty(screenshot)
         junk_list = self.identify_items_other(non_empty, screenshot)
         self.sell(junk_list)
@@ -129,7 +131,7 @@ class IdentSellTest():
             for j in range(6):
                 colour = set(screenshot[i*44, 22+j*44])
                 if colour != self.empty:
-                    non_empty.append(i, j)
+                    non_empty.append([i, j])
         # format will be as follows of return list
         # x,y,r,g,b
         return non_empty
@@ -138,14 +140,15 @@ class IdentSellTest():
         junk = []
         for rowcol in rowcol_list:
             colour = set(screenshot[rowcol[0]*44, rowcol[1]*44])
+            # print(colour)
             if colour == self.rar_none:
-                junk.append(rowcol[0], rowcol[1])
+                junk.append([rowcol[0], rowcol[1]])
             elif colour == self.rar_green:
                 if self.cutoff >= 1:
-                    junk.append(rowcol[0], rowcol[1])
+                    junk.append([rowcol[0], rowcol[1]])
             elif colour == self.rar_green:
                 if self.cutoff >= 2:
-                    junk.append(rowcol[0], rowcol[1])
+                    junk.append([rowcol[0], rowcol[1]])
         # format will be as follows of return list
         # x,y corresponding to row,col
         return junk
@@ -155,16 +158,23 @@ class IdentSellTest():
         for rowcol in rowcol_list:
             colour = set(screenshot[rowcol[0]*44, 22+rowcol[1]*44])
             if colour in self.junk_list:
-                junk.append(rowcol[0], rowcol[1])
+                junk.append([rowcol[0], rowcol[1]])
         # format will be as follows of return list
         # x,y corresponding to row,col
         return junk
 
     def sell(self, rowcol_list):
-        print("-----------------")
+        offsetx = self.game_wincap.window_rect[0] + 534
+        offsety = self.game_wincap.window_rect[1] + 277
         for item in rowcol_list:
-            print("Would sell item at {},{}".format(item[0], item[1]))
-        print("-----------------")
+            x = offsetx+item[1]*44
+            y = offsety+item[0]*44
+            ctypes.windll.user32.SetCursorPos(x, y)
+            time.sleep(0.25)
+            ctypes.windll.user32.mouse_event(
+                0x0008, 0, 0, 0, 0)
+            ctypes.windll.user32.mouse_event(
+                0x0010, 0, 0, 0, 0)
 
     def repair(self):
         self.game_wincap.update_window_position(border=False)
@@ -190,6 +200,6 @@ class IdentSellTest():
 
 if __name__ == "__main__":
     ist = IdentSellTest()
-    # ist.ident_sell_repair()
+    ist.ident_sell_repair()
     # ist.hover_mouse_all()
-    ist.open_store_if_necessary()
+    # ist.open_store_if_necessary()
