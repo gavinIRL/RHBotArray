@@ -151,10 +151,20 @@ class IdentSellTest():
         return junk
 
     def identify_items_other(self, rowcol_list, screenshot):
-        pass
+        junk = []
+        for rowcol in rowcol_list:
+            colour = set(screenshot[rowcol[0]*44, 22+rowcol[1]*44])
+            if colour in self.junk_list:
+                junk.append(rowcol[0], rowcol[1])
+        # format will be as follows of return list
+        # x,y corresponding to row,col
+        return junk
 
     def sell(self, rowcol_list):
-        pass
+        print("-----------------")
+        for item in rowcol_list:
+            print("Would sell item at {},{}".format(item[0], item[1]))
+        print("-----------------")
 
     def repair(self):
         self.game_wincap.update_window_position(border=False)
