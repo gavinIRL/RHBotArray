@@ -31,6 +31,9 @@ class IdentSellTest():
         self.inventory_wincap = WindowCapture(
             self.gamename, [512, 277, 775, 430])
 
+        # This is for correct mouse positioning
+        self.game_wincap = WindowCapture(self.gamename)
+
     def ident_sell_repair(self):
         self.open_store_if_necessary()
         # First go through all the equipment
@@ -54,12 +57,12 @@ class IdentSellTest():
         pass
 
     def change_tab(self, name):
+        x = self.game_wincap.window_rect[0] + 534-60
+        self.game_wincap.update_window_position(border=False)
         if name == "Equipment":
-            x = 100
-            y = 100
+            y = self.game_wincap.window_rect[1] + 277 - 15
         elif name == "Other":
-            x = 100
-            y = 100
+            y = self.game_wincap.window_rect[1] + 277 + 44
         ctypes.windll.user32.SetCursorPos(x, y)
         ctypes.windll.user32.mouse_event(
             0x0002, 0, 0, 0, 0)
@@ -67,8 +70,18 @@ class IdentSellTest():
             0x0004, 0, 0, 0, 0)
 
     def hover_mouse_all(self):
-        # make sure to move mouse out of way at end
-        pass
+        self.game_wincap.update_window_position(border=False)
+        offsetx = self.game_wincap.window_rect[0] + 534
+        offsety = self.game_wincap.window_rect[1] + 277
+        for i in range(4):
+            for j in range(6):
+                x = offsetx+j*44
+                y = offsety+i*44
+                ctypes.windll.user32.SetCursorPos(x, y)
+                time.sleep(0.001)
+        ctypes.windll.user32.SetCursorPos(offsetx, offsety-70)
+
+        ctypes.windll.user32.SetCursorPos(offsetx+100, offsety+180)
 
     def remove_empty(self, screenshot):
         non_empty = []
@@ -76,7 +89,7 @@ class IdentSellTest():
         # x,y,r,g,b
         return non_empty
 
-    def identify_rarities_equip(self, pixel_list):
+    def identify_rarities_equip(self, rowcol_list):
         rarities = []
         # format will be as follows of return list
         # x,y,rarity
@@ -85,13 +98,35 @@ class IdentSellTest():
     def sell_equip(self, pixel_list):
         pass
 
-    def identify_items_other(self, pixel_list):
+    def identify_items_other(self, rowcol_list):
         pass
 
     def sell_other(self, pixel_list):
         pass
 
+    def repair(self):
+        self.game_wincap.update_window_position(border=False)
+        offsetx = self.game_wincap.window_rect[0] + 534
+        offsety = self.game_wincap.window_rect[1] + 277
+        ctypes.windll.user32.SetCursorPos(offsetx-310, offsety+325)
+        ctypes.windll.user32.mouse_event(
+            0x0002, 0, 0, 0, 0)
+        ctypes.windll.user32.mouse_event(
+            0x0004, 0, 0, 0, 0)
+        ctypes.windll.user32.SetCursorPos(offsetx+0, offsety+180)
+        ctypes.windll.user32.mouse_event(
+            0x0002, 0, 0, 0, 0)
+        ctypes.windll.user32.mouse_event(
+            0x0004, 0, 0, 0, 0)
+        # this is if everything is already repaired
+        ctypes.windll.user32.SetCursorPos(offsetx+100, offsety+180)
+        ctypes.windll.user32.mouse_event(
+            0x0002, 0, 0, 0, 0)
+        ctypes.windll.user32.mouse_event(
+            0x0004, 0, 0, 0, 0)
+
 
 if __name__ == "__main__":
     ist = IdentSellTest()
-    ist.ident_sell_repair()
+    # ist.ident_sell_repair()
+    ist.hover_mouse_all()
