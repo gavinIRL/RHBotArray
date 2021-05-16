@@ -28,7 +28,7 @@ start = time()
 data = []
 for i in range(4):
     for j in range(6):
-        colour = screenshot[22+i*44, 22+j*44]
+        colour = screenshot[i*44, 22+j*44]
         data.append([i+1, j+1, colour[0], colour[1], colour[2]])
 for line in data:
     rgb = "{},{},{}".format(line[2], line[3], line[4])
@@ -36,10 +36,10 @@ for line in data:
         line[0], line[1], rgb))
 end = time()
 print(end-start)
-while(True):
-    cv.imshow('Matches', screenshot)
-    sleep(0.1)
-    if cv.waitKey(1) == ord('q'):
-        cv.destroyAllWindows()
-        break
+# while(True):
+#     cv.imshow('Matches', screenshot)
+#     sleep(0.1)
+#     if cv.waitKey(1) == ord('q'):
+#         cv.destroyAllWindows()
+#         break
 print('Done.')
