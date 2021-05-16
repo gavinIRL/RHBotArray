@@ -127,15 +127,27 @@ class IdentSellTest():
         non_empty = []
         for i in range(4):
             for j in range(6):
-                colour = screenshot[i*44, 22+j*44]
+                colour = set(screenshot[i*44, 22+j*44])
+                if colour != self.empty:
+                    non_empty.append(i, j)
         # format will be as follows of return list
         # x,y,r,g,b
         return non_empty
 
     def identify_rarities_equip(self, rowcol_list, screenshot):
         junk = []
+        for rowcol in rowcol_list:
+            colour = set(screenshot[rowcol[0]*44, rowcol[1]*44])
+            if colour == self.rar_none:
+                junk.append(rowcol[0], rowcol[1])
+            elif colour == self.rar_green:
+                if self.cutoff >= 1:
+                    junk.append(rowcol[0], rowcol[1])
+            elif colour == self.rar_green:
+                if self.cutoff >= 2:
+                    junk.append(rowcol[0], rowcol[1])
         # format will be as follows of return list
-        # x,y
+        # x,y corresponding to row,col
         return junk
 
     def identify_items_other(self, rowcol_list, screenshot):
