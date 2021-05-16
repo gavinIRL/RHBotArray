@@ -1,0 +1,6 @@
+Poor Carp Leather|216,91,218
+Dried Meat|98,119,245
+Parsley Powder|93,188,121
+Worst Carp Leather|91,190,218
+Butter Slices|117,169,234
+Poor Linen|61,34,48
