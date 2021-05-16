@@ -16,9 +16,9 @@ Garlic Sauce|
 Mushroom|
 Whole Potato|
 Cream Powder|
-Salted Bacon|
-Curry Powder|
-Seafood Sauce|
+Salted Bacon|41,48,141
+Curry Powder|195,250,253
+Seafood Sauce|153,189,226
 Cheese Slices|68,172,225
-Garlic Powder|
-Butter Slices|
+Garlic Powder|233,248,246
+Butter Slices|115,164,213
