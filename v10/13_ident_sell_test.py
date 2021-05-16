@@ -34,6 +34,9 @@ class IdentSellTest():
         # This is for correct mouse positioning
         self.game_wincap = WindowCapture(self.gamename)
 
+        self.shop_check_wincap = WindowCapture(
+            self.gamename, [274, 207, 444, 208])
+
     def ident_sell_repair(self):
         self.open_store_if_necessary()
         # First go through all the equipment
@@ -54,11 +57,28 @@ class IdentSellTest():
     def open_store_if_necessary(self):
         # This will search to see if the inventory is open
         # in the correct spot and then click shop if not
-        pass
+        screenshot = self.shop_check_wincap.get_screenshot()
+        pix1 = screenshot[0, 0]
+        pix1 = int(pix1[0]) + int(pix1[1]) + int(pix1[2])
+        pix2 = screenshot[0, 169]
+        pix2 = int(pix2[0]) + int(pix2[1]) + int(pix2[2])
+        if pix1 == 103 and pix2 == 223:
+            pass
+            # print("It matches")
+        else:
+            # need to open the store
+            self.game_wincap.update_window_position(border=False)
+            offsetx = self.game_wincap.window_rect[0] + 534
+            offsety = self.game_wincap.window_rect[1] + 277
+            ctypes.windll.user32.SetCursorPos(offsetx+610, offsety-10)
+            ctypes.windll.user32.mouse_event(
+                0x0002, 0, 0, 0, 0)
+            ctypes.windll.user32.mouse_event(
+                0x0004, 0, 0, 0, 0)
 
     def change_tab(self, name):
-        x = self.game_wincap.window_rect[0] + 534-60
         self.game_wincap.update_window_position(border=False)
+        x = self.game_wincap.window_rect[0] + 534-60
         if name == "Equipment":
             y = self.game_wincap.window_rect[1] + 277 - 15
         elif name == "Other":
@@ -81,7 +101,7 @@ class IdentSellTest():
                 time.sleep(0.001)
         ctypes.windll.user32.SetCursorPos(offsetx, offsety-70)
 
-        ctypes.windll.user32.SetCursorPos(offsetx+100, offsety+180)
+        ctypes.windll.user32.SetCursorPos(offsetx+610, offsety-10)
 
     def remove_empty(self, screenshot):
         non_empty = []
@@ -130,3 +150,4 @@ if __name__ == "__main__":
     ist = IdentSellTest()
     # ist.ident_sell_repair()
     ist.hover_mouse_all()
+    # ist.open_store_if_necessary()
