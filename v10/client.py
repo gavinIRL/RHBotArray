@@ -15,6 +15,7 @@ import time
 import os
 from cryptography.fernet import Fernet
 from quest_handle import QuestHandle
+from sell_repair import SellRepair
 
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
@@ -101,6 +102,9 @@ class ClientKeypressListener():
         self.delay_spread = []
         self.create_random_delays()
 
+        # These are for the sell and repair logic
+        self.sell_repair = SellRepair(last_row_protect=True)
+
     def start_mouse_listener(self):
         if not self.test:
             self.mouse_listener = mouse.Listener(
@@ -184,6 +188,11 @@ class ClientKeypressListener():
                     for server in self.list_servers:
                         server.send_message("autoloot,off")
                     print("AUTOLOOT OFF")
+            elif key == KeyCode(char='7'):
+                for server in self.list_servers:
+                    server.send_message("sellrepair,1")
+                print("Selling and repairing...")
+                self.sell_repair.ident_sell_repair()
             elif key == KeyCode(char='8'):
                 if not self.batch_recording_ongoing:
                     for server in self.list_servers:
