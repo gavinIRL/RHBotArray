@@ -109,6 +109,9 @@ class ClientKeypressListener():
         # These are for the sell and repair logic
         self.sell_repair = SellRepair(last_row_protect=True)
 
+        # These are for allowing x in all cases
+        self.xallow = False
+
     def detect_name(self):
         plyrname_rect = [165, 45, 320, 65]
         plyrname_wincap = WindowCapture(self.gamename, plyrname_rect)
@@ -226,6 +229,16 @@ class ClientKeypressListener():
                         "{:.3f}".format(
                             (time.time() - self.batch_start_time)) + "|0,0\n"
                 self.quest_handle.start_quest_handle()
+            elif key == KeyCode(char='9'):
+                self.xallow = not self.xallow
+                if self.xallow:
+                    for server in self.list_servers:
+                        server.send_message("xallow,1")
+                    print("XALLOW ON")
+                else:
+                    for server in self.list_servers:
+                        server.send_message("xallow,0")
+                    print("XALLOW OFF")
             elif GetWindowText(GetForegroundWindow()) == self.gamename:
                 if str(key) not in self.unreleased_keys:
                     if not self.batch_recording_ongoing:
@@ -262,6 +275,8 @@ class ClientKeypressListener():
         elif key == KeyCode(char='7'):
             pass
         elif key == KeyCode(char='8'):
+            pass
+        elif key == KeyCode(char='9'):
             pass
         elif self.transmitting:
             if GetWindowText(GetForegroundWindow()) == self.gamename:
