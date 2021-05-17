@@ -426,6 +426,8 @@ class RHBotArrayServer():
                 pydirectinput.keyDown("x")
                 time.sleep(0.1)
                 pydirectinput.keyUp("x")
+            elif button == "mainplayer":
+                self.main_player = direction
             elif button == "'x'":
                 if self.allowx:
                     if direction == "down":
