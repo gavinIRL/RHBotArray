@@ -197,6 +197,7 @@ class ClientKeypressListener():
                             target=self.send_batch, args=(server, self.batch, i))
                         t.start()
                     print("Ending batch record")
+                    self.batch = ""
             elif key == KeyCode(char='3'):
                 for server in self.list_servers:
                     server.send_message("revive,1")
