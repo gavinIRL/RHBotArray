@@ -14,6 +14,7 @@ from hsvfilter import grab_object_preset, HsvFilter
 import cv2
 import pytesseract
 from quest_handle import QuestHandle
+from sell_repair import SellRepair
 
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
@@ -83,6 +84,9 @@ class RHBotArrayServer():
 
         # These are related to the questhandling
         self.quest_handle = QuestHandle()
+
+        # These are related to sell and repair
+        self.sell_repair = SellRepair()
 
     def move_mouse_centre(self):
         ctypes.windll.user32.SetCursorPos(self.centre_x, self.centre_y)
@@ -433,6 +437,8 @@ class RHBotArrayServer():
                 self.quest_handle.start_quest_handle()
             elif button == "batch":
                 self.batch_handle(direction)
+            elif button == "sellrepair":
+                self.sell_repair.ident_sell_repair()
             elif button == "mainplayer":
                 self.main_player = direction
             elif direction == "down":
