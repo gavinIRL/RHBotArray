@@ -175,7 +175,7 @@ class ClientKeypressListener():
             self.listener.start()
 
     def on_press(self, key):
-        if key == KeyCode(char='4'):
+        if key == KeyCode(char='0'):
             print("Exiting bot")
             for server in self.list_servers:
                 server.delay = 0
