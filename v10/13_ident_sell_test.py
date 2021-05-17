@@ -19,13 +19,13 @@ os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 
 class IdentSellTest():
-    def __init__(self, rarity_cutoff=1, last_row=True) -> None:
+    def __init__(self, rarity_cutoff=1, last_row_protect=False) -> None:
         # rarities are as follows:
         # nocolour=0, green=1, blue=2
         self.cutoff = rarity_cutoff
         # this is for whether lastrow in equip is protected
         # useful for characters levelling with next upgrades ready
-        self.last_row = last_row
+        self.last_row_protect = last_row_protect
         with open("gamename.txt") as f:
             self.gamename = f.readline()
         self.inventory_wincap = WindowCapture(
@@ -64,7 +64,7 @@ class IdentSellTest():
         # self.hover_mouse_all()
         non_empty = self.remove_empty(screenshot)
         junk_list = self.identify_rarities_equip(non_empty, screenshot)
-        self.sell(junk_list)
+        self.sell(junk_list, "Equipment")
         # Then go through all the other loot
         self.change_tab("Other")
         time.sleep(0.1)
@@ -163,14 +163,18 @@ class IdentSellTest():
         # x,y corresponding to row,col
         return junk
 
-    def sell(self, rowcol_list):
+    def sell(self, rowcol_list, tab="Other"):
         offsetx = self.game_wincap.window_rect[0] + 534
         offsety = self.game_wincap.window_rect[1] + 277
         for item in rowcol_list:
+            if tab == "Equipment":
+                if self.last_row_protect:
+                    if item[0] == 3:
+                        continue
             x = offsetx+item[1]*44
             y = offsety+item[0]*44
             ctypes.windll.user32.SetCursorPos(x, y)
-            time.sleep(0.25)
+            time.sleep(0.03)
             ctypes.windll.user32.mouse_event(
                 0x0008, 0, 0, 0, 0)
             ctypes.windll.user32.mouse_event(
@@ -199,7 +203,7 @@ class IdentSellTest():
 
 
 if __name__ == "__main__":
-    ist = IdentSellTest()
+    ist = IdentSellTest(last_row_protect=False)
     ist.ident_sell_repair()
     # ist.hover_mouse_all()
     # ist.open_store_if_necessary()
