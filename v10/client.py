@@ -16,6 +16,10 @@ import os
 from cryptography.fernet import Fernet
 from quest_handle import QuestHandle
 from sell_repair import SellRepair
+from hsvfilter import HsvFilter
+from vision import Vision
+import cv2
+import pytesseract
 
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
@@ -104,6 +108,26 @@ class ClientKeypressListener():
 
         # These are for the sell and repair logic
         self.sell_repair = SellRepair(last_row_protect=True)
+
+    def detect_name(self):
+        plyrname_rect = [165, 45, 320, 65]
+        plyrname_wincap = WindowCapture(self.gamename, plyrname_rect)
+        plyrname_filt = HsvFilter(0, 0, 103, 89, 104, 255, 0, 0, 0, 0)
+        plyrmname_vision = Vision('xprompt67filtv2.jpg')
+        # get an updated image of the game
+        image = plyrname_wincap.get_screenshot()
+        # pre-process the image
+        image = plyrmname_vision.apply_hsv_filter(
+            image, plyrname_filt)
+        rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        results = pytesseract.image_to_data(
+            rgb, output_type=pytesseract.Output.DICT, lang='eng')
+        biggest = 0
+        for entry in results["text"]:
+            if len(entry) > biggest:
+                name = entry
+                biggest = len(entry)
+        return name
 
     def start_mouse_listener(self):
         if not self.test:
@@ -369,6 +393,10 @@ class RHBotClient():
         ckl.start_keypress_listener()
         with open("mainplayer.txt") as f:
             mainplayer = f.readline()
+        try:
+            mainplayer = ckl.detect_name()
+        except:
+            pass
         for server in list_servers:
             ClientUtils.start_server_thread(server)
             server.send_message("mainplayer,"+mainplayer)

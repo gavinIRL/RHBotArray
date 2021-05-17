@@ -441,6 +441,7 @@ class RHBotArrayServer():
                 self.sell_repair.ident_sell_repair()
             elif button == "mainplayer":
                 self.main_player = direction
+                print("Mainplayer={}".format(direction))
             elif direction == "down":
                 key = self.convert_pynput_to_pag(
                     button.replace("'", ""))
