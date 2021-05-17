@@ -304,11 +304,11 @@ class RHBotArrayServer():
             # do the action
             if line[1] == "keyDown":
                 # print("Would press {} down now".format(line[0]))
-                k = self.convert_pynput_to_pag(line[0])
+                k = self.convert_pynput_to_pag(line[0].strip("'"))
                 pydirectinput.keyDown(k)
             elif line[1] == "keyUp":
                 # print("Would press {} down now".format(line[0]))
-                k = self.convert_pynput_to_pag(line[0])
+                k = self.convert_pynput_to_pag(line[0].strip("'"))
                 pydirectinput.keyUp(k)
             elif line[1] == "click":
                 xrat, yrat = line[3].split(",")
