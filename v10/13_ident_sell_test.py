@@ -59,17 +59,17 @@ class IdentSellTest():
         self.open_store_if_necessary()
         # First go through all the equipment
         self.change_tab("Equipment")
-        time.sleep(0.1)
-        screenshot = self.inventory_wincap.get_screenshot()
         self.hover_mouse_all()
+        time.sleep(0.3)
+        screenshot = self.inventory_wincap.get_screenshot()
         non_empty = self.remove_empty(screenshot)
         junk_list = self.identify_rarities_equip(non_empty, screenshot)
         self.sell(junk_list, "Equipment")
         # Then go through all the other loot
         self.change_tab("Other")
-        time.sleep(0.1)
-        screenshot = self.inventory_wincap.get_screenshot()
         self.hover_mouse_all()
+        time.sleep(0.3)
+        screenshot = self.inventory_wincap.get_screenshot()
         non_empty = self.remove_empty(screenshot)
         junk_list = self.identify_items_other(non_empty, screenshot)
         self.sell(junk_list)
@@ -120,10 +120,10 @@ class IdentSellTest():
                 x = offsetx+j*44
                 y = offsety+i*44
                 ctypes.windll.user32.SetCursorPos(x, y)
-                time.sleep(0.001)
+                time.sleep(0.01)
         ctypes.windll.user32.SetCursorPos(offsetx, offsety-70)
 
-        ctypes.windll.user32.SetCursorPos(offsetx+610, offsety-10)
+        # ctypes.windll.user32.SetCursorPos(offsetx+610, offsety-10)
 
     def remove_empty(self, screenshot):
         non_empty = []
@@ -140,7 +140,6 @@ class IdentSellTest():
         junk = []
         for rowcol in rowcol_list:
             colour = set(screenshot[rowcol[0]*44, rowcol[1]*44])
-            # print(colour)
             if colour == self.rar_none:
                 junk.append([rowcol[0], rowcol[1]])
             elif colour == self.rar_green:
@@ -174,7 +173,7 @@ class IdentSellTest():
             x = offsetx+item[1]*44
             y = offsety+item[0]*44
             ctypes.windll.user32.SetCursorPos(x, y)
-            time.sleep(0.03)
+            time.sleep(0.1)
             ctypes.windll.user32.mouse_event(
                 0x0008, 0, 0, 0, 0)
             ctypes.windll.user32.mouse_event(
