@@ -59,6 +59,7 @@ class IdentSellTest():
         self.open_store_if_necessary()
         # First go through all the equipment
         self.change_tab("Equipment")
+        time.sleep(0.2)
         self.hover_mouse_all()
         time.sleep(0.3)
         screenshot = self.inventory_wincap.get_screenshot()
@@ -67,6 +68,7 @@ class IdentSellTest():
         self.sell(junk_list, "Equipment")
         # Then go through all the other loot
         self.change_tab("Other")
+        time.sleep(0.2)
         self.hover_mouse_all()
         time.sleep(0.3)
         screenshot = self.inventory_wincap.get_screenshot()
@@ -120,7 +122,7 @@ class IdentSellTest():
                 x = offsetx+j*44
                 y = offsety+i*44
                 ctypes.windll.user32.SetCursorPos(x, y)
-                time.sleep(0.01)
+                time.sleep(0.03)
         ctypes.windll.user32.SetCursorPos(offsetx, offsety-70)
 
         # ctypes.windll.user32.SetCursorPos(offsetx+610, offsety-10)
