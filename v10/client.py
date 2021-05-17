@@ -249,7 +249,7 @@ class ClientKeypressListener():
                         self.batch += str(key) + "|keyDown|" + \
                             "{:.3f}".format(
                                 (time.time() - self.batch_start_time)) + "|0,0\n"
-                        self.unreleased_keys.append(key)
+                        self.unreleased_keys.append(str(key))
 
         elif key == KeyCode(char='1'):
             self.transmitting = True
