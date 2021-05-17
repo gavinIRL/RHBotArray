@@ -88,6 +88,9 @@ class RHBotArrayServer():
         # These are related to sell and repair
         self.sell_repair = SellRepair()
 
+        # These are related to allow x in all cases
+        self.allowx = False
+
     def move_mouse_centre(self):
         ctypes.windll.user32.SetCursorPos(self.centre_x, self.centre_y)
 
@@ -422,7 +425,12 @@ class RHBotArrayServer():
                 time.sleep(0.1)
                 pydirectinput.keyUp("x")
             elif button == "'x'":
-                if direction == "down":
+                if self.allowx:
+                    if direction == "down":
+                        pydirectinput.keyDown("x")
+                    else:
+                        pydirectinput.keyUp("x")
+                elif direction == "down":
                     self.loot_if_available()
                 else:
                     pydirectinput.keyUp("x")
@@ -442,6 +450,11 @@ class RHBotArrayServer():
             elif button == "mainplayer":
                 self.main_player = direction
                 print("Mainplayer={}".format(direction))
+            elif button == "xallow":
+                if direction == "1":
+                    self.allowx = True
+                else:
+                    self.allowx = False
             elif direction == "down":
                 key = self.convert_pynput_to_pag(
                     button.replace("'", ""))
