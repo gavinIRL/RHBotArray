@@ -235,6 +235,8 @@ class ClientKeypressListener():
             pass
         elif key == KeyCode(char='6'):
             pass
+        elif key == KeyCode(char='7'):
+            pass
         elif key == KeyCode(char='8'):
             pass
         elif self.transmitting:
