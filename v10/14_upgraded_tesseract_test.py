@@ -33,10 +33,10 @@ class UpgradedDetectTest():
         #     rgb, output_type=pytesseract.Output.DICT, lang='eng')
         # print(results["text"][4])
         result = pytesseract.image_to_string(
-            rgb, lang='eng', boxes=False, config='--psm 7 --oem 3 -c tessedit_char_whitelist=01234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz')
+            rgb, lang='eng', config='--psm 7 --oem 3 -c tessedit_char_whitelist=01234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz')[:-2]
         print(result)
 
 
 if __name__ == "__main__":
-    udt = UpgradedDetectTest
+    udt = UpgradedDetectTest()
     udt.detect_name()
