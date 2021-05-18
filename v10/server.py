@@ -226,7 +226,7 @@ class RHBotArrayServer():
             start_time = time.time()
             self.move_towards(dir, first_rel_dists)
             move_time = time.time() - start_time
-            if not move_time < 0.05:
+            if move_time < 0.05:
                 time.sleep(0.05-move_time)
             for key in ["up", "down", "left", "right"]:
                 pydirectinput.keyUp(key)
