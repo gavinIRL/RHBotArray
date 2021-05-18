@@ -46,6 +46,8 @@ class SellRepair():
         return jl
 
     def ident_sell_repair(self):
+        self.game_wincap.update_window_position(border=False)
+        self.shop_check_wincap.update_window_position(border=False)
         self.open_store_if_necessary()
         # First go through all the equipment
         self.change_tab("Equipment")
