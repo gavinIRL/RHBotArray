@@ -385,9 +385,10 @@ class ClientUtils():
                     list_ips.append(ip.strip())
         return list_ips
 
-    def start_server_thread(server):
-        t = threading.Thread(target=server.main_loop(), daemon=True)
-        t.start()
+    def start_server_threads(list_servers):
+        for server in list_servers:
+            t = threading.Thread(target=server.main_loop)
+            t.start()
 
     def get_monitor_scaling():
         user32 = ctypes.windll.user32
@@ -407,17 +408,21 @@ class RHBotClient():
             list_servers, test, delay_spacing)
         ckl.start_mouse_listener()
         ckl.start_keypress_listener()
+
         with open("mainplayer.txt") as f:
             mainplayer = f.readline()
         try:
             mainplayer = ckl.detect_name()
         except:
             pass
+        # for server in list_servers:
+        ClientUtils.start_server_threads(list_servers)
+        print("Got to here")
+        time.sleep(0.25)
         for server in list_servers:
-            ClientUtils.start_server_thread(server)
             server.send_message("mainplayer,"+mainplayer)
         while True:
-            time.sleep(0.5)
+            time.sleep(0.25)
             if ckl.batch_recording_ongoing:
                 if time.time() > ckl.batch_start_time + 10:
                     if len(ckl.unreleased_keys) == 0:
