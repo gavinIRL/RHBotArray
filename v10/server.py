@@ -152,6 +152,8 @@ class RHBotArrayServer():
         return truex, truey
 
     def get_relative_dists(self):
+        print(self.main_player)
+        print(self.curr_player)
         # format is currplayer x, y, mainplayer x, y
         positions = [0, 0, 0, 0]
         # get an updated image of the game
@@ -427,7 +429,8 @@ class RHBotArrayServer():
                 time.sleep(0.1)
                 pydirectinput.keyUp("x")
             elif button == "mainplayer":
-                self.main_player = direction
+                self.curr_player = direction
+                print("Admin player name is "+direction)
             elif button == "'x'":
                 if self.allowx:
                     if direction == "down":
