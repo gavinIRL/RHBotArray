@@ -52,6 +52,6 @@ class BigMapPlayerCheck():
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 filter = HsvFilter(34, 160, 122, 50, 255, 255, 0, 0, 0, 0)
 sfi = BigMapPlayerCheck()
-existing_image = "18_SW.png"
-save_image = "18_SW_plyronly.jpg"
+existing_image = "SW.png"
+save_image = "SW_plyronly.jpg"
 sfi.save_and_convert(filter, existing_image, save_image)
