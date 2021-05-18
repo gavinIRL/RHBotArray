@@ -103,7 +103,15 @@ class RHBotArrayServer():
         rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         results = pytesseract.image_to_data(
             rgb, output_type=pytesseract.Output.DICT, lang='eng')
-        return results["text"][4]
+        str_list = filter(None, results["text"])
+        with open("mainplayer.txt") as f:
+            longest = f.readline()
+        # try:
+        #     longest = max(str_list, key=len)
+        # except:
+        #     with open("mainplayer.txt") as f:
+        #         longest = f.readline()
+        return longest
 
     def grab_current_lan_ip(self):
         output = subprocess.run(
@@ -218,8 +226,8 @@ class RHBotArrayServer():
             start_time = time.time()
             self.move_towards(dir, first_rel_dists)
             move_time = time.time() - start_time
-            if not move_time < 0.1:
-                time.sleep(0.1-move_time)
+            if not move_time < 0.05:
+                time.sleep(0.05-move_time)
             for key in ["up", "down", "left", "right"]:
                 pydirectinput.keyUp(key)
             end_time = time.time() - start_time
@@ -233,19 +241,19 @@ class RHBotArrayServer():
                 # Need to reverse direction
                 if first_rel_dists[index] > 0:
                     pydirectinput.keyDown(key1)
-                    time.sleep((end_time-start_time)/percent_moved)
+                    time.sleep((end_time)/percent_moved)
                     pydirectinput.keyUp(key1)
                 else:
                     pydirectinput.keyDown(key2)
-                    time.sleep((end_time-start_time)/percent_moved)
+                    time.sleep((end_time)/percent_moved)
                     pydirectinput.keyUp(key2)
             elif percent_moved < 0.9:
                 # Need to continue
-                travel_time_reqd = (1-percent_moved)*(end_time-start_time)
+                travel_time_reqd = (1-percent_moved)*(end_time)
                 start_time = time.time()
                 self.move_towards(dir, last_rel_dists)
                 move_time = time.time() - start_time
-                if not move_time < travel_time_reqd:
+                if move_time < travel_time_reqd:
                     time.sleep(travel_time_reqd-move_time)
                 for key in ["up", "down", "left", "right"]:
                     pydirectinput.keyUp(key)
