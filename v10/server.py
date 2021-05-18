@@ -461,8 +461,7 @@ class RHBotArrayServer():
             elif button == "batch":
                 self.batch_handle(direction)
             elif button == "sellrepair":
-                pass
-                # os.popen('python sell_repair.py')
+                os.popen('python sell_repair.py')
             elif button == "mainplayer":
                 self.main_player = direction
                 print("Mainplayer={}".format(direction))
