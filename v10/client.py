@@ -411,13 +411,12 @@ class RHBotClient():
 
         with open("mainplayer.txt") as f:
             mainplayer = f.readline()
-        try:
-            mainplayer = ckl.detect_name()
-        except:
-            pass
+        # try:
+        #     mainplayer = ckl.detect_name()
+        # except:
+        #     pass
         # for server in list_servers:
         ClientUtils.start_server_threads(list_servers)
-        print("Got to here")
         time.sleep(0.25)
         for server in list_servers:
             server.send_message("mainplayer,"+mainplayer)
