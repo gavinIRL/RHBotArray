@@ -108,6 +108,7 @@ class ClientKeypressListener():
 
         # These are for the sell and repair logic
         self.sell_repair = SellRepair(last_row_protect=True)
+        self.selling_ongoing = 0
 
         # These are for allowing x in all cases
         self.xallow = False
@@ -175,13 +176,16 @@ class ClientKeypressListener():
             self.listener.start()
 
     def on_press(self, key):
-        if key == KeyCode(char='0'):
+        if self.selling_ongoing != 0:
+            if self.selling_ongoing > time.time() + 3:
+                self.selling_ongoing = 0
+        elif key == KeyCode(char='0'):
             print("Exiting bot")
             for server in self.list_servers:
                 server.delay = 0
                 server.send_message("quit,1")
             os._exit(1)
-        if self.transmitting:
+        elif self.transmitting:
             if key == KeyCode(char='1'):
                 self.transmitting = False
                 print("TRANSMIT OFF")
@@ -217,10 +221,12 @@ class ClientKeypressListener():
                         server.send_message("autoloot,off")
                     print("AUTOLOOT OFF")
             elif key == KeyCode(char='7'):
+                self.selling_ongoing = time.time()
                 for server in self.list_servers:
                     server.send_message("sellrepair,1")
                 print("Selling and repairing...")
-                self.sell_repair.ident_sell_repair()
+                os.popen('python sell_repair.py')
+                # self.sell_repair.ident_sell_repair()
             elif key == KeyCode(char='8'):
                 if not self.batch_recording_ongoing:
                     for server in self.list_servers:
@@ -251,7 +257,6 @@ class ClientKeypressListener():
                             "{:.3f}".format(
                                 (time.time() - self.batch_start_time)) + "|0,0\n"
                         self.unreleased_keys.append(str(key))
-
         elif key == KeyCode(char='1'):
             self.transmitting = True
             if self.batch_recording_ongoing:
