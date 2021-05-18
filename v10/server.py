@@ -217,12 +217,12 @@ class RHBotArrayServer():
             # then start resolving the x direction
             start_time = time.time()
             self.move_towards(dir, first_rel_dists)
-            move_time = time.time() - start_time()
+            move_time = time.time() - start_time
             if not move_time < 0.1:
                 time.sleep(0.1-move_time)
             for key in ["up", "down", "left", "right"]:
                 pydirectinput.keyUp(key)
-            end_time = time.time() - start_time()
+            end_time = time.time() - start_time
 
             last_rel_dists = self.get_relative_dists()
             if not last_rel_dists:
@@ -244,7 +244,7 @@ class RHBotArrayServer():
                 travel_time_reqd = (1-percent_moved)*(end_time-start_time)
                 start_time = time.time()
                 self.move_towards(dir, last_rel_dists)
-                move_time = time.time() - start_time()
+                move_time = time.time() - start_time
                 if not move_time < travel_time_reqd:
                     time.sleep(travel_time_reqd-move_time)
                 for key in ["up", "down", "left", "right"]:
