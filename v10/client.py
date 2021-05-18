@@ -143,8 +143,11 @@ class ClientKeypressListener():
         self.mouse_listener.start()
 
     def on_click(self, x, y, button, pressed):
+        if self.selling_ongoing != 0:
+            if self.selling_ongoing < time.time() - 5:
+                self.selling_ongoing = 0
         # First off need to check if transmitting is enabled
-        if self.transmitting:
+        elif self.transmitting:
             # Need to then check if the click was in the right window
             # Do this by checking if window focused
             if GetWindowText(GetForegroundWindow()) == self.gamename:
@@ -177,7 +180,7 @@ class ClientKeypressListener():
 
     def on_press(self, key):
         if self.selling_ongoing != 0:
-            if self.selling_ongoing > time.time() + 3:
+            if self.selling_ongoing < time.time() - 5:
                 self.selling_ongoing = 0
         elif key == KeyCode(char='0'):
             print("Exiting bot")
