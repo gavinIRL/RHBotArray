@@ -113,8 +113,11 @@ class SellRepair():
             for j in range(6):
                 x = offsetx+j*44
                 y = offsety+i*44
+                ctypes.windll.user32.SetCursorPos(x-10, y)
+                time.sleep(0.03)
                 ctypes.windll.user32.SetCursorPos(x, y)
                 time.sleep(0.03)
+                ctypes.windll.user32.SetCursorPos(x+10, y)
         ctypes.windll.user32.SetCursorPos(offsetx, offsety-70)
 
         # ctypes.windll.user32.SetCursorPos(offsetx+610, offsety-10)
