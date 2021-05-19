@@ -23,10 +23,10 @@ os.chdir(os.path.dirname(os.path.abspath(__file__)))
 #     gamename = f.readline()
 # with open("player.txt") as f:
 #     main_player = f.readline()
-x = 10
+x = 200
 y = 140
-w = 300
-h = 200
+w = 900
+h = 600
 wincap = WindowCapture(custom_rect=[x, y, w+x, h+y])
 # initialize the Vision class
 vision_limestone = Vision('xprompt67filtv2.jpg')
