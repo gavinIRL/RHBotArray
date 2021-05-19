@@ -22,13 +22,33 @@ from client import ClientUtils
 class PlayerPositionTest():
 
     def __init__(self) -> None:
-        pass
+        self.rects = self.load_level_rects()
 
     def start(self):
-        pass
+        level_name = self.detect_level_name()
+        # Then grab the right rect for the level
+        rect = self.rects[level_name]
+        # Then open the map
+        while not self.detect_bigmap_open():
+            # Press M
+            pass
+        print(self.grab_player_pos())
+        # Then close the map
+        while self.detect_bigmap_open():
+            # Press M
+            pass
+
+    def load_level_rects(self):
+        rects = {}
+        return rects
 
     def detect_level_name(self):
-        pass
+        name = ""
+        return name
 
     def detect_bigmap_open(self):
-        pass
+        return True
+
+    def grab_player_pos(self):
+        xrat, yrat = (0.5, 0.5)
+        return xrat, yrat
