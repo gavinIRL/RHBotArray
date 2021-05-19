@@ -3,6 +3,7 @@ from hsvfilter import HsvFilter, grab_object_preset
 import numpy as np
 import os
 from vision import Vision
+import time
 
 
 class BigMapPlayerCheck():
@@ -53,6 +54,7 @@ class BigMapPlayerCheck():
 
 
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
+start_time = time.time()
 filter = HsvFilter(34, 160, 122, 50, 255, 255, 0, 0, 0, 0)
 sfi = BigMapPlayerCheck()
 existing_image = "CH.jpg"
@@ -65,5 +67,6 @@ rectangles = vision_limestone.find(
     save_image, threshold=0.31, epsilon=0.5)
 output_image = vision_limestone.draw_rectangles(save_image, rectangles)
 cv.imshow('Matches', output_image)
+print("Time taken: {}s".format(time.time()-start_time))
 cv.waitKey(0)
 cv.destroyAllWindows()
