@@ -85,7 +85,7 @@ class PlayerPositionTest():
         return result
 
     def detect_bigmap_open(self):
-        wincap = WindowCapture(custom_rect=[819, 263, 852, 264])
+        wincap = WindowCapture(self.gamename, custom_rect=[819, 263, 852, 264])
         image = wincap.get_screenshot()
         if set(image[0][0]) == {5, 3, 1}:
             if set(image[19][0]) == {51, 24, 23}:
@@ -94,8 +94,17 @@ class PlayerPositionTest():
         return False
 
     def grab_player_pos(self):
-        xrat, yrat = (0.5, 0.5)
-        return xrat, yrat
+        wincap = WindowCapture(self.gamename, self.map_rect)
+        image = wincap.get_screenshot()
+        save_image = self.filter_blackwhite_invert(filter, image)
+        vision_limestone = Vision('plyr.jpg')
+        rectangles = vision_limestone.find(
+            save_image, threshold=0.31, epsilon=0.5)
+        points = vision_limestone.get_click_points(rectangles)
+        if len(points) == 1:
+            x, y = points[0]
+            return x, y
+        return False
 
     def shift_channel(self, c, amount):
         if amount > 0:
