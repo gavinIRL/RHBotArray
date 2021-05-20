@@ -45,7 +45,7 @@ class PlayerPositionTest():
 
     def load_level_rects(self):
         # Load the translation from name to num
-        with open("level_name_num.txt") as f:
+        with open("lvl_name_num.txt") as f:
             self.num_names = f.readlines()
         for i, entry in enumerate(self.num_names):
             self.num_names[i] = entry.split("-")
@@ -58,9 +58,9 @@ class PlayerPositionTest():
         for number, name in self.num_names:
             for num, area, rect in nums_rects:
                 if area == "FM" and num == number:
-                    self.rects[name] = rect
+                    self.rects[name.rstrip()] = rect.rstrip()
                     break
-        print(self.rects)
+        # print(self.rects)
 
     def detect_level_name(self):
         existing_image = WindowCapture(self.gamename, [1121, 31, 1248, 44])
@@ -123,3 +123,7 @@ class PlayerPositionTest():
         inverted = cv.cvtColor(inverted, cv.COLOR_GRAY2BGR)
         return inverted
         # cv.imwrite(save_image, inverted)
+
+
+if __name__ == "__main__":
+    ppt = PlayerPositionTest()
