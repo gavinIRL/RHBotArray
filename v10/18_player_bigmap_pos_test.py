@@ -23,6 +23,8 @@ os.chdir(os.path.dirname(os.path.abspath(__file__)))
 class PlayerPositionTest():
 
     def __init__(self) -> None:
+        self.map_rect = None
+        self.level_name = None
         self.rects = {}
         self.num_names = []
         self.load_level_rects()
@@ -30,18 +32,25 @@ class PlayerPositionTest():
             self.gamename = f.readline()
 
     def start(self):
-        level_name = self.detect_level_name()
+        self.level_name = self.detect_level_name()
         # Then grab the right rect for the level
-        rect = self.rects[level_name]
+        self.map_rect = self.string_to_rect(self.rects[self.level_name])
         # Then open the map
         while not self.detect_bigmap_open():
             # Press M
-            pass
-        print(self.grab_player_pos())
+            pydirectinput.keyDown("m")
+            time.sleep(0.08)
+            pydirectinput.keyUp("m")
+            time.sleep(0.08)
+        player_pos = self.grab_player_pos()
+        print(player_pos)
         # Then close the map
         while self.detect_bigmap_open():
             # Press M
             pass
+
+    def string_to_rect(self, string: str):
+        return [int(i) for i in string.split(',')]
 
     def load_level_rects(self):
         # Load the translation from name to num
