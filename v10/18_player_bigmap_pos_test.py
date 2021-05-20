@@ -23,7 +23,9 @@ os.chdir(os.path.dirname(os.path.abspath(__file__)))
 class PlayerPositionTest():
 
     def __init__(self) -> None:
-        self.rects = self.load_level_rects()
+        self.rects = {}
+        self.num_names = []
+        self.load_level_rects()
         with open("gamename.txt") as f:
             self.gamename = f.readline()
 
@@ -42,8 +44,23 @@ class PlayerPositionTest():
             pass
 
     def load_level_rects(self):
-        rects = {}
-        return rects
+        # Load the translation from name to num
+        with open("level_name_num.txt") as f:
+            self.num_names = f.readlines()
+        for i, entry in enumerate(self.num_names):
+            self.num_names[i] = entry.split("-")
+        # Load the num to rect catalogue
+        with open("catalogue.txt") as f:
+            nums_rects = f.readlines()
+        for i, entry in enumerate(nums_rects):
+            nums_rects[i] = entry.split("-")
+        # Then add each rect to the rects dict against name
+        for number, name in self.num_names:
+            for num, area, rect in nums_rects:
+                if area == "FM" and num == number:
+                    self.rects[name] = rect
+                    break
+        print(self.rects)
 
     def detect_level_name(self):
         existing_image = WindowCapture(self.gamename, [1121, 31, 1248, 44])
