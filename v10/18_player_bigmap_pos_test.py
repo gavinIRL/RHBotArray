@@ -73,7 +73,8 @@ class PlayerPositionTest():
         # print(self.rects)
 
     def detect_level_name(self):
-        existing_image = WindowCapture(self.gamename, [1121, 31, 1248, 44])
+        wincap = WindowCapture(self.gamename, [1121, 31, 1248, 44])
+        existing_image = wincap.get_screenshot()
         filter = HsvFilter(0, 0, 103, 89, 104, 255, 0, 0, 0, 0)
         vision = Vision('xprompt67filtv2.jpg')
         save_image = vision.apply_hsv_filter(existing_image, filter)
@@ -84,7 +85,13 @@ class PlayerPositionTest():
         return result
 
     def detect_bigmap_open(self):
-        return True
+        wincap = WindowCapture(custom_rect=[819, 263, 852, 264])
+        image = wincap.get_screenshot()
+        if set(image[0][0]) == {5, 3, 1}:
+            if set(image[19][0]) == {51, 24, 23}:
+                if set(image[32][0]) == {168, 158, 159}:
+                    return True
+        return False
 
     def grab_player_pos(self):
         xrat, yrat = (0.5, 0.5)
@@ -137,3 +144,4 @@ class PlayerPositionTest():
 
 if __name__ == "__main__":
     ppt = PlayerPositionTest()
+    ppt.detect_bigmap_open()
