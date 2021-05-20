@@ -37,17 +37,18 @@ class PlayerPositionTest():
         self.map_rect = self.string_to_rect(self.rects[self.level_name])
         # Then open the map
         while not self.detect_bigmap_open():
-            # Press M
-            pydirectinput.keyDown("m")
-            time.sleep(0.08)
-            pydirectinput.keyUp("m")
-            time.sleep(0.08)
+            self.try_toggle_map()
         player_pos = self.grab_player_pos()
         print(player_pos)
         # Then close the map
         while self.detect_bigmap_open():
-            # Press M
-            pass
+            self.try_toggle_map()
+
+    def try_toggle_map(self):
+        pydirectinput.keyDown("m")
+        time.sleep(0.08)
+        pydirectinput.keyUp("m")
+        time.sleep(0.08)
 
     def string_to_rect(self, string: str):
         return [int(i) for i in string.split(',')]
