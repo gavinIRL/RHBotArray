@@ -38,7 +38,7 @@ class DSTest():
             pydirectinput.keyDown("x")
             time.sleep(0.05)
             pydirectinput.keyUp("x")
-        if key == keyboard.Key.f12:
+        if key == keyboard.Key.f11:
             os._exit(1)
 
     def on_release(self, key):
