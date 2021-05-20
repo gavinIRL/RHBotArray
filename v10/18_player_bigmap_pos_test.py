@@ -32,17 +32,21 @@ class PlayerPositionTest():
             self.gamename = f.readline()
 
     def start(self):
+        time.sleep(3)
+        print("Starting")
         self.level_name = self.detect_level_name()
         # Then grab the right rect for the level
         self.map_rect = self.string_to_rect(self.rects[self.level_name])
         # Then open the map
         while not self.detect_bigmap_open():
             self.try_toggle_map()
+            break
         player_pos = self.grab_player_pos()
         print(player_pos)
         # Then close the map
         while self.detect_bigmap_open():
             self.try_toggle_map()
+            break
 
     def try_toggle_map(self):
         pydirectinput.keyDown("m")
@@ -75,9 +79,7 @@ class PlayerPositionTest():
     def detect_level_name(self):
         wincap = WindowCapture(self.gamename, [1121, 31, 1248, 44])
         existing_image = wincap.get_screenshot()
-        filter = HsvFilter(0, 0, 103, 89, 104, 255, 0, 0, 0, 0)
-        vision = Vision('xprompt67filtv2.jpg')
-        save_image = vision.apply_hsv_filter(existing_image, filter)
+        save_image = existing_image
         rgb = cv2.cvtColor(save_image, cv2.COLOR_BGR2RGB)
         tess_config = '--psm 7 --oem 3 -c tessedit_char_whitelist=01234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
         result = pytesseract.image_to_string(
@@ -85,16 +87,19 @@ class PlayerPositionTest():
         return result
 
     def detect_bigmap_open(self):
-        wincap = WindowCapture(self.gamename, custom_rect=[819, 263, 852, 264])
+        wincap = WindowCapture(self.gamename, custom_rect=[820, 263, 853, 464])
         image = wincap.get_screenshot()
+        cv2.imwrite("testy.jpg", image)
+        print("{},{},{}".format(image[0][0], image[0][19], image[0][32]))
         if set(image[0][0]) == {5, 3, 1}:
-            if set(image[19][0]) == {51, 24, 23}:
-                if set(image[32][0]) == {168, 158, 159}:
+            if set(image[0][19]) == {51, 24, 23}:
+                if set(image[0][32]) == {168, 158, 159}:
                     return True
         return False
 
     def grab_player_pos(self):
         wincap = WindowCapture(self.gamename, self.map_rect)
+        filter = HsvFilter(34, 160, 122, 50, 255, 255, 0, 0, 0, 0)
         image = wincap.get_screenshot()
         save_image = self.filter_blackwhite_invert(filter, image)
         vision_limestone = Vision('plyr.jpg')
@@ -119,8 +124,7 @@ class PlayerPositionTest():
         return c
 
     def filter_blackwhite_invert(self, filter, existing_image):
-        img = cv.imread(existing_image, cv.IMREAD_UNCHANGED)
-        hsv = cv.cvtColor(img, cv.COLOR_BGR2HSV)
+        hsv = cv.cvtColor(existing_image, cv.COLOR_BGR2HSV)
         hsv_filter = filter
         # add/subtract saturation and value
         h, s, v = cv.split(hsv)
@@ -153,4 +157,4 @@ class PlayerPositionTest():
 
 if __name__ == "__main__":
     ppt = PlayerPositionTest()
-    ppt.detect_bigmap_open()
+    ppt.start()
