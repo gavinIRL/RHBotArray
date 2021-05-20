@@ -38,9 +38,9 @@ class PlayerPositionTest():
         # Then grab the right rect for the level
         self.map_rect = self.string_to_rect(self.rects[self.level_name])
         # Then open the map
+        time.sleep(0.07)
         while not self.detect_bigmap_open():
             self.try_toggle_map()
-            break
         player_pos = self.grab_player_pos()
         print(player_pos)
         # Then close the map
@@ -52,7 +52,7 @@ class PlayerPositionTest():
         pydirectinput.keyDown("m")
         time.sleep(0.08)
         pydirectinput.keyUp("m")
-        time.sleep(0.08)
+        time.sleep(0.12)
 
     def string_to_rect(self, string: str):
         return [int(i) for i in string.split(',')]
@@ -87,14 +87,15 @@ class PlayerPositionTest():
         return result
 
     def detect_bigmap_open(self):
-        wincap = WindowCapture(self.gamename, custom_rect=[820, 263, 853, 464])
+        wincap = WindowCapture(self.gamename, custom_rect=[819, 263, 855, 264])
         image = wincap.get_screenshot()
         cv2.imwrite("testy.jpg", image)
-        print("{},{},{}".format(image[0][0], image[0][19], image[0][32]))
-        if set(image[0][0]) == {5, 3, 1}:
-            if set(image[0][19]) == {51, 24, 23}:
-                if set(image[0][32]) == {168, 158, 159}:
-                    return True
+        a, b, c = [int(i) for i in image[0][0]]
+        d, e, f = [int(i) for i in image[0][-2]]
+        if a+b+c < 30:
+            if d+e+f > 700:
+                # print("Working")
+                return True
         return False
 
     def grab_player_pos(self):
@@ -157,4 +158,6 @@ class PlayerPositionTest():
 
 if __name__ == "__main__":
     ppt = PlayerPositionTest()
+    start = time.time()
     ppt.start()
+    print("Time taken: {}s".format(time.time() - start))
