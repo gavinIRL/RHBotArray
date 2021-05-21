@@ -4,6 +4,9 @@ import time
 # Bunch of stuff so that the script can send keystrokes to game #
 
 SendInput = ctypes.windll.user32.SendInput
+MapVirtualKey = ctypes.windll.user32.MapVirtualKeyW
+
+MAPVK_VK_TO_VSC = 0
 
 # C struct redefinitions
 PUL = ctypes.POINTER(ctypes.c_ulong)
@@ -46,20 +49,48 @@ class Input(ctypes.Structure):
 
 
 def PressKey(hexKeyCode):
-    extra = ctypes.c_ulong(0)
-    ii_ = Input_I()
-    ii_.ki = KeyBdInput(0, hexKeyCode, 0x0008, 0, ctypes.pointer(extra))
-    x = Input(ctypes.c_ulong(1), ii_)
-    ctypes.windll.user32.SendInput(1, ctypes.pointer(x), ctypes.sizeof(x))
+    # print(hexKeyCode)
+    if hexKeyCode in [75, 76, 77, 78]:
+        # Do the primary key
+        hexKeyCode2 = 0xE0
+        extra = ctypes.c_ulong(0)
+        ii_ = Input_I()
+        ii_.ki = KeyBdInput(0, hexKeyCode2, 0x0008, 0, ctypes.pointer(extra))
+        x = Input(ctypes.c_ulong(1), ii_)
+        SendInput(1, ctypes.pointer(x), ctypes.sizeof(x))
+        # then the arrow itself
+        ii_.ki = KeyBdInput(0, hexKeyCode, 0x0001, 0, ctypes.pointer(extra))
+        x = Input(ctypes.c_ulong(1), ii_)
+        ctypes.windll.user32.SendInput(1, ctypes.pointer(x), ctypes.sizeof(x))
+        SendInput(1, ctypes.pointer(x), ctypes.sizeof(x))
+
+    else:
+        extra = ctypes.c_ulong(0)
+        ii_ = Input_I()
+        ii_.ki = KeyBdInput(0, hexKeyCode, 0x0008, 0, ctypes.pointer(extra))
+        x = Input(ctypes.c_ulong(1), ii_)
+        ctypes.windll.user32.SendInput(1, ctypes.pointer(x), ctypes.sizeof(x))
 
 
 def ReleaseKey(hexKeyCode):
+    keybdFlags = 0x0008 | 0x0002
+    if hexKeyCode in [75, 76, 77, 78]:
+        keybdFlags |= 0x0001
     extra = ctypes.c_ulong(0)
     ii_ = Input_I()
-    ii_.ki = KeyBdInput(0, hexKeyCode, 0x0008 | 0x0002,
+    ii_.ki = KeyBdInput(0, hexKeyCode, keybdFlags,
                         0, ctypes.pointer(extra))
     x = Input(ctypes.c_ulong(1), ii_)
     ctypes.windll.user32.SendInput(1, ctypes.pointer(x), ctypes.sizeof(x))
+
+    if hexKeyCode in [75, 76, 77, 78] and ctypes.windll.user32.GetKeyState(0x90):
+        hexKeyCode = 0xE0
+        extra = ctypes.c_ulong(0)
+        ii_ = Input_I()
+        ii_.ki = KeyBdInput(0, hexKeyCode, 0x0008 | 0x0002,
+                            0, ctypes.pointer(extra))
+        x = Input(ctypes.c_ulong(1), ii_)
+        ctypes.windll.user32.SendInput(1, ctypes.pointer(x), ctypes.sizeof(x))
 
 
 KEYBOARD_MAPPING = {
@@ -99,24 +130,20 @@ KEYBOARD_MAPPING = {
     'b': 0x30,
     'n': 0x31,
     'm': 0x32,
+    'up': MapVirtualKey(0x26, MAPVK_VK_TO_VSC),
+    'left': MapVirtualKey(0x25, MAPVK_VK_TO_VSC),
+    'down': MapVirtualKey(0x28, MAPVK_VK_TO_VSC),
+    'right': MapVirtualKey(0x27, MAPVK_VK_TO_VSC),
 }
 
-
-time.sleep(2)
-start_time = time.time()
-pydirectinput.keyDown("i")
-print("Keydown time = {}s".format(time.time()-start_time))
-time.sleep(0.08)
-start_time = time.time()
-pydirectinput.keyUp("i")
-print("Keydown time = {}s".format(time.time()-start_time))
-
-key = "i"
+time.sleep(4)
+key = "left"
+numlock = False
 hexKeyCode = KEYBOARD_MAPPING[key]
 start_time = time.time()
 PressKey(hexKeyCode)
-print("Keydown time = {}s".format(time.time()-start_time))
-time.sleep(0.08)
+print("KeyDown time: {}".format(time.time()-start_time))
+time.sleep(0.8)
 start_time = time.time()
 ReleaseKey(hexKeyCode)
-print("Keydown time = {}s".format(time.time()-start_time))
+print("KeyUp time: {}".format(time.time()-start_time))
