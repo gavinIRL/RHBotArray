@@ -33,12 +33,12 @@ class PlayerPositionTest():
 
     def start(self):
         time.sleep(3)
-        print("Starting")
+        # print("Starting")
+        start = time.time()
         self.level_name = self.detect_level_name()
         # Then grab the right rect for the level
         self.map_rect = self.string_to_rect(self.rects[self.level_name])
         # Then open the map
-        time.sleep(0.07)
         while not self.detect_bigmap_open():
             self.try_toggle_map()
         player_pos = self.grab_player_pos()
@@ -46,13 +46,13 @@ class PlayerPositionTest():
         # Then close the map
         while self.detect_bigmap_open():
             self.try_toggle_map()
-            break
+        print("Time taken: {}s".format(time.time() - start))
 
     def try_toggle_map(self):
         pydirectinput.keyDown("m")
-        time.sleep(0.08)
+        time.sleep(0.05)
         pydirectinput.keyUp("m")
-        time.sleep(0.12)
+        time.sleep(0.08)
 
     def string_to_rect(self, string: str):
         return [int(i) for i in string.split(',')]
@@ -158,6 +158,4 @@ class PlayerPositionTest():
 
 if __name__ == "__main__":
     ppt = PlayerPositionTest()
-    start = time.time()
     ppt.start()
-    print("Time taken: {}s".format(time.time() - start))
