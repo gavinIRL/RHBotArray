@@ -20,6 +20,9 @@ from hsvfilter import HsvFilter
 from vision import Vision
 import cv2
 import pytesseract
+from fuzzywuzzy import process
+import pydirectinput
+import numpy as np
 
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
@@ -112,6 +115,67 @@ class ClientKeypressListener():
 
         # These are for allowing x in all cases
         self.xallow = False
+
+        # These are for the v2 regroup command
+        self.map_rect = None
+        self.level_name = None
+        self.speed = 20
+        self.rects = {}
+        self.speeds = {}
+        self.num_names = []
+        self.load_level_rects()
+        self.key_map = ClientUtils.load_key_dict()
+        self.player_pos = None
+
+    def try_toggle_map(self):
+        pydirectinput.keyDown("m")
+        time.sleep(0.05)
+        pydirectinput.keyUp("m")
+        time.sleep(0.08)
+
+    def string_to_rect(self, string: str):
+        return [int(i) for i in string.split(',')]
+
+    def load_level_rects(self):
+        # Load the translation from name to num
+        with open("lvl_name_num.txt") as f:
+            self.num_names = f.readlines()
+        for i, entry in enumerate(self.num_names):
+            self.num_names[i] = entry.split("-")
+        # Load the num to rect catalogue
+        with open("catalogue.txt") as f:
+            nums_rects = f.readlines()
+        for i, entry in enumerate(nums_rects):
+            nums_rects[i] = entry.split("-")
+        # Finally load the level speeds
+        with open("lvl_speed.txt") as f:
+            num_speeds = f.readlines()
+        for i, entry in enumerate(num_speeds):
+            num_speeds[i] = entry.split("|")
+        # Then add each rect to the rects dict against name
+        # Also add each speed to the speed dict against name
+        for number, name in self.num_names:
+            for num, area, rect in nums_rects:
+                if area == "FM" and num == number:
+                    self.rects[name.rstrip().replace(" ", "")] = rect.rstrip()
+                    if "1" in name:
+                        self.rects[name.rstrip().replace(
+                            " ", "").replace("1", "L")] = rect.rstrip()
+                    if "ri" in name:
+                        self.rects[name.rstrip().replace(
+                            " ", "").replace("ri", "n").replace("1", "L")] = rect.rstrip()
+                    break
+            for num, speed in num_speeds:
+                if num == number:
+                    self.speeds[name.rstrip().replace(
+                        " ", "")] = float(speed.rstrip())
+                    if "1" in name:
+                        self.speeds[name.rstrip().replace(
+                            " ", "").replace("1", "L")] = float(speed.rstrip())
+                    if "ri" in name:
+                        self.speeds[name.rstrip().replace(
+                            " ", "").replace("ri", "n").replace("1", "L")] = float(speed.rstrip())
+                    break
 
     def detect_name(self):
         plyrname_rect = [165, 45, 320, 65]
@@ -210,8 +274,9 @@ class ClientKeypressListener():
                     server.send_message("revive,1")
                 print("Reviving...")
             elif key == KeyCode(char='5'):
+                x, y = self.grab_player_pos()
                 for server in self.list_servers:
-                    server.send_message("regroup,1")
+                    server.send_message("regroup,{}|{}".format(x, y))
                 print("Regrouping...")
             elif key == KeyCode(char='6'):
                 self.autoloot_enabled = not self.autoloot_enabled
@@ -270,6 +335,27 @@ class ClientKeypressListener():
             self.batch_recording_ongoing = False
             print("TRANSMIT ON")
 
+    def grab_player_pos(self):
+        self.level_name = self.detect_level_name()
+        # Then grab the right rect for the level
+        try:
+            self.map_rect = self.string_to_rect(self.rects[self.level_name])
+            self.speed = self.speeds[self.level_name]
+        except:
+            try:
+                best_match = process.extractOne(
+                    self.level_name, self.rects, score_cutoff=0.8)
+                self.map_rect = self.string_to_rect(
+                    self.rects[best_match])
+                self.speed = self.speeds[best_match]
+            except:
+                self.map_rect = [362, 243, 1105, 748]
+                self.speed = 30
+        # Then open the map
+        if not self.detect_bigmap_open():
+            self.try_toggle_map()
+        return self.grab_player_pos()
+
     def on_release(self, key):
         if key == KeyCode(char='1'):
             pass
@@ -320,6 +406,80 @@ class ClientKeypressListener():
     #     truex = int((relx + self.game_wincap.window_rect[0]))
     #     truey = int((rely + self.game_wincap.window_rect[1]))
     #     return truex, truey
+
+    def filter_blackwhite_invert(self, filter, existing_image):
+        hsv = cv2.cvtColor(existing_image, cv2.COLOR_BGR2HSV)
+        hsv_filter = filter
+        # add/subtract saturation and value
+        h, s, v = cv2.split(hsv)
+        s = self.shift_channel(s, hsv_filter.sAdd)
+        s = self.shift_channel(s, -hsv_filter.sSub)
+        v = self.shift_channel(v, hsv_filter.vAdd)
+        v = self.shift_channel(v, -hsv_filter.vSub)
+        hsv = cv2.merge([h, s, v])
+
+        # Set minimum and maximum HSV values to display
+        lower = np.array([hsv_filter.hMin, hsv_filter.sMin, hsv_filter.vMin])
+        upper = np.array([hsv_filter.hMax, hsv_filter.sMax, hsv_filter.vMax])
+        # Apply the thresholds
+        mask = cv2.inRange(hsv, lower, upper)
+        result = cv2.bitwise_and(hsv, hsv, mask=mask)
+
+        # convert back to BGR
+        img = cv2.cvtColor(result, cv2.COLOR_HSV2BGR)
+        # now change it to greyscale
+        grayImage = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        # now change it to black and white
+        (thresh, blackAndWhiteImage) = cv2.threshold(
+            grayImage, 67, 255, cv2.THRESH_BINARY)
+        # now invert it
+        inverted = (255-blackAndWhiteImage)
+        inverted = cv2.cvtColor(inverted, cv2.COLOR_GRAY2BGR)
+        return inverted
+
+    def shift_channel(self, c, amount):
+        if amount > 0:
+            lim = 255 - amount
+            c[c >= lim] = 255
+            c[c < lim] += amount
+        elif amount < 0:
+            amount = -amount
+            lim = amount
+            c[c <= lim] = 0
+            c[c > lim] -= amount
+        return c
+
+    def detect_level_name(self):
+        wincap = WindowCapture(self.gamename, [1121, 31, 1248, 44])
+        existing_image = wincap.get_screenshot()
+        filter = HsvFilter(0, 0, 0, 169, 34, 255, 0, 0, 0, 0)
+        vision_limestone = Vision('plyr.jpg')
+        # cv2.imwrite("testy2.jpg", existing_image)
+        save_image = vision_limestone.apply_hsv_filter(existing_image, filter)
+        # cv2.imwrite("testy3.jpg", save_image)
+        gray_image = cv2.cvtColor(save_image, cv2.COLOR_BGR2GRAY)
+        (thresh, blackAndWhiteImage) = cv2.threshold(
+            gray_image, 129, 255, cv2.THRESH_BINARY)
+        # now invert it
+        inverted = (255-blackAndWhiteImage)
+        save_image = cv2.cvtColor(inverted, cv2.COLOR_GRAY2BGR)
+        rgb = cv2.cvtColor(save_image, cv2.COLOR_BGR2RGB)
+        tess_config = '--psm 7 --oem 3 -c tessedit_char_whitelist=01234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
+        result = pytesseract.image_to_string(
+            rgb, lang='eng', config=tess_config)[:-2]
+        return result
+
+    def detect_bigmap_open(self):
+        wincap = WindowCapture(self.gamename, custom_rect=[819, 263, 855, 264])
+        image = wincap.get_screenshot()
+        cv2.imwrite("testy.jpg", image)
+        a, b, c = [int(i) for i in image[0][0]]
+        d, e, f = [int(i) for i in image[0][-2]]
+        if a+b+c < 30:
+            if d+e+f > 700:
+                # print("Working")
+                return True
+        return False
 
     def create_random_delays(self):
         for index, _ in enumerate(self.list_servers):
@@ -404,6 +564,51 @@ class ClientUtils():
         user32.SetProcessDPIAware()
         [w, h] = [user32.GetSystemMetrics(0), user32.GetSystemMetrics(1)]
         return float(("{:.2f}".format(w/w_orig)))
+
+    def load_key_dict(self):
+        KEYBOARD_MAPPING = {
+            '1': 0x02,
+            '2': 0x03,
+            '3': 0x04,
+            '4': 0x05,
+            '5': 0x06,
+            '6': 0x07,
+            '7': 0x08,
+            '8': 0x09,
+            '9': 0x0A,
+            '0': 0x0B,
+            'q': 0x10,
+            'w': 0x11,
+            'e': 0x12,
+            'r': 0x13,
+            't': 0x14,
+            'y': 0x15,
+            'u': 0x16,
+            'i': 0x17,
+            'o': 0x18,
+            'p': 0x19,
+            'a': 0x1E,
+            's': 0x1F,
+            'd': 0x20,
+            'f': 0x21,
+            'g': 0x22,
+            'h': 0x23,
+            'j': 0x24,
+            'k': 0x25,
+            'l': 0x26,
+            'z': 0x2C,
+            'x': 0x2D,
+            'c': 0x2E,
+            'v': 0x2F,
+            'b': 0x30,
+            'n': 0x31,
+            'm': 0x32,
+            'up': MapVirtualKey(0x26, MAPVK_VK_TO_VSC),
+            'left': MapVirtualKey(0x25, MAPVK_VK_TO_VSC),
+            'down': MapVirtualKey(0x28, MAPVK_VK_TO_VSC),
+            'right': MapVirtualKey(0x27, MAPVK_VK_TO_VSC),
+        }
+        return KEYBOARD_MAPPING
 
 
 class RHBotClient():
