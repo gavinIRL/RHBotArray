@@ -101,7 +101,7 @@ class PlayerPositionTest():
         time_taken = time.time() - start_time
         player_pos_end = self.grab_player_pos()
         print(player_pos_end)
-        x_travel = player_pos[0]-player_pos_end[0]
+        x_travel = player_pos_end[0]-player_pos[0]
         print("Travelled {} pixels in {}s => {} pixels/sec".format(x_travel,
                                                                    time_taken, x_travel/time_taken))
 
@@ -131,6 +131,11 @@ class PlayerPositionTest():
                 if area == "FM" and num == number:
                     self.rects[name.rstrip()] = rect.rstrip()
                     self.rects[name.rstrip().replace(" ", "")] = rect.rstrip()
+                    if "1" in name:
+                        self.rects[name.rstrip().replace("1", "L")
+                                   ] = rect.rstrip()
+                        self.rects[name.rstrip().replace(
+                            " ", "").replace("1", "L")] = rect.rstrip()
                     break
         # print(self.rects)
 
