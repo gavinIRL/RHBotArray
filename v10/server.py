@@ -919,8 +919,8 @@ class RHBotArrayServer():
         if rely != 0:
             self.resolve_dir_v2(rely, "y")
         # Finally close the map
-        if self.detect_bigmap_open():
-            self.try_toggle_map()
+        # if self.detect_bigmap_open():
+        #     self.try_toggle_map()
 
     def resolve_dir_v2(self, value, dir):
         if dir == "x":

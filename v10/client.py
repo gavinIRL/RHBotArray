@@ -127,7 +127,7 @@ class ClientKeypressListener():
         self.player_pos = None
 
     def try_toggle_map(self):
-        print("Toggling map")
+        # print("Toggling map")
         # time.sleep(0.1)
         # pydirectinput.keyDown("m")
         # time.sleep(0.18)
@@ -135,7 +135,11 @@ class ClientKeypressListener():
         # time.sleep(0.08)
         pydirectinput.click(
             int(self.scaling*1262+self.game_wincap.window_rect[0]), int(self.scaling*64+self.game_wincap.window_rect[1]))
-        print("Finished toggling map")
+        # print("Finished toggling map")
+
+    def close_map(self):
+        pydirectinput.click(
+            int(self.scaling*859+self.game_wincap.window_rect[0]), int(self.scaling*260+self.game_wincap.window_rect[1]))
 
     def string_to_rect(self, string: str):
         return [int(i) for i in string.split(',')]
@@ -282,7 +286,8 @@ class ClientKeypressListener():
                 for server in self.list_servers:
                     server.send_message("regroup,{}|{}".format(x, y))
                 print("Regrouping...")
-                self.try_toggle_map()
+                time.sleep(0.01)
+                self.close_map()
             elif key == KeyCode(char='6'):
                 self.autoloot_enabled = not self.autoloot_enabled
                 if self.autoloot_enabled:
