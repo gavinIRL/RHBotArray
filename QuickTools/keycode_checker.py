@@ -21,6 +21,8 @@ class KeyCodeChecker():
 
     def on_press(self, key):
         print(key)
+        if key == keyboard.Key.f11:
+            os._exit(1)
 
     def on_release(self, key):
         pass
