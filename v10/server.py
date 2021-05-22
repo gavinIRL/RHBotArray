@@ -16,7 +16,47 @@ import pytesseract
 from quest_handle import QuestHandle
 from sell_repair import SellRepair
 
+# Required code for custom input
+SendInput = ctypes.windll.user32.SendInput
+MapVirtualKey = ctypes.windll.user32.MapVirtualKeyW
+KEYEVENTF_EXTENDEDKEY = 0x0001
+KEYEVENTF_KEYUP = 0x0002
+KEYEVENTF_SCANCODE = 0x0008
+KEYEVENTF_UNICODE = 0x0004
+MAPVK_VK_TO_CHAR = 2
+MAPVK_VK_TO_VSC = 0
+MAPVK_VSC_TO_VK = 1
+MAPVK_VSC_TO_VK_EX = 3
+# C struct redefinitions
+PUL = ctypes.POINTER(ctypes.c_ulong)
+
+# Change directory to current file location
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
+
+
+# Add the required classes for custom input
+class KeyBdInput(ctypes.Structure):
+    _fields_ = [("wVk", ctypes.c_ushort),
+                ("wScan", ctypes.c_ushort),
+                ("dwFlags", ctypes.c_ulong),
+                ("time", ctypes.c_ulong),
+                ("dwExtraInfo", PUL)]
+
+
+class HardwareInput(ctypes.Structure):
+    _fields_ = [("uMsg", ctypes.c_ulong),
+                ("wParamL", ctypes.c_short),
+                ("wParamH", ctypes.c_ushort)]
+
+
+class Input_I(ctypes.Union):
+    _fields_ = [("ki", KeyBdInput),
+                ("hi", HardwareInput)]
+
+
+class Input(ctypes.Structure):
+    _fields_ = [("type", ctypes.c_ulong),
+                ("ii", Input_I)]
 
 
 class RHBotArrayServer():
@@ -63,7 +103,7 @@ class RHBotArrayServer():
             self.gamename, xprompt_custom_rect)
         self.xprompt_vision = Vision("xprompt67filtv2.jpg")
 
-        # These are related to the regroup command
+        # These are related to the v1 regroup command
         if not self.print_only:
             # These are related to auto playername detect
             plyrname_rect = [165, 45, 320, 65]
@@ -90,6 +130,16 @@ class RHBotArrayServer():
 
         # These are related to allow x in all cases
         self.allowx = False
+
+        # These are for the v2 regroup command
+        self.map_rect = None
+        self.level_name = None
+        self.speed = 20
+        self.rects = {}
+        self.speeds = {}
+        self.num_names = []
+        self.load_level_rects()
+        self.key_map = self.load_key_dict()
 
     def move_mouse_centre(self):
         ctypes.windll.user32.SetCursorPos(self.centre_x, self.centre_y)
