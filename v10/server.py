@@ -15,6 +15,7 @@ import cv2
 import pytesseract
 from quest_handle import QuestHandle
 from sell_repair import SellRepair
+import numpy as np
 
 # Required code for custom input
 SendInput = ctypes.windll.user32.SendInput
@@ -670,6 +671,48 @@ class RHBotArrayServer():
             x = Input(ctypes.c_ulong(1), ii_)
             ctypes.windll.user32.SendInput(
                 1, ctypes.pointer(x), ctypes.sizeof(x))
+
+    def filter_blackwhite_invert(self, filter, existing_image):
+        hsv = cv2.cvtColor(existing_image, cv2.COLOR_BGR2HSV)
+        hsv_filter = filter
+        # add/subtract saturation and value
+        h, s, v = cv2.split(hsv)
+        s = self.shift_channel(s, hsv_filter.sAdd)
+        s = self.shift_channel(s, -hsv_filter.sSub)
+        v = self.shift_channel(v, hsv_filter.vAdd)
+        v = self.shift_channel(v, -hsv_filter.vSub)
+        hsv = cv2.merge([h, s, v])
+
+        # Set minimum and maximum HSV values to display
+        lower = np.array([hsv_filter.hMin, hsv_filter.sMin, hsv_filter.vMin])
+        upper = np.array([hsv_filter.hMax, hsv_filter.sMax, hsv_filter.vMax])
+        # Apply the thresholds
+        mask = cv2.inRange(hsv, lower, upper)
+        result = cv2.bitwise_and(hsv, hsv, mask=mask)
+
+        # convert back to BGR
+        img = cv2.cvtColor(result, cv2.COLOR_HSV2BGR)
+        # now change it to greyscale
+        grayImage = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        # now change it to black and white
+        (thresh, blackAndWhiteImage) = cv2.threshold(
+            grayImage, 67, 255, cv2.THRESH_BINARY)
+        # now invert it
+        inverted = (255-blackAndWhiteImage)
+        inverted = cv2.cvtColor(inverted, cv2.COLOR_GRAY2BGR)
+        return inverted
+
+    def shift_channel(self, c, amount):
+        if amount > 0:
+            lim = 255 - amount
+            c[c >= lim] = 255
+            c[c < lim] += amount
+        elif amount < 0:
+            amount = -amount
+            lim = amount
+            c[c <= lim] = 0
+            c[c > lim] -= amount
+        return c
 
 
 if __name__ == "__main__":
