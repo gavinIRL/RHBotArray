@@ -17,6 +17,7 @@ import ctypes
 import pydirectinput
 from win32gui import GetWindowText, GetForegroundWindow
 from client import ClientUtils
+from fuzzywuzzy import process
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 SendInput = ctypes.windll.user32.SendInput
@@ -89,7 +90,13 @@ class PlayerPositionTest():
         try:
             self.map_rect = self.string_to_rect(self.rects[self.level_name])
         except:
-            self.map_rect = False
+            try:
+                best_match = process.extractOne(
+                    self.level_name, self.rects, score_cutoff=0.8)
+                self.map_rect = self.string_to_rect(
+                    self.rects[best_match])
+            except:
+                self.map_rect = False
         # Then open the map
         if not self.detect_bigmap_open():
             self.try_toggle_map()
