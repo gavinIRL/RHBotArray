@@ -129,23 +129,24 @@ class PlayerPositionTest():
         for number, name in self.num_names:
             for num, area, rect in nums_rects:
                 if area == "FM" and num == number:
-                    self.rects[name.rstrip()] = rect.rstrip()
                     self.rects[name.rstrip().replace(" ", "")] = rect.rstrip()
                     if "1" in name:
-                        self.rects[name.rstrip().replace("1", "L")
-                                   ] = rect.rstrip()
                         self.rects[name.rstrip().replace(
                             " ", "").replace("1", "L")] = rect.rstrip()
+                    if "ri" in name:
+                        self.rects[name.rstrip().replace(
+                            " ", "").replace("ri", "n").replace("1", "L")] = rect.rstrip()
                     break
         # print(self.rects)
 
     def detect_level_name(self):
         wincap = WindowCapture(self.gamename, [1121, 31, 1248, 44])
         existing_image = wincap.get_screenshot()
-        filter = HsvFilter(0, 0, 0, 147, 34, 255, 22, 0, 0, 48)
+        filter = HsvFilter(0, 0, 0, 169, 34, 255, 0, 0, 0, 0)
         vision_limestone = Vision('plyr.jpg')
-        cv2.imwrite("testy2.jpg", existing_image)
+        # cv2.imwrite("testy2.jpg", existing_image)
         save_image = vision_limestone.apply_hsv_filter(existing_image, filter)
+        # cv2.imwrite("testy3.jpg", save_image)
         gray_image = cv.cvtColor(save_image, cv.COLOR_BGR2GRAY)
         (thresh, blackAndWhiteImage) = cv.threshold(
             gray_image, 67, 255, cv.THRESH_BINARY)
@@ -175,14 +176,13 @@ class PlayerPositionTest():
         filter = HsvFilter(34, 160, 122, 50, 255, 255, 0, 0, 0, 0)
         image = wincap.get_screenshot()
         save_image = self.filter_blackwhite_invert(filter, image)
+        # cv2.imwrite("testy3.jpg", save_image)
         vision_limestone = Vision('plyr.jpg')
         rectangles = vision_limestone.find(
             save_image, threshold=0.31, epsilon=0.5)
         points = vision_limestone.get_click_points(rectangles)
-        if len(points) == 1:
-            x, y = points[0]
-            return x, y
-        return False
+        x, y = points[0]
+        return x, y
 
     def shift_channel(self, c, amount):
         if amount > 0:
