@@ -714,6 +714,58 @@ class RHBotArrayServer():
             c[c > lim] -= amount
         return c
 
+    def detect_level_name(self):
+        wincap = WindowCapture(self.gamename, [1121, 31, 1248, 44])
+        existing_image = wincap.get_screenshot()
+        filter = HsvFilter(0, 0, 0, 169, 34, 255, 0, 0, 0, 0)
+        vision_limestone = Vision('plyr.jpg')
+        # cv2.imwrite("testy2.jpg", existing_image)
+        save_image = vision_limestone.apply_hsv_filter(existing_image, filter)
+        # cv2.imwrite("testy3.jpg", save_image)
+        gray_image = cv2.cvtColor(save_image, cv2.COLOR_BGR2GRAY)
+        (thresh, blackAndWhiteImage) = cv2.threshold(
+            gray_image, 129, 255, cv2.THRESH_BINARY)
+        # now invert it
+        inverted = (255-blackAndWhiteImage)
+        save_image = cv2.cvtColor(inverted, cv2.COLOR_GRAY2BGR)
+        rgb = cv2.cvtColor(save_image, cv2.COLOR_BGR2RGB)
+        tess_config = '--psm 7 --oem 3 -c tessedit_char_whitelist=01234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
+        result = pytesseract.image_to_string(
+            rgb, lang='eng', config=tess_config)[:-2]
+        return result
+
+    def detect_bigmap_open(self):
+        wincap = WindowCapture(self.gamename, custom_rect=[819, 263, 855, 264])
+        image = wincap.get_screenshot()
+        cv2.imwrite("testy.jpg", image)
+        a, b, c = [int(i) for i in image[0][0]]
+        d, e, f = [int(i) for i in image[0][-2]]
+        if a+b+c < 30:
+            if d+e+f > 700:
+                # print("Working")
+                return True
+        return False
+
+    def grab_player_pos(self):
+        if not self.map_rect:
+            wincap = WindowCapture(self.gamename)
+        else:
+            wincap = WindowCapture(self.gamename, self.map_rect)
+        filter = HsvFilter(34, 160, 122, 50, 255, 255, 0, 0, 0, 0)
+        image = wincap.get_screenshot()
+        save_image = self.filter_blackwhite_invert(filter, image)
+        vision_limestone = Vision('plyr.jpg')
+        rectangles = vision_limestone.find(
+            save_image, threshold=0.31, epsilon=0.5)
+        points = vision_limestone.get_click_points(rectangles)
+        x, y = points[0]
+        if not self.map_rect:
+            return x, y
+        else:
+            x += wincap.window_rect[0]
+            y += wincap.window_rect[1]
+            return x, y
+
 
 if __name__ == "__main__":
     lst = RHBotArrayServer(print_only=False)
