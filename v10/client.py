@@ -127,10 +127,15 @@ class ClientKeypressListener():
         self.player_pos = None
 
     def try_toggle_map(self):
-        pydirectinput.keyDown("m")
-        time.sleep(0.05)
-        pydirectinput.keyUp("m")
-        time.sleep(0.08)
+        print("Toggling map")
+        # time.sleep(0.1)
+        # pydirectinput.keyDown("m")
+        # time.sleep(0.18)
+        # pydirectinput.keyUp("m")
+        # time.sleep(0.08)
+        pydirectinput.click(
+            int(self.scaling*1262+self.game_wincap.window_rect[0]), int(self.scaling*64+self.game_wincap.window_rect[1]))
+        print("Finished toggling map")
 
     def string_to_rect(self, string: str):
         return [int(i) for i in string.split(',')]
@@ -372,8 +377,8 @@ class ClientKeypressListener():
         if not self.map_rect:
             return x, y
         else:
-            x += wincap.window_rect[0]
-            y += wincap.window_rect[1]
+            x += self.map_rect[0]
+            y += self.map_rect[1]
             return x, y
 
     def on_release(self, key):

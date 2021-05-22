@@ -773,7 +773,6 @@ class RHBotArrayServer():
     def release_key(self, hexKeyCode, key="T"):
         keybdFlags = 0x0008 | 0x0002
         if key in ["up", "down", "left", "right"]:
-            print("Detected")
             keybdFlags |= 0x0001
         extra = ctypes.c_ulong(0)
         ii_ = Input_I()
@@ -882,8 +881,8 @@ class RHBotArrayServer():
         if not self.map_rect:
             return x, y
         else:
-            x += wincap.window_rect[0]
-            y += wincap.window_rect[1]
+            x += self.map_rect[0]
+            y += self.map_rect[1]
             return x, y
 
     def pre_regroup_updates(self):
