@@ -141,6 +141,47 @@ class RHBotArrayServer():
         self.load_level_rects()
         self.key_map = self.load_key_dict()
 
+    def load_level_rects(self):
+        # Load the translation from name to num
+        with open("lvl_name_num.txt") as f:
+            self.num_names = f.readlines()
+        for i, entry in enumerate(self.num_names):
+            self.num_names[i] = entry.split("-")
+        # Load the num to rect catalogue
+        with open("catalogue.txt") as f:
+            nums_rects = f.readlines()
+        for i, entry in enumerate(nums_rects):
+            nums_rects[i] = entry.split("-")
+        # Finally load the level speeds
+        with open("lvl_speed.txt") as f:
+            num_speeds = f.readlines()
+        for i, entry in enumerate(num_speeds):
+            num_speeds[i] = entry.split("|")
+        # Then add each rect to the rects dict against name
+        # Also add each speed to the speed dict against name
+        for number, name in self.num_names:
+            for num, area, rect in nums_rects:
+                if area == "FM" and num == number:
+                    self.rects[name.rstrip().replace(" ", "")] = rect.rstrip()
+                    if "1" in name:
+                        self.rects[name.rstrip().replace(
+                            " ", "").replace("1", "L")] = rect.rstrip()
+                    if "ri" in name:
+                        self.rects[name.rstrip().replace(
+                            " ", "").replace("ri", "n").replace("1", "L")] = rect.rstrip()
+                    break
+            for num, speed in num_speeds:
+                if num == number:
+                    self.speeds[name.rstrip().replace(
+                        " ", "")] = float(speed.rstrip())
+                    if "1" in name:
+                        self.speeds[name.rstrip().replace(
+                            " ", "").replace("1", "L")] = float(speed.rstrip())
+                    if "ri" in name:
+                        self.speeds[name.rstrip().replace(
+                            " ", "").replace("ri", "n").replace("1", "L")] = float(speed.rstrip())
+                    break
+
     def move_mouse_centre(self):
         ctypes.windll.user32.SetCursorPos(self.centre_x, self.centre_y)
 
@@ -536,6 +577,51 @@ class RHBotArrayServer():
                         pydirectinput.keyUp(key)
                 else:
                     pydirectinput.keyUp(key)
+
+    def load_key_dict(self):
+        KEYBOARD_MAPPING = {
+            '1': 0x02,
+            '2': 0x03,
+            '3': 0x04,
+            '4': 0x05,
+            '5': 0x06,
+            '6': 0x07,
+            '7': 0x08,
+            '8': 0x09,
+            '9': 0x0A,
+            '0': 0x0B,
+            'q': 0x10,
+            'w': 0x11,
+            'e': 0x12,
+            'r': 0x13,
+            't': 0x14,
+            'y': 0x15,
+            'u': 0x16,
+            'i': 0x17,
+            'o': 0x18,
+            'p': 0x19,
+            'a': 0x1E,
+            's': 0x1F,
+            'd': 0x20,
+            'f': 0x21,
+            'g': 0x22,
+            'h': 0x23,
+            'j': 0x24,
+            'k': 0x25,
+            'l': 0x26,
+            'z': 0x2C,
+            'x': 0x2D,
+            'c': 0x2E,
+            'v': 0x2F,
+            'b': 0x30,
+            'n': 0x31,
+            'm': 0x32,
+            'up': MapVirtualKey(0x26, MAPVK_VK_TO_VSC),
+            'left': MapVirtualKey(0x25, MAPVK_VK_TO_VSC),
+            'down': MapVirtualKey(0x28, MAPVK_VK_TO_VSC),
+            'right': MapVirtualKey(0x27, MAPVK_VK_TO_VSC),
+        }
+        return KEYBOARD_MAPPING
 
 
 if __name__ == "__main__":
