@@ -273,7 +273,7 @@ class ClientKeypressListener():
                     server.send_message("revive,1")
                 print("Reviving...")
             elif key == KeyCode(char='5'):
-                x, y = self.grab_player_pos()
+                x, y = self.find_player()
                 for server in self.list_servers:
                     server.send_message("regroup,{}|{}".format(x, y))
                 print("Regrouping...")
@@ -334,7 +334,7 @@ class ClientKeypressListener():
             self.batch_recording_ongoing = False
             print("TRANSMIT ON")
 
-    def grab_player_pos(self):
+    def find_player(self):
         self.level_name = self.detect_level_name()
         # Then grab the right rect for the level
         try:
@@ -354,6 +354,27 @@ class ClientKeypressListener():
         if not self.detect_bigmap_open():
             self.try_toggle_map()
         return self.grab_player_pos()
+
+    def grab_player_pos(self):
+        if not self.map_rect:
+            wincap = WindowCapture(self.gamename)
+        else:
+            wincap = WindowCapture(self.gamename, self.map_rect)
+        filter = HsvFilter(34, 160, 122, 50, 255, 255, 0, 0, 0, 0)
+        image = wincap.get_screenshot()
+        save_image = self.filter_blackwhite_invert(filter, image)
+        # cv2.imwrite("testy3.jpg", save_image)
+        vision_limestone = Vision('plyr.jpg')
+        rectangles = vision_limestone.find(
+            save_image, threshold=0.31, epsilon=0.5)
+        points = vision_limestone.get_click_points(rectangles)
+        x, y = points[0]
+        if not self.map_rect:
+            return x, y
+        else:
+            x += wincap.window_rect[0]
+            y += wincap.window_rect[1]
+            return x, y
 
     def on_release(self, key):
         if key == KeyCode(char='1'):
