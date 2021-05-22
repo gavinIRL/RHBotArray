@@ -623,6 +623,54 @@ class RHBotArrayServer():
         }
         return KEYBOARD_MAPPING
 
+    def press_key(self, hexKeyCode):
+        if hexKeyCode in [75, 76, 77, 78]:
+            # Do the primary key
+            hexKeyCode2 = 0xE0
+            extra = ctypes.c_ulong(0)
+            ii_ = Input_I()
+            ii_.ki = KeyBdInput(0, hexKeyCode2, 0x0008,
+                                0, ctypes.pointer(extra))
+            x = Input(ctypes.c_ulong(1), ii_)
+            SendInput(1, ctypes.pointer(x), ctypes.sizeof(x))
+            # then the arrow itself
+            ii_.ki = KeyBdInput(0, hexKeyCode, 0x0001,
+                                0, ctypes.pointer(extra))
+            x = Input(ctypes.c_ulong(1), ii_)
+            ctypes.windll.user32.SendInput(
+                1, ctypes.pointer(x), ctypes.sizeof(x))
+            SendInput(1, ctypes.pointer(x), ctypes.sizeof(x))
+
+        else:
+            extra = ctypes.c_ulong(0)
+            ii_ = Input_I()
+            ii_.ki = KeyBdInput(0, hexKeyCode, 0x0008,
+                                0, ctypes.pointer(extra))
+            x = Input(ctypes.c_ulong(1), ii_)
+            ctypes.windll.user32.SendInput(
+                1, ctypes.pointer(x), ctypes.sizeof(x))
+
+    def release_key(self, hexKeyCode):
+        keybdFlags = 0x0008 | 0x0002
+        if hexKeyCode in [75, 76, 77, 78]:
+            keybdFlags |= 0x0001
+        extra = ctypes.c_ulong(0)
+        ii_ = Input_I()
+        ii_.ki = KeyBdInput(0, hexKeyCode, keybdFlags,
+                            0, ctypes.pointer(extra))
+        x = Input(ctypes.c_ulong(1), ii_)
+        ctypes.windll.user32.SendInput(1, ctypes.pointer(x), ctypes.sizeof(x))
+
+        if hexKeyCode in [75, 76, 77, 78] and ctypes.windll.user32.GetKeyState(0x90):
+            hexKeyCode = 0xE0
+            extra = ctypes.c_ulong(0)
+            ii_ = Input_I()
+            ii_.ki = KeyBdInput(0, hexKeyCode, 0x0008 | 0x0002,
+                                0, ctypes.pointer(extra))
+            x = Input(ctypes.c_ulong(1), ii_)
+            ctypes.windll.user32.SendInput(
+                1, ctypes.pointer(x), ctypes.sizeof(x))
+
 
 if __name__ == "__main__":
     lst = RHBotArrayServer(print_only=False)
