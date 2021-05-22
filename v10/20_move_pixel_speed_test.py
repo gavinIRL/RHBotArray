@@ -149,7 +149,7 @@ class PlayerPositionTest():
         # cv2.imwrite("testy3.jpg", save_image)
         gray_image = cv.cvtColor(save_image, cv.COLOR_BGR2GRAY)
         (thresh, blackAndWhiteImage) = cv.threshold(
-            gray_image, 67, 255, cv.THRESH_BINARY)
+            gray_image, 129, 255, cv.THRESH_BINARY)
         # now invert it
         inverted = (255-blackAndWhiteImage)
         save_image = cv.cvtColor(inverted, cv.COLOR_GRAY2BGR)
