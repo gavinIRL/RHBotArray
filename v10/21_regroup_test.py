@@ -101,7 +101,7 @@ class PlayerPositionTest():
                 self.speed = self.speeds[best_match]
             except:
                 self.map_rect = [362, 243, 1105, 748]
-                self.speed = 20
+                self.speed = 30
         # Then open the map
         if not self.detect_bigmap_open():
             self.try_toggle_map()
