@@ -45,8 +45,6 @@ class Input(ctypes.Structure):
     _fields_ = [("type", ctypes.c_ulong),
                 ("ii", Input_I)]
 
-# Actuals Functions
-
 
 def PressKey(hexKeyCode):
     # print(hexKeyCode)

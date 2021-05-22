@@ -79,7 +79,10 @@ class PlayerPositionTest():
     def detect_level_name(self):
         wincap = WindowCapture(self.gamename, [1121, 31, 1248, 44])
         existing_image = wincap.get_screenshot()
-        save_image = existing_image
+        filter = HsvFilter(0, 0, 0, 147, 34, 255, 22, 0, 0, 48)
+        vision_limestone = Vision('plyr.jpg')
+        cv2.imwrite("testy2.jpg", existing_image)
+        save_image = vision_limestone.apply_hsv_filter(existing_image, filter)
         rgb = cv2.cvtColor(save_image, cv2.COLOR_BGR2RGB)
         tess_config = '--psm 7 --oem 3 -c tessedit_char_whitelist=01234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
         result = pytesseract.image_to_string(
