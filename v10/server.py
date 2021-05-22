@@ -16,6 +16,7 @@ import pytesseract
 from quest_handle import QuestHandle
 from sell_repair import SellRepair
 import numpy as np
+from fuzzywuzzy import process
 
 # Required code for custom input
 SendInput = ctypes.windll.user32.SendInput
@@ -141,6 +142,16 @@ class RHBotArrayServer():
         self.num_names = []
         self.load_level_rects()
         self.key_map = self.load_key_dict()
+        self.player_pos = None
+
+    def try_toggle_map(self):
+        pydirectinput.keyDown("m")
+        time.sleep(0.05)
+        pydirectinput.keyUp("m")
+        time.sleep(0.08)
+
+    def string_to_rect(self, string: str):
+        return [int(i) for i in string.split(',')]
 
     def load_level_rects(self):
         # Load the translation from name to num
@@ -542,7 +553,7 @@ class RHBotArrayServer():
                 else:
                     pydirectinput.keyUp("x")
             elif button == "regroup":
-                self.regroup()
+                self.regroupv2(direction)
             elif button == "autoloot":
                 if direction == "on":
                     self.autoloot_thread_start()
@@ -765,6 +776,59 @@ class RHBotArrayServer():
             x += wincap.window_rect[0]
             y += wincap.window_rect[1]
             return x, y
+
+    def pre_regroup_updates(self):
+        self.level_name = self.detect_level_name()
+        # Then grab the right rect for the level
+        try:
+            self.map_rect = self.string_to_rect(self.rects[self.level_name])
+            self.speed = self.speeds[self.level_name]
+        except:
+            try:
+                best_match = process.extractOne(
+                    self.level_name, self.rects, score_cutoff=0.8)
+                self.map_rect = self.string_to_rect(
+                    self.rects[best_match])
+                self.speed = self.speeds[best_match]
+            except:
+                self.map_rect = [362, 243, 1105, 748]
+                self.speed = 30
+        # Then open the map
+        if not self.detect_bigmap_open():
+            self.try_toggle_map()
+        self.player_pos = self.grab_player_pos()
+
+    def regroupv2(self, coords: str):
+        x, y = coords.split("|")
+        # first perform the pre-regroup updates
+        self.pre_regroup_updates()
+        # Then calculate the relative positions
+        relx = int(x) - self.player_pos[0]
+        rely = self.player_pos[1] - int(y)
+        # First take care of the x-dir
+        if relx != 0:
+            self.resolve_dir_v2(relx, "x")
+        if rely != 0:
+            self.resolve_dir_v2(rely, "y")
+        # Finally close the map
+        if self.detect_bigmap_open():
+            self.try_toggle_map()
+
+    def resolve_dir_v2(self, value, dir):
+        if dir == "x":
+            if value > 0:
+                key = "left"
+            else:
+                key = "right"
+        elif dir == "y":
+            if value > 0:
+                key = "down"
+            else:
+                key = "up"
+        time_reqd = abs(value/self.speed)
+        self.press_key(self.key_map[key])
+        time.sleep(time_reqd-0.003)
+        self.release_key(self.key_map[key])
 
 
 if __name__ == "__main__":
