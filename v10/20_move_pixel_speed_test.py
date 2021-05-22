@@ -86,7 +86,10 @@ class PlayerPositionTest():
         # print("Starting")
         self.level_name = self.detect_level_name()
         # Then grab the right rect for the level
-        self.map_rect = self.string_to_rect(self.rects[self.level_name])
+        try:
+            self.map_rect = self.string_to_rect(self.rects[self.level_name])
+        except:
+            self.map_rect = False
         # Then open the map
         if not self.detect_bigmap_open():
             self.try_toggle_map()
@@ -172,7 +175,10 @@ class PlayerPositionTest():
         return False
 
     def grab_player_pos(self):
-        wincap = WindowCapture(self.gamename, self.map_rect)
+        if not self.map_rect:
+            wincap = WindowCapture(self.gamename)
+        else:
+            wincap = WindowCapture(self.gamename, self.map_rect)
         filter = HsvFilter(34, 160, 122, 50, 255, 255, 0, 0, 0, 0)
         image = wincap.get_screenshot()
         save_image = self.filter_blackwhite_invert(filter, image)
@@ -182,7 +188,12 @@ class PlayerPositionTest():
             save_image, threshold=0.31, epsilon=0.5)
         points = vision_limestone.get_click_points(rectangles)
         x, y = points[0]
-        return x, y
+        if not self.map_rect:
+            return x, y
+        else:
+            x += wincap.window_rect[0]
+            y += wincap.window_rect[1]
+            return x, y
 
     def shift_channel(self, c, amount):
         if amount > 0:
