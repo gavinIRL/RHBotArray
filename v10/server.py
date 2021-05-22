@@ -18,6 +18,9 @@ from sell_repair import SellRepair
 import numpy as np
 from fuzzywuzzy import process
 
+# Change directory to current file location
+os.chdir(os.path.dirname(os.path.abspath(__file__)))
+
 # Required code for custom input
 SendInput = ctypes.windll.user32.SendInput
 MapVirtualKey = ctypes.windll.user32.MapVirtualKeyW
@@ -32,11 +35,7 @@ MAPVK_VSC_TO_VK_EX = 3
 # C struct redefinitions
 PUL = ctypes.POINTER(ctypes.c_ulong)
 
-# Change directory to current file location
-os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
-
-# Add the required classes for custom input
 class KeyBdInput(ctypes.Structure):
     _fields_ = [("wVk", ctypes.c_ushort),
                 ("wScan", ctypes.c_ushort),
@@ -51,8 +50,18 @@ class HardwareInput(ctypes.Structure):
                 ("wParamH", ctypes.c_ushort)]
 
 
+class MouseInput(ctypes.Structure):
+    _fields_ = [("dx", ctypes.c_long),
+                ("dy", ctypes.c_long),
+                ("mouseData", ctypes.c_ulong),
+                ("dwFlags", ctypes.c_ulong),
+                ("time", ctypes.c_ulong),
+                ("dwExtraInfo", PUL)]
+
+
 class Input_I(ctypes.Union):
     _fields_ = [("ki", KeyBdInput),
+                ("mi", MouseInput),
                 ("hi", HardwareInput)]
 
 
@@ -311,7 +320,7 @@ class RHBotArrayServer():
                 key = "up"
         if abs(dist) > 5:
             # pydirectinput.keyDown(key)
-            self.press_key(self.key_map[key])
+            self.press_key(self.key_map[key], key)
 
     def resolve_direction(self, dir):
         if dir == "x":
@@ -336,7 +345,7 @@ class RHBotArrayServer():
                 time.sleep(0.05-move_time)
             for key in ["up", "down", "left", "right"]:
                 # pydirectinput.keyUp(key)
-                self.release_key(self.key_map[key])
+                self.release_key(self.key_map[key], key)
             end_time = time.time() - start_time
 
             last_rel_dists = self.get_relative_dists()
@@ -348,16 +357,16 @@ class RHBotArrayServer():
                 # Need to reverse direction
                 if first_rel_dists[index] > 0:
                     # pydirectinput.keyDown(key1)
-                    self.press_key(self.key_map[key1])
+                    self.press_key(self.key_map[key1], key1)
                     time.sleep((end_time)/percent_moved)
                     # pydirectinput.keyUp(key1)
-                    self.release_key(self.key_map[key1])
+                    self.release_key(self.key_map[key1], key1)
                 else:
                     # pydirectinput.keyDown(key2)
-                    self.press_key(self.key_map[key2])
+                    self.press_key(self.key_map[key2], key2)
                     time.sleep((end_time)/percent_moved)
                     # pydirectinput.keyUp(key2)
-                    self.release_key(self.key_map[key2])
+                    self.release_key(self.key_map[key2], key2)
             elif percent_moved < 0.9:
                 # Need to continue
                 travel_time_reqd = (1-percent_moved)*(end_time)
@@ -368,7 +377,7 @@ class RHBotArrayServer():
                     time.sleep(travel_time_reqd-move_time)
                 for key in ["up", "down", "left", "right"]:
                     # pydirectinput.keyUp(key)
-                    self.release_key(self.key_map[key])
+                    self.release_key(self.key_map[key], key)
 
     def regroup(self):
         # first resolve the x direction
@@ -430,12 +439,12 @@ class RHBotArrayServer():
                 # print("Would press {} down now".format(line[0]))
                 k = self.convert_pynput_to_pag(line[0].strip("'"))
                 # pydirectinput.keyDown(k)
-                self.press_key(self.key_map[k])
+                self.press_key(self.key_map[k], k)
             elif line[1] == "keyUp":
                 # print("Would press {} down now".format(line[0]))
                 k = self.convert_pynput_to_pag(line[0].strip("'"))
                 # pydirectinput.keyUp(k)
-                self.press_key(self.key_map[k])
+                self.press_key(self.key_map[k], k)
             elif line[1] == "click":
                 xrat, yrat = line[3].split(",")
                 # print("Would click at {},{} now".format(x, y))
@@ -597,20 +606,20 @@ class RHBotArrayServer():
                 if self.move_only:
                     if button in self.move_only_exclude_keys:
                         # pydirectinput.keyDown(key)
-                        self.press_key(self.key_map[key])
+                        self.press_key(self.key_map[key], key)
                 else:
                     # pydirectinput.keyDown(key)
-                    self.press_key(self.key_map[key])
+                    self.press_key(self.key_map[key], key)
             elif direction == "up":
                 key = self.convert_pynput_to_pag(
                     button.replace("'", ""))
                 if self.move_only:
                     if button in self.move_only_exclude_keys:
                         # pydirectinput.keyUp(key)
-                        self.release_key(self.key_map[key])
+                        self.release_key(self.key_map[key], key)
                 else:
                     # pydirectinput.keyUp(key)
-                    self.release_key(self.key_map[key])
+                    self.release_key(self.key_map[key], key)
 
     def load_key_dict(self):
         KEYBOARD_MAPPING = {
@@ -657,8 +666,8 @@ class RHBotArrayServer():
         }
         return KEYBOARD_MAPPING
 
-    def press_key(self, hexKeyCode):
-        if hexKeyCode in [75, 76, 77, 78]:
+    def press_key(self, hexKeyCode, key="T"):
+        if key in ["up", "down", "left", "right"]:
             # Do the primary key
             hexKeyCode2 = 0xE0
             extra = ctypes.c_ulong(0)
@@ -684,9 +693,10 @@ class RHBotArrayServer():
             ctypes.windll.user32.SendInput(
                 1, ctypes.pointer(x), ctypes.sizeof(x))
 
-    def release_key(self, hexKeyCode):
+    def release_key(self, hexKeyCode, key="T"):
         keybdFlags = 0x0008 | 0x0002
-        if hexKeyCode in [75, 76, 77, 78]:
+        if key in ["up", "down", "left", "right"]:
+            print("Detected")
             keybdFlags |= 0x0001
         extra = ctypes.c_ulong(0)
         ii_ = Input_I()
@@ -695,7 +705,7 @@ class RHBotArrayServer():
         x = Input(ctypes.c_ulong(1), ii_)
         ctypes.windll.user32.SendInput(1, ctypes.pointer(x), ctypes.sizeof(x))
 
-        if hexKeyCode in [75, 76, 77, 78] and ctypes.windll.user32.GetKeyState(0x90):
+        if key in ["up", "down", "left", "right"] and ctypes.windll.user32.GetKeyState(0x90):
             hexKeyCode = 0xE0
             extra = ctypes.c_ulong(0)
             ii_ = Input_I()
@@ -848,9 +858,9 @@ class RHBotArrayServer():
             else:
                 key = "up"
         time_reqd = abs(value/self.speed)
-        self.press_key(self.key_map[key])
+        self.press_key(self.key_map[key], key)
         time.sleep(time_reqd-0.003)
-        self.release_key(self.key_map[key])
+        self.release_key(self.key_map[key], key)
 
 
 if __name__ == "__main__":
