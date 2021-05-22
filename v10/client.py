@@ -282,6 +282,7 @@ class ClientKeypressListener():
                 for server in self.list_servers:
                     server.send_message("regroup,{}|{}".format(x, y))
                 print("Regrouping...")
+                self.try_toggle_map()
             elif key == KeyCode(char='6'):
                 self.autoloot_enabled = not self.autoloot_enabled
                 if self.autoloot_enabled:

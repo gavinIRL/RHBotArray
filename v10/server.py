@@ -911,8 +911,8 @@ class RHBotArrayServer():
         # first perform the pre-regroup updates
         self.pre_regroup_updates()
         # Then calculate the relative positions
-        relx = int(x) - self.player_pos[0]
-        rely = self.player_pos[1] - int(y)
+        relx = self.player_pos[0] - int(x)
+        rely = int(y) - self.player_pos[1]
         # First take care of the x-dir
         if relx != 0:
             self.resolve_dir_v2(relx, "x")
