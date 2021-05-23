@@ -199,7 +199,7 @@ class SellRepair():
 
 
 if __name__ == "__main__":
-    ist = SellRepair(last_row_protect=False)
+    ist = SellRepair(last_row_protect=True)
     ist.ident_sell_repair()
     # ist.hover_mouse_all()
     # ist.open_store_if_necessary()
