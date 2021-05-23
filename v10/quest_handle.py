@@ -42,7 +42,7 @@ class QuestHandle():
         self.next_rect = [880, 740, 1040, 780]
         self.next_wincap = WindowCapture(gamename, self.next_rect)
 
-        self.quest_rect = [210, 60, 1455, 650]
+        self.quest_rect = [310, 160, 1055, 650]
         self.quest_wincap = WindowCapture(gamename, self.quest_rect)
 
         self.questlist_rect = [740, 240, 1050, 580]
@@ -165,8 +165,9 @@ class QuestHandle():
         image = self.vision.apply_hsv_filter(
             image, self.white_text_filter)
         rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        tess_config = '--psm 6 --oem 3 -c tessedit_char_whitelist=Quest'
         results = pytesseract.image_to_data(
-            rgb, output_type=pytesseract.Output.DICT, lang='eng')
+            rgb, output_type=pytesseract.Output.DICT, lang='eng', config=tess_config)
         detection = False
         for i in range(0, len(results["text"])):
             if "Quest" in results["text"][i]:
