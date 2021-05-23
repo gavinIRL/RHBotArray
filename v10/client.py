@@ -252,7 +252,7 @@ class ClientKeypressListener():
 
     def on_press(self, key):
         if self.selling_ongoing != 0:
-            if self.selling_ongoing < time.time() - 5:
+            if self.selling_ongoing < time.time() - 7.5:
                 self.selling_ongoing = 0
         elif key == KeyCode(char='0'):
             print("Exiting bot")
