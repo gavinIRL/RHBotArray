@@ -48,7 +48,7 @@ class ClearAllTest():
         cv2.imwrite("testy.jpg", image)
         a, b, c = [int(i) for i in image[0][0]]
         d, e, f = [int(i) for i in image[0][-1]]
-        print("Sum abc:{}, def:{}".format(a+b+c, d+e+f))
+        # print("Sum abc:{}, def:{}".format(a+b+c, d+e+f))
         if a+b+c > 700:
             if d+e+f > 700:
                 return True
