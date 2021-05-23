@@ -126,6 +126,9 @@ class ClientKeypressListener():
         self.load_level_rects()
         self.player_pos = None
 
+        # Input mode, true = pag, false = custom
+        self.inputmode = False
+
     def try_toggle_map(self):
         # print("Toggling map")
         # time.sleep(0.1)
@@ -281,6 +284,17 @@ class ClientKeypressListener():
                 for server in self.list_servers:
                     server.send_message("revive,1")
                 print("Reviving...")
+            elif key == KeyCode(char='4'):
+                self.inputmode = not self.inputmode
+                for server in self.list_servers:
+                    if self.inputmode:
+                        server.send_message("inputmode,1")
+                    else:
+                        server.send_message("inputmode,0")
+                if self.inputmode:
+                    print("Swapping to PAG")
+                else:
+                    print("Swapping to Custom")
             elif key == KeyCode(char='5'):
                 x, y = self.find_player()
                 for server in self.list_servers:
