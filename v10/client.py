@@ -16,7 +16,7 @@ import os
 from cryptography.fernet import Fernet
 from quest_handle import QuestHandle
 from sell_repair import SellRepair
-from hsvfilter import HsvFilter
+from hsvfilter import grab_object_preset, HsvFilter
 from vision import Vision
 import cv2
 import pytesseract
@@ -128,6 +128,13 @@ class ClientKeypressListener():
 
         # Input mode, true = pag, false = custom
         self.inputmode = False
+
+        # Autoloot support client-side
+        self.xprompt_filter, xprompt_custom_rect = grab_object_preset(
+            object_name="prompt_press_x_pickup")
+        self.xprompt_wincap = WindowCapture(
+            self.gamename, xprompt_custom_rect)
+        self.xprompt_vision = Vision("xprompt67filtv2.jpg")
 
     def try_toggle_map(self):
         # print("Toggling map")
@@ -338,6 +345,8 @@ class ClientKeypressListener():
                     for server in self.list_servers:
                         server.send_message("xallow,0")
                     print("XALLOW OFF")
+            elif self.autoloot_enabled and key == KeyCode(char='x'):
+                pass
             elif GetWindowText(GetForegroundWindow()) == self.gamename:
                 if str(key) not in self.unreleased_keys:
                     if not self.batch_recording_ongoing:
@@ -358,6 +367,44 @@ class ClientKeypressListener():
                     t.start()
             self.batch_recording_ongoing = False
             print("TRANSMIT ON")
+
+    def auto_loot(self):
+        consec_xpress = 0
+        while self.autoloot_enabled:
+            if self.loot_if_available():
+                consec_xpress += 1
+                if not consec_xpress > 6:
+                    time.sleep(0.01)
+                    pydirectinput.keyUp("x")
+                    # self.release_key(self.key_map["x"])
+                    time.sleep(0.15)
+                else:
+                    time.sleep(0.4)
+            else:
+                time.sleep(0.1)
+                consec_xpress = 0
+
+    def autoloot_thread_start(self):
+        t = threading.Thread(target=self.auto_loot, daemon=True)
+        self.autoloot_enabled = True
+        t.start()
+
+    def loot_if_available(self):
+        # get an updated image of the game at specified area
+        xprompt_screenshot = self.xprompt_wincap.get_screenshot()
+        # pre-process the image to help with detection
+        xprompt_output_image = self.xprompt_vision.apply_hsv_filter(
+            xprompt_screenshot, self.xprompt_filter)
+        # do object detection, this time grab rectangles
+        xprompt_rectangles = self.xprompt_vision.find(
+            xprompt_output_image, threshold=0.61, epsilon=0.5)
+        # then return answer to whether currently in dungeon
+        if len(xprompt_rectangles) == 1:
+            # self.press_key(self.key_map["x"])
+            pydirectinput.keyDown("x")
+            # keyup performed in main loop
+            # return True for autoloot
+            return True
 
     def find_player(self):
         self.level_name = self.detect_level_name()
@@ -408,6 +455,8 @@ class ClientKeypressListener():
             pass
         elif key == KeyCode(char='3'):
             pass
+        elif key == KeyCode(char='4'):
+            pass
         elif key == KeyCode(char='5'):
             pass
         elif key == KeyCode(char='6'):
@@ -417,6 +466,8 @@ class ClientKeypressListener():
         elif key == KeyCode(char='8'):
             pass
         elif key == KeyCode(char='9'):
+            pass
+        elif self.autoloot_enabled and key == KeyCode(char='x'):
             pass
         elif self.transmitting:
             if GetWindowText(GetForegroundWindow()) == self.gamename:
@@ -438,19 +489,6 @@ class ClientKeypressListener():
                         self.batch_start_time = time.time()
                         # print(self.batch)
                         self.batch = ""
-
-    # def convert_ratio_to_click(self, ratx, raty):
-    #     # This will grab the current rectangle coords of game window
-    #     # and then turn the ratio of positions versus the game window
-    #     # into true x,y coords
-    #     self.game_wincap.update_window_position(border=False)
-    #     # Turn the ratios into relative
-    #     relx = int(ratx * self.game_wincap.w)
-    #     rely = int(raty * self.game_wincap.h)
-    #     # Turn the relative into true
-    #     truex = int((relx + self.game_wincap.window_rect[0]))
-    #     truey = int((rely + self.game_wincap.window_rect[1]))
-    #     return truex, truey
 
     def filter_blackwhite_invert(self, filter, existing_image):
         hsv = cv2.cvtColor(existing_image, cv2.COLOR_BGR2HSV)
