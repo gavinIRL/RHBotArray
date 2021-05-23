@@ -392,6 +392,7 @@ class RHBotArrayServer():
                 # pydirectinput.keyUp("x")
                 self.release_key(self.key_map["x"])
                 time.sleep(0.15)
+            time.sleep(0.1)
 
     def autoloot_thread_start(self):
         t = threading.Thread(target=self.auto_loot, daemon=True)
