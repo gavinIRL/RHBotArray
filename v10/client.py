@@ -94,6 +94,7 @@ class ClientKeypressListener():
         self.autoloot_enabled = False
 
         self.quest_handle = QuestHandle()
+        self.quest_handle_clicks = 0
 
         self.scaling = ClientUtils.get_monitor_scaling()
         # print("Scaling={}".format(self.scaling))
@@ -228,6 +229,8 @@ class ClientKeypressListener():
         if self.selling_ongoing != 0:
             if self.selling_ongoing < time.time() - 5:
                 self.selling_ongoing = 0
+        elif self.quest_handle_clicks > 0:
+            self.quest_handle_clicks -= 1
         # First off need to check if transmitting is enabled
         elif self.transmitting:
             # Need to then check if the click was in the right window
@@ -327,6 +330,7 @@ class ClientKeypressListener():
                 os.popen('python sell_repair.py')
                 # self.sell_repair.ident_sell_repair()
             elif key == KeyCode(char='8'):
+                self.quest_handle_clicks += 1
                 if not self.batch_recording_ongoing:
                     for server in self.list_servers:
                         server.send_message("questhandle,1")
