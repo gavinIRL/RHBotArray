@@ -13,22 +13,8 @@ The last week has been spent improving and fixing a lot of the features in Versi
 ### Proposed solutions to problems and annoyances
 * Upon pressing a hotkey, detect if the escape menu is open and if so click the close icon, and/or detect if the map is open and do the same. This should be client-side and server-side.
 
-## Current Status
-* Version 1 - Complete
-* Version 2 - Complete
-* Version 3 - Complete
-* Version 4 - Complete
-* Version 5 - Complete
-* Version 6 - Complete
-* Version 7 - Complete
-* Version 8 - Complete
-* Version 9 - Complete
-* Version 10 - In Progress
-* Version 11 - Not Started
-* Version 12 - Not Started
-* Version 13 - Not Started
-
 ## Versions
+### Version Features
 * Version 1 - Establishing basic chat server connection and functionality
 * Version 2 - Changing client communication to be keystrokes sent by listener
 * Version 3 - Executing sent keystrokes at server end
@@ -44,6 +30,20 @@ The last week has been spent improving and fixing a lot of the features in Versi
 * Version 13 - Automated level navigation
 * Version 14 - Automated quest identification and progression
 
+### Version Status
+* Version 1 - Complete
+* Version 2 - Complete
+* Version 3 - Complete
+* Version 4 - Complete
+* Version 5 - Complete
+* Version 6 - Complete
+* Version 7 - Complete
+* Version 8 - Complete
+* Version 9 - Complete
+* Version 10 - In Progress
+* Version 11 - Not Started
+* Version 12 - Not Started
+* Version 13 - Not Started
 
 ## Previous Status Updates
 ### 16th May 2021
