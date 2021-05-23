@@ -275,5 +275,6 @@ class QuestHandle():
 
 
 if __name__ == "__main__":
+    time.sleep(3)
     qht = QuestHandle()
-    qht.start()
+    qht.start_quest_handle()
