@@ -153,6 +153,10 @@ class RHBotArrayServer():
         self.key_map = self.load_key_dict()
         self.player_pos = None
 
+        # This is for the pag vs custom input town mode
+        # False means custom mode, true means pag
+        self.inputmode = False
+
     def try_toggle_map(self):
         # pydirectinput.keyDown("m")
         self.press_key(self.key_map["m"])
@@ -446,13 +450,13 @@ class RHBotArrayServer():
             if line[1] == "keyDown":
                 # print("Would press {} down now".format(line[0]))
                 k = self.convert_pynput_to_pag(line[0].strip("'"))
-                # pydirectinput.keyDown(k)
-                self.press_key(self.key_map[k], k)
+                pydirectinput.keyDown(k)
+                # self.press_key(self.key_map[k], k)
             elif line[1] == "keyUp":
                 # print("Would press {} down now".format(line[0]))
                 k = self.convert_pynput_to_pag(line[0].strip("'"))
-                # pydirectinput.keyUp(k)
-                self.press_key(self.key_map[k], k)
+                pydirectinput.keyUp(k)
+                # self.press_key(self.key_map[k], k)
             elif line[1] == "click":
                 xrat, yrat = line[3].split(",")
                 # print("Would click at {},{} now".format(x, y))
@@ -560,16 +564,17 @@ class RHBotArrayServer():
                 ctypes.windll.user32.SetCursorPos(x, y)
                 ctypes.windll.user32.mouse_event(
                     0x0008, 0, 0, 0, 0)
+                time.sleep(0.03)
                 ctypes.windll.user32.mouse_event(
                     0x00010, 0, 0, 0, 0)
             elif button == "quit":
                 print("Shutting down server")
                 os._exit(1)
             elif button == "revive":
-                # pydirectinput.keyDown("x")
+                pydirectinput.keyDown("x")
                 self.press_key(self.key_map["x"])
-                time.sleep(0.1)
-                # pydirectinput.keyUp("x")
+                time.sleep(0.05)
+                pydirectinput.keyUp("x")
                 self.release_key(self.key_map["x"])
             elif button == "mainplayer":
                 self.curr_player = direction
@@ -577,16 +582,22 @@ class RHBotArrayServer():
             elif button == "'x'":
                 if self.allowx:
                     if direction == "down":
-                        # pydirectinput.keyDown("x")
-                        self.press_key(self.key_map["x"])
+                        if self.inputmode:
+                            pydirectinput.keyDown("x")
+                        else:
+                            self.press_key(self.key_map["x"])
                     else:
-                        # pydirectinput.keyUp("x")
-                        self.release_key(self.key_map["x"])
+                        if self.inputmode:
+                            pydirectinput.keyUp("x")
+                        else:
+                            self.release_key(self.key_map["x"])
                 elif direction == "down":
                     self.loot_if_available()
                 else:
-                    # pydirectinput.keyUp("x")
-                    self.release_key(self.key_map["x"])
+                    if self.inputmode:
+                        pydirectinput.keyUp("x")
+                    else:
+                        self.release_key(self.key_map["x"])
             elif button == "regroup":
                 self.regroupv2(direction)
             elif button == "autoloot":
@@ -594,6 +605,11 @@ class RHBotArrayServer():
                     self.autoloot_thread_start()
                 else:
                     self.autoloot_enabled = False
+            elif button == "inputmode":
+                if direction == "1":
+                    self.inputmode = True
+                else:
+                    self.inputmode = False
             elif button == "questhandle":
                 self.quest_handle.start_quest_handle()
             elif button == "batch":
@@ -613,21 +629,29 @@ class RHBotArrayServer():
                     button.replace("'", ""))
                 if self.move_only:
                     if button in self.move_only_exclude_keys:
-                        # pydirectinput.keyDown(key)
-                        self.press_key(self.key_map[key], key)
+                        if self.inputmode:
+                            pydirectinput.keyDown(key)
+                        else:
+                            self.press_key(self.key_map[key], key)
                 else:
-                    # pydirectinput.keyDown(key)
-                    self.press_key(self.key_map[key], key)
+                    if self.inputmode:
+                        pydirectinput.keyDown(key)
+                    else:
+                        self.press_key(self.key_map[key], key)
             elif direction == "up":
                 key = self.convert_pynput_to_pag(
                     button.replace("'", ""))
                 if self.move_only:
                     if button in self.move_only_exclude_keys:
-                        # pydirectinput.keyUp(key)
-                        self.release_key(self.key_map[key], key)
+                        if self.inputmode:
+                            pydirectinput.keyUp(key)
+                        else:
+                            self.release_key(self.key_map[key], key)
                 else:
-                    # pydirectinput.keyUp(key)
-                    self.release_key(self.key_map[key], key)
+                    if self.inputmode:
+                        pydirectinput.keyUp(key)
+                    else:
+                        self.release_key(self.key_map[key], key)
 
     def load_key_dict(self):
         KEYBOARD_MAPPING = {
