@@ -386,13 +386,20 @@ class RHBotArrayServer():
         self.resolve_direction("y")
 
     def auto_loot(self):
+        consec_xpress = 0
         while self.autoloot_enabled:
             if self.loot_if_available():
-                time.sleep(0.01)
-                # pydirectinput.keyUp("x")
-                self.release_key(self.key_map["x"])
-                time.sleep(0.15)
-            time.sleep(0.1)
+                consec_xpress += 1
+                if not consec_xpress > 6:
+                    time.sleep(0.01)
+                    # pydirectinput.keyUp("x")
+                    self.release_key(self.key_map["x"])
+                    time.sleep(0.15)
+                else:
+                    time.sleep(0.4)
+            else:
+                time.sleep(0.1)
+                consec_xpress = 0
 
     def autoloot_thread_start(self):
         t = threading.Thread(target=self.auto_loot, daemon=True)
