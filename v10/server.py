@@ -614,6 +614,8 @@ class RHBotArrayServer():
                 self.quest_handle.start_quest_handle()
             elif button == "batch":
                 self.batch_handle(direction)
+            elif button == "clearall":
+                self.clear_all()
             elif button == "sellrepair":
                 os.popen('python sell_repair.py')
             elif button == "mainplayer":
@@ -969,6 +971,32 @@ class RHBotArrayServer():
         self.press_key(self.key_map[key], key)
         time.sleep(time_reqd-0.003)
         self.release_key(self.key_map[key], key)
+
+    def clear_all(self):
+        if self.detect_menu_open():
+            self.close_esc_menu()
+        elif self.detect_bigmap_open():
+            self.close_map()
+
+    def detect_menu_open(self):
+        wincap = WindowCapture(self.gamename, custom_rect=[595, 278, 621, 479])
+        image = wincap.get_screenshot()
+        cv2.imwrite("testy.jpg", image)
+        a, b, c = [int(i) for i in image[0][0]]
+        d, e, f = [int(i) for i in image[0][-1]]
+        # print("Sum abc:{}, def:{}".format(a+b+c, d+e+f))
+        if a+b+c > 700:
+            if d+e+f > 700:
+                return True
+        return False
+
+    def close_map(self):
+        pydirectinput.click(
+            int(self.scaling*859+self.game_wincap.window_rect[0]), int(self.scaling*260+self.game_wincap.window_rect[1]))
+
+    def close_esc_menu(self):
+        pydirectinput.click(
+            int(self.scaling*749+self.game_wincap.window_rect[0]), int(self.scaling*280+self.game_wincap.window_rect[1]))
 
 
 if __name__ == "__main__":
