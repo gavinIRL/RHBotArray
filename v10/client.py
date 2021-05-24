@@ -349,6 +349,10 @@ class ClientKeypressListener():
                     for server in self.list_servers:
                         server.send_message("xallow,0")
                     print("XALLOW OFF")
+            elif key == KeyCode(char='-'):
+                for server in self.list_servers:
+                    server.send_message("clearall,1")
+                print("Clearing All...")
             elif self.autoloot_enabled and key == KeyCode(char='x'):
                 pass
             elif GetWindowText(GetForegroundWindow()) == self.gamename:
