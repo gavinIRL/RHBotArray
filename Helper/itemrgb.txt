@@ -1,0 +1,24 @@
+Poor Carp Leather|216,91,218
+Dried Meat|98,119,245
+Parsley Powder|93,188,121
+Worst Carp Leather|91,190,218
+Butter|117,169,234
+Poor Linen|61,34,48
+Worst Solvent|215,199,206
+Wine|125,128,203
+Rum|16,17,18
+Basil Leaf|78,172,95
+Cheese|117,208,226
+Worst Steel|67,57,25
+Worst Linen|76,59,93
+Olive|75,66,103
+Garlic Sauce|186,207,243
+Mushroom|6,15,23
+Whole Potato|44,52,98
+Cream Powder|206,230,254
+Salted Bacon|41,48,141
+Curry Powder|195,250,253
+Seafood Sauce|153,189,226
+Cheese Slices|68,172,225
+Garlic Powder|233,248,246
+Butter Slices|115,164,213
