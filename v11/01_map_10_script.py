@@ -1,5 +1,7 @@
 # This file will automatically run through map 10
 import time
+import os
+os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 
 class Map10_MS30():
@@ -18,15 +20,7 @@ class Map10_MS30():
         time.sleep(3)
         for room in self.rooms:
             # Need to decide if boss room or not
-            if not room[0] == "b":
-                # Now move to the correct point in room
-                self.move_to(int(room[1]), int(room[2]))
-                # And perform the roomclear skill
-                self.roomclear_skill()
-                # Until sectclear detected continue to perform homing skills
-                while not self.sect_clear_detected():
-                    self.continue_clear()
-            else:
+            if room[0] == "b":
                 # Now move to the correct point in room
                 self.move_to(int(room[1]), int(room[2]), 45)
                 # Perform the first bossfight skill combo
@@ -41,6 +35,28 @@ class Map10_MS30():
                     self.roomclear_skill()
                 # After boss is defeated need to move to the main loot drop point
                 self.move_to(int(room[5]), int(room[6]), 45)
+            # Else if need to break a box straight away
+            elif "x" in room:
+                # Now move to the boxes
+                self.move_to(int(room[1]), int(room[2]))
+                # And then perform x attack twice
+                self.x_attack_twice()
+                # Now move to the correct point in room
+                self.move_to(int(room[3]), int(room[4]))
+                # And perform the roomclear skill
+                self.roomclear_skill()
+                # Until sectclear detected continue to perform homing skills
+                while not self.sect_clear_detected():
+                    self.continue_clear()
+            # Handling for all other rooms
+            else:
+                # Now move to the correct point in room
+                self.move_to(int(room[1]), int(room[2]))
+                # And perform the roomclear skill
+                self.roomclear_skill()
+                # Until sectclear detected continue to perform homing skills
+                while not self.sect_clear_detected():
+                    self.continue_clear()
             # And then check for loot afterwards
             self.ident_farloot()
         # Once boss is defeated need to go through the event check
@@ -81,6 +97,9 @@ class Map10_MS30():
     def boss_combo_2(self):
         pass
 
+    def x_attack_twice(self):
+        pass
+
     def sect_clear_detected(self):
         return True
 
@@ -93,7 +112,12 @@ class Map10_MS30():
         # exitposx,exitposy
         # exception is bossfight which has move2 vs exit
         # and additional lootx, looty for bossloot
-        pass
+        return_list = []
+        with open("/levels/map10.txt") as file:
+            lines = file.readlines()
+        for line in lines:
+            return_list.append(line.split(","))
+        return return_list
 
     def detect_endlevel_event(self):
         pass
