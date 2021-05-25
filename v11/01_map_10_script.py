@@ -1,13 +1,66 @@
 # This file will automatically run through map 10
+import time
+
 
 class Map10_MS30():
-    def __init__(self) -> None:
-        pass
+    def __init__(self, maxloops=1) -> None:
+        self.rooms = self.load_map_rooms()
+        self.maxloops = maxloops
 
     def start(self):
-        pass
+        while self.maxloops > 0:
+            self.mainloop()
+            self.maxloops -= 1
 
-    def move_to(self, x, y, angle):
+    def mainloop(self):
+        # First assume that have entered the map
+        # Therefore will wait for 3 seconds
+        time.sleep(3)
+        for room in self.rooms:
+            # Need to decide if boss room or not
+            if not room[0] == "b":
+                # Now move to the correct point in room
+                self.move_to(int(room[1]), int(room[2]))
+                # And perform the roomclear skill
+                self.roomclear_skill()
+                # Until sectclear detected continue to perform homing skills
+                while not self.sect_clear_detected():
+                    self.continue_clear()
+            else:
+                # Now move to the correct point in room
+                self.move_to(int(room[1]), int(room[2]), 45)
+                # Perform the first bossfight skill combo
+                self.boss_combo_1()
+                # Then move to the second point in the room
+                self.move_to(int(room[3]), int(room[4]), 45)
+                # Perform the second bossfight combo
+                self.boss_combo_2()
+                # Until boss is defeated continue to attack
+                while not self.boss_defeat_detected():
+                    self.boss_combo_1()
+                    self.roomclear_skill()
+                # After boss is defeated need to move to the main loot drop point
+                self.move_to(int(room[5]), int(room[6]), 45)
+            # And then check for loot afterwards
+            self.ident_farloot()
+        # Once boss is defeated need to go through the event check
+        # And clear the event if necessary
+        if not self.detect_endlevel_event():
+            # Try to move towards and detect loot
+            self.move_to(int(self.rooms[-1][5]), int(self.rooms[-1][6]), 45)
+            self.ident_farloot()
+        # Then go through the reward select
+        self.select_reward()
+        # Check once more for loot
+        self.move_to(int(self.rooms[-1][5]), int(self.rooms[-1][6]), 45)
+        self.ident_farloot()
+        # Then perform the sell and repair
+        self.sell_and_repair()
+        # And if there are more loops to do then go again
+        if self.maxloops > 0:
+            self.repeat_level()
+
+    def move_to(self, x, y, angle=90):
         pass
 
     def roomclear_skill(self):
@@ -27,3 +80,34 @@ class Map10_MS30():
 
     def boss_combo_2(self):
         pass
+
+    def sect_clear_detected(self):
+        return True
+
+    def boss_defeat_detected(self):
+        return True
+
+    def load_map_rooms(self):
+        # Format to be as follows:
+        # roomnum, moveposx, moveposy,
+        # exitposx,exitposy
+        # exception is bossfight which has move2 vs exit
+        # and additional lootx, looty for bossloot
+        pass
+
+    def detect_endlevel_event(self):
+        pass
+
+    def select_reward(self):
+        pass
+
+    def sell_and_repair(self):
+        pass
+
+    def repeat_level(self):
+        pass
+
+
+if __name__ == "__main__":
+    map10 = Map10_MS30(maxloops=1)
+    map10.start()
