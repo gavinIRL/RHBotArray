@@ -6,8 +6,11 @@ from pynput.keyboard import Key, Listener, KeyCode
 import time
 import os
 import cv2
+import ctypes
 import pydirectinput
 from windowcapture import WindowCapture
+from win32api import GetSystemMetrics
+from quest_handle import QuestHandle
 
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
@@ -20,6 +23,7 @@ class Helper():
             self.gamename = f.readline()
         self.game_wincap = WindowCapture(self.gamename)
         self.scaling = self.get_monitor_scaling()
+        self.quest_handle = QuestHandle()
 
     def start(self):
         self.start_keypress_listener()
@@ -63,13 +67,23 @@ class Helper():
         elif self.detect_bigmap_open():
             self.close_map()
 
+    def detect_bigmap_open(self):
+        wincap = WindowCapture(self.gamename, custom_rect=[819, 263, 855, 264])
+        image = wincap.get_screenshot()
+        cv2.imwrite("testy.jpg", image)
+        a, b, c = [int(i) for i in image[0][0]]
+        d, e, f = [int(i) for i in image[0][-2]]
+        if a+b+c < 30:
+            if d+e+f > 700:
+                return True
+        return False
+
     def detect_menu_open(self):
         wincap = WindowCapture(self.gamename, custom_rect=[595, 278, 621, 479])
         image = wincap.get_screenshot()
         cv2.imwrite("testy.jpg", image)
         a, b, c = [int(i) for i in image[0][0]]
         d, e, f = [int(i) for i in image[0][-1]]
-        # print("Sum abc:{}, def:{}".format(a+b+c, d+e+f))
         if a+b+c > 700:
             if d+e+f > 700:
                 return True
@@ -82,6 +96,13 @@ class Helper():
     def close_esc_menu(self):
         pydirectinput.click(
             int(self.scaling*749+self.game_wincap.window_rect[0]), int(self.scaling*280+self.game_wincap.window_rect[1]))
+
+    def get_monitor_scaling():
+        user32 = ctypes.windll.user32
+        w_orig = GetSystemMetrics(0)
+        user32.SetProcessDPIAware()
+        [w, h] = [user32.GetSystemMetrics(0), user32.GetSystemMetrics(1)]
+        return float(("{:.2f}".format(w/w_orig)))
 
 
 if __name__ == "__main__":
