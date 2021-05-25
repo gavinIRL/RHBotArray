@@ -97,7 +97,7 @@ class Helper():
         pydirectinput.click(
             int(self.scaling*749+self.game_wincap.window_rect[0]), int(self.scaling*280+self.game_wincap.window_rect[1]))
 
-    def get_monitor_scaling():
+    def get_monitor_scaling(self):
         user32 = ctypes.windll.user32
         w_orig = GetSystemMetrics(0)
         user32.SetProcessDPIAware()
