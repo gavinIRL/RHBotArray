@@ -1,6 +1,7 @@
 import os
-import cv2 as cv
+import cv2
 import numpy as np
+import pytesseract
 from hsvfilter import HsvFilter
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
@@ -19,31 +20,51 @@ class BotUtils():
         return c
 
     def filter_blackwhite_invert(filter, existing_image):
-        hsv = cv.cvtColor(existing_image, cv.COLOR_BGR2HSV)
+        hsv = cv2.cvtColor(existing_image, cv2.COLOR_BGR2HSV)
         hsv_filter = filter
         # add/subtract saturation and value
-        h, s, v = cv.split(hsv)
+        h, s, v = cv2.split(hsv)
         s = BotUtils.shift_channel(s, hsv_filter.sAdd)
         s = BotUtils.shift_channel(s, -hsv_filter.sSub)
         v = BotUtils.shift_channel(v, hsv_filter.vAdd)
         v = BotUtils.shift_channel(v, -hsv_filter.vSub)
-        hsv = cv.merge([h, s, v])
+        hsv = cv2.merge([h, s, v])
 
         # Set minimum and maximum HSV values to display
         lower = np.array([hsv_filter.hMin, hsv_filter.sMin, hsv_filter.vMin])
         upper = np.array([hsv_filter.hMax, hsv_filter.sMax, hsv_filter.vMax])
         # Apply the thresholds
-        mask = cv.inRange(hsv, lower, upper)
-        result = cv.bitwise_and(hsv, hsv, mask=mask)
+        mask = cv2.inRange(hsv, lower, upper)
+        result = cv2.bitwise_and(hsv, hsv, mask=mask)
 
         # convert back to BGR
-        img = cv.cvtColor(result, cv.COLOR_HSV2BGR)
+        img = cv2.cvtColor(result, cv2.COLOR_HSV2BGR)
         # now change it to greyscale
-        grayImage = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
+        grayImage = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         # now change it to black and white
-        (thresh, blackAndWhiteImage) = cv.threshold(
-            grayImage, 67, 255, cv.THRESH_BINARY)
+        (thresh, blackAndWhiteImage) = cv2.threshold(
+            grayImage, 67, 255, cv2.THRESH_BINARY)
         # now invert it
         inverted = (255-blackAndWhiteImage)
-        inverted = cv.cvtColor(inverted, cv.COLOR_GRAY2BGR)
+        inverted = cv2.cvtColor(inverted, cv2.COLOR_GRAY2BGR)
         return inverted
+
+    def detect_level_name(self):
+        wincap = WindowCapture(self.gamename, [1121, 31, 1248, 44])
+        existing_image = wincap.get_screenshot()
+        filter = HsvFilter(0, 0, 0, 169, 34, 255, 0, 0, 0, 0)
+        vision_limestone = Vision('plyr.jpg')
+        # cv2.imwrite("testy2.jpg", existing_image)
+        save_image = vision_limestone.apply_hsv_filter(existing_image, filter)
+        # cv2.imwrite("testy3.jpg", save_image)
+        gray_image = cv2.cvtColor(save_image, cv2.COLOR_BGR2GRAY)
+        (thresh, blackAndWhiteImage) = cv2.threshold(
+            gray_image, 129, 255, cv2.THRESH_BINARY)
+        # now invert it
+        inverted = (255-blackAndWhiteImage)
+        save_image = cv2.cvtColor(inverted, cv2.COLOR_GRAY2BGR)
+        rgb = cv2.cvtColor(save_image, cv2.COLOR_BGR2RGB)
+        tess_config = '--psm 7 --oem 3 -c tessedit_char_whitelist=01234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
+        result = pytesseract.image_to_string(
+            rgb, lang='eng', config=tess_config)[:-2]
+        return result
