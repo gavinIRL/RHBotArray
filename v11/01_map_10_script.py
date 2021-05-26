@@ -113,7 +113,9 @@ class Map10_MS30():
         # exception is bossfight which has move2 vs exit
         # and additional lootx, looty for bossloot
         return_list = []
-        with open("/levels/map10.txt") as file:
+        filepath = os.path.dirname(
+            os.path.abspath(__file__)) + "/levels/map10.txt"
+        with open(filepath) as file:
             lines = file.readlines()
         for line in lines:
             return_list.append(line.split(","))
