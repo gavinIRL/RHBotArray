@@ -2,11 +2,25 @@ import os
 import cv2
 import numpy as np
 import pytesseract
-from hsvfilter import HsvFilter
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 
-class BotUtils():
+class HsvFilter:
+    def __init__(self, hMin=None, sMin=None, vMin=None, hMax=None, sMax=None, vMax=None,
+                 sAdd=None, sSub=None, vAdd=None, vSub=None):
+        self.hMin = hMin
+        self.sMin = sMin
+        self.vMin = vMin
+        self.hMax = hMax
+        self.sMax = sMax
+        self.vMax = vMax
+        self.sAdd = sAdd
+        self.sSub = sSub
+        self.vAdd = vAdd
+        self.vSub = vSub
+
+
+class BotUtils:
     def shift_channel(c, amount):
         if amount > 0:
             lim = 255 - amount
@@ -19,7 +33,7 @@ class BotUtils():
             c[c > lim] -= amount
         return c
 
-    def filter_blackwhite_invert(filter, existing_image):
+    def filter_blackwhite_invert(filter: HsvFilter, existing_image):
         hsv = cv2.cvtColor(existing_image, cv2.COLOR_BGR2HSV)
         hsv_filter = filter
         # add/subtract saturation and value
@@ -49,8 +63,8 @@ class BotUtils():
         inverted = cv2.cvtColor(inverted, cv2.COLOR_GRAY2BGR)
         return inverted
 
-    def detect_level_name(self):
-        wincap = WindowCapture(self.gamename, [1121, 31, 1248, 44])
+    def detect_level_name(gamename):
+        wincap = WindowCapture(gamename, [1121, 31, 1248, 44])
         existing_image = wincap.get_screenshot()
         filter = HsvFilter(0, 0, 0, 169, 34, 255, 0, 0, 0, 0)
         # cv2.imwrite("testy2.jpg", existing_image)
@@ -68,7 +82,7 @@ class BotUtils():
             rgb, lang='eng', config=tess_config)[:-2]
         return result
 
-    def apply_hsv_filter(original_image, hsv_filter):
+    def apply_hsv_filter(original_image, hsv_filter: HsvFilter):
         # convert image to HSV
         hsv = cv2.cvtColor(original_image, cv2.COLOR_BGR2HSV)
 
@@ -103,20 +117,20 @@ class BotUtils():
                 return True
         return False
 
-    def grab_player_pos(self, gamename, map_rect=None):
+    def grab_player_pos(gamename, map_rect=None):
         if not map_rect:
             wincap = WindowCapture(gamename)
         else:
             wincap = WindowCapture(gamename, map_rect)
         filter = HsvFilter(34, 160, 122, 50, 255, 255, 0, 0, 0, 0)
         image = wincap.get_screenshot()
-        save_image = self.filter_blackwhite_invert(filter, image)
-        vision_limestone = Vision('plyr.jpg')
-        rectangles = vision_limestone.find(
+        save_image = BotUtils.filter_blackwhite_invert(filter, image)
+        vision = Vision('plyr.jpg')
+        rectangles = vision.find(
             save_image, threshold=0.31, epsilon=0.5)
-        points = vision_limestone.get_click_points(rectangles)
+        points = vision.get_click_points(rectangles)
         x, y = points[0]
-        if not self.map_rect:
+        if not map_rect:
             return x, y
         else:
             x += wincap.window_rect[0]
@@ -149,11 +163,6 @@ class BotUtils():
 
 
 class Vision:
-    needle_img = None
-    needle_w = 0
-    needle_h = 0
-    method = None
-
     def __init__(self, needle_img_path, method=cv2.TM_CCOEFF_NORMED):
         self.needle_img = cv2.imread(needle_img_path, cv2.IMREAD_UNCHANGED)
         self.needle_w = self.needle_img.shape[1]
@@ -207,7 +216,7 @@ class Vision:
         return haystack_img
 
 
-class DynamicFilter():
+class DynamicFilter:
     TRACKBAR_WINDOW = "Trackbars"
     # create gui window with controls for adjusting arguments in real-time
 
@@ -254,18 +263,3 @@ class DynamicFilter():
         hsv_filter.vAdd = cv2.getTrackbarPos('VAdd', self.TRACKBAR_WINDOW)
         hsv_filter.vSub = cv2.getTrackbarPos('VSub', self.TRACKBAR_WINDOW)
         return hsv_filter
-
-
-class HsvFilter:
-    def __init__(self, hMin=None, sMin=None, vMin=None, hMax=None, sMax=None, vMax=None,
-                 sAdd=None, sSub=None, vAdd=None, vSub=None):
-        self.hMin = hMin
-        self.sMin = sMin
-        self.vMin = vMin
-        self.hMax = hMax
-        self.sMax = sMax
-        self.vMax = vMax
-        self.sAdd = sAdd
-        self.sSub = sSub
-        self.vAdd = vAdd
-        self.vSub = vSub
