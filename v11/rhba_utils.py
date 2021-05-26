@@ -1,6 +1,9 @@
 import os
 import cv2
 import numpy as np
+import win32gui
+import win32ui
+import win32con
 import pytesseract
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
@@ -20,7 +23,83 @@ class HsvFilter:
         self.vSub = vSub
 
 
+class WindowCapture:
+    def __init__(self, window_name=None, custom_rect=None):
+        self.custom_rect = custom_rect
+        if window_name is None:
+            self.hwnd = win32gui.GetDesktopWindow()
+        else:
+            self.hwnd = win32gui.FindWindow(None, window_name)
+            if not self.hwnd:
+                raise Exception('Window not found: {}'.format(window_name))
+
+        # Declare all the class variables
+        self.w, self.h, self.cropped_x, self.cropped_y
+        self.offset_x, self.offset_y
+        self.update_window_position()
+
+    def get_screenshot(self):
+        # get the window image data
+        wDC = win32gui.GetWindowDC(self.hwnd)
+        dcObj = win32ui.CreateDCFromHandle(wDC)
+        cDC = dcObj.CreateCompatibleDC()
+        dataBitMap = win32ui.CreateBitmap()
+        dataBitMap.CreateCompatibleBitmap(dcObj, self.w, self.h)
+        cDC.SelectObject(dataBitMap)
+        cDC.BitBlt((0, 0), (self.w, self.h), dcObj,
+                   (self.cropped_x, self.cropped_y), win32con.SRCCOPY)
+        # convert the raw data into a format opencv can read
+        signedIntsArray = dataBitMap.GetBitmapBits(True)
+        img = np.fromstring(signedIntsArray, dtype='uint8')
+        img.shape = (self.h, self.w, 4)
+        # free resources
+        dcObj.DeleteDC()
+        cDC.DeleteDC()
+        win32gui.ReleaseDC(self.hwnd, wDC)
+        win32gui.DeleteObject(dataBitMap.GetHandle())
+        # drop the alpha channel
+        img = img[..., :3]
+        # make image C_CONTIGUOUS
+        img = np.ascontiguousarray(img)
+
+        return img
+
+    def update_window_position(self, border=True):
+        self.window_rect = win32gui.GetWindowRect(self.hwnd)
+        self.w = self.window_rect[2] - self.window_rect[0]
+        self.h = self.window_rect[3] - self.window_rect[1]
+        border_pixels = 8
+        titlebar_pixels = 30
+        if self.custom_rect is None:
+            if border:
+                self.w = self.w - (border_pixels * 2)
+                self.h = self.h - titlebar_pixels - border_pixels
+                self.cropped_x = border_pixels
+                self.cropped_y = titlebar_pixels
+            else:
+                self.cropped_x = 0
+                self.cropped_y = 0
+        else:
+            self.w = self.custom_rect[2] - self.custom_rect[0]
+            self.h = self.custom_rect[3] - self.custom_rect[1]
+            self.cropped_x = self.custom_rect[0]
+            self.cropped_y = self.custom_rect[1]
+        self.offset_x = self.window_rect[0] + self.cropped_x
+        self.offset_y = self.window_rect[1] + self.cropped_y
+
+    # WARNING: need to call the update_window_position function to prevent errors
+    # That would come from moving the window after starting the bot
+    def get_screen_position(self, pos):
+        return (pos[0] + self.offset_x, pos[1] + self.offset_y)
+
+
 class BotUtils:
+    def list_window_names():
+        def winEnumHandler(hwnd, ctx):
+            if win32gui.IsWindowVisible(hwnd):
+                print(hex(hwnd), win32gui.GetWindowText(hwnd))
+        win32gui.EnumWindows(winEnumHandler, None)
+
     def shift_channel(c, amount):
         if amount > 0:
             lim = 255 - amount
