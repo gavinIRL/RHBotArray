@@ -205,3 +205,52 @@ class Vision:
                            marker_color, marker_type)
 
         return haystack_img
+
+
+class DynamicFilter():
+    TRACKBAR_WINDOW = "Trackbars"
+    # create gui window with controls for adjusting arguments in real-time
+
+    def init_control_gui(self):
+        cv2.namedWindow(self.TRACKBAR_WINDOW, cv2.WINDOW_NORMAL)
+        cv2.resizeWindow(self.TRACKBAR_WINDOW, 350, 700)
+
+        # required callback. we'll be using getTrackbarPos() to do lookups
+        # instead of using the callback.
+        def nothing(position):
+            pass
+
+        # create trackbars for bracketing.
+        # OpenCV scale for HSV is H: 0-179, S: 0-255, V: 0-255
+        cv2.createTrackbar('HMin', self.TRACKBAR_WINDOW, 0, 179, nothing)
+        cv2.createTrackbar('SMin', self.TRACKBAR_WINDOW, 0, 255, nothing)
+        cv2.createTrackbar('VMin', self.TRACKBAR_WINDOW, 0, 255, nothing)
+        cv2.createTrackbar('HMax', self.TRACKBAR_WINDOW, 0, 179, nothing)
+        cv2.createTrackbar('SMax', self.TRACKBAR_WINDOW, 0, 255, nothing)
+        cv2.createTrackbar('VMax', self.TRACKBAR_WINDOW, 0, 255, nothing)
+        # Set default value for Max HSV trackbars
+        cv2.setTrackbarPos('HMax', self.TRACKBAR_WINDOW, 179)
+        cv2.setTrackbarPos('SMax', self.TRACKBAR_WINDOW, 255)
+        cv2.setTrackbarPos('VMax', self.TRACKBAR_WINDOW, 255)
+
+        # trackbars for increasing/decreasing saturation and value
+        cv2.createTrackbar('SAdd', self.TRACKBAR_WINDOW, 0, 255, nothing)
+        cv2.createTrackbar('SSub', self.TRACKBAR_WINDOW, 0, 255, nothing)
+        cv2.createTrackbar('VAdd', self.TRACKBAR_WINDOW, 0, 255, nothing)
+        cv2.createTrackbar('VSub', self.TRACKBAR_WINDOW, 0, 255, nothing)
+
+    # returns an HSV filter object based on the control GUI values
+    def get_hsv_filter_from_controls(self):
+        # Get current positions of all trackbars
+        hsv_filter = HsvFilter()
+        hsv_filter.hMin = cv2.getTrackbarPos('HMin', self.TRACKBAR_WINDOW)
+        hsv_filter.sMin = cv2.getTrackbarPos('SMin', self.TRACKBAR_WINDOW)
+        hsv_filter.vMin = cv2.getTrackbarPos('VMin', self.TRACKBAR_WINDOW)
+        hsv_filter.hMax = cv2.getTrackbarPos('HMax', self.TRACKBAR_WINDOW)
+        hsv_filter.sMax = cv2.getTrackbarPos('SMax', self.TRACKBAR_WINDOW)
+        hsv_filter.vMax = cv2.getTrackbarPos('VMax', self.TRACKBAR_WINDOW)
+        hsv_filter.sAdd = cv2.getTrackbarPos('SAdd', self.TRACKBAR_WINDOW)
+        hsv_filter.sSub = cv2.getTrackbarPos('SSub', self.TRACKBAR_WINDOW)
+        hsv_filter.vAdd = cv2.getTrackbarPos('VAdd', self.TRACKBAR_WINDOW)
+        hsv_filter.vSub = cv2.getTrackbarPos('VSub', self.TRACKBAR_WINDOW)
+        return hsv_filter
