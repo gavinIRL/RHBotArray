@@ -53,9 +53,8 @@ class BotUtils():
         wincap = WindowCapture(self.gamename, [1121, 31, 1248, 44])
         existing_image = wincap.get_screenshot()
         filter = HsvFilter(0, 0, 0, 169, 34, 255, 0, 0, 0, 0)
-        vision_limestone = Vision('plyr.jpg')
         # cv2.imwrite("testy2.jpg", existing_image)
-        save_image = vision_limestone.apply_hsv_filter(existing_image, filter)
+        save_image = BotUtils.apply_hsv_filter(existing_image, filter)
         # cv2.imwrite("testy3.jpg", save_image)
         gray_image = cv2.cvtColor(save_image, cv2.COLOR_BGR2GRAY)
         (thresh, blackAndWhiteImage) = cv2.threshold(
@@ -68,3 +67,27 @@ class BotUtils():
         result = pytesseract.image_to_string(
             rgb, lang='eng', config=tess_config)[:-2]
         return result
+
+    def apply_hsv_filter(original_image, hsv_filter=None):
+        # convert image to HSV
+        hsv = cv2.cvtColor(original_image, cv2.COLOR_BGR2HSV)
+
+        # add/subtract saturation and value
+        h, s, v = cv2.split(hsv)
+        s = BotUtils.shift_channel(s, hsv_filter.sAdd)
+        s = BotUtils.shift_channel(s, -hsv_filter.sSub)
+        v = BotUtils.shift_channel(v, hsv_filter.vAdd)
+        v = BotUtils.shift_channel(v, -hsv_filter.vSub)
+        hsv = cv2.merge([h, s, v])
+
+        # Set minimum and maximum HSV values to display
+        lower = np.array([hsv_filter.hMin, hsv_filter.sMin, hsv_filter.vMin])
+        upper = np.array([hsv_filter.hMax, hsv_filter.sMax, hsv_filter.vMax])
+        # Apply the thresholds
+        mask = cv2.inRange(hsv, lower, upper)
+        result = cv2.bitwise_and(hsv, hsv, mask=mask)
+
+        # convert back to BGR for imshow() to display it properly
+        img = cv2.cvtColor(result, cv2.COLOR_HSV2BGR)
+
+        return img
