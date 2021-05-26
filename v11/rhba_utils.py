@@ -68,7 +68,7 @@ class BotUtils():
             rgb, lang='eng', config=tess_config)[:-2]
         return result
 
-    def apply_hsv_filter(original_image, hsv_filter=None):
+    def apply_hsv_filter(original_image, hsv_filter):
         # convert image to HSV
         hsv = cv2.cvtColor(original_image, cv2.COLOR_BGR2HSV)
 
@@ -91,3 +91,34 @@ class BotUtils():
         img = cv2.cvtColor(result, cv2.COLOR_HSV2BGR)
 
         return img
+
+    def detect_bigmap_open(self, gamename):
+        wincap = WindowCapture(gamename, custom_rect=[819, 263, 855, 264])
+        image = wincap.get_screenshot()
+        cv2.imwrite("testy.jpg", image)
+        a, b, c = [int(i) for i in image[0][0]]
+        d, e, f = [int(i) for i in image[0][-2]]
+        if a+b+c < 30:
+            if d+e+f > 700:
+                return True
+        return False
+
+    def grab_player_pos(self, gamename, map_rect=None):
+        if not map_rect:
+            wincap = WindowCapture(gamename)
+        else:
+            wincap = WindowCapture(gamename, map_rect)
+        filter = HsvFilter(34, 160, 122, 50, 255, 255, 0, 0, 0, 0)
+        image = wincap.get_screenshot()
+        save_image = self.filter_blackwhite_invert(filter, image)
+        vision_limestone = Vision('plyr.jpg')
+        rectangles = vision_limestone.find(
+            save_image, threshold=0.31, epsilon=0.5)
+        points = vision_limestone.get_click_points(rectangles)
+        x, y = points[0]
+        if not self.map_rect:
+            return x, y
+        else:
+            x += wincap.window_rect[0]
+            y += wincap.window_rect[1]
+            return x, y
