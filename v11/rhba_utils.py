@@ -1,5 +1,6 @@
 import os
 import cv2
+import time
 import numpy as np
 import win32gui
 import win32ui
@@ -94,6 +95,28 @@ class WindowCapture:
 
 
 class BotUtils:
+    def resolve_single_direction(speed, value, dir, PAG=False):
+        if not PAG:
+            sleep_time = 0.003
+        else:
+            sleep_time = 0.1
+        if dir == "x":
+            if value > 0:
+                key = "left"
+            else:
+                key = "right"
+        elif dir == "y":
+            if value > 0:
+                key = "down"
+            else:
+                key = "up"
+        time_reqd = abs(value/speed)
+        if not PAG:
+            self.press_key(self.key_map[key], key)
+            pass
+        time.sleep(time_reqd-0.003)
+        self.release_key(self.key_map[key], key)
+
     def list_window_names():
         def winEnumHandler(hwnd, ctx):
             if win32gui.IsWindowVisible(hwnd):
