@@ -31,22 +31,24 @@ class ScreenshotGrabber5Sec():
 
     def on_release(self, key):
         if key == keyboard.Key.f10:
-            print("Starting sectclear check")
-            t = Thread(target=self.sectclear_checker)
+            print("Starting bosshp check")
+            t = Thread(target=self.bosshp_checker)
             t.start()
 
     def detect_boss_bar(self, gamename):
         wincap = WindowCapture(gamename, custom_rect=[
                                415+97, 105+533, 415+98, 105+534])
         image = wincap.get_screenshot()
+        # bgr
         a, b, c = [int(i) for i in image[0][0]]
         d, e, f = [int(i) for i in image[0][-1]]
-        if a+d > 440:
-            if b+c+e+f < 80:
+        # print("abc={},{},{}".format(a, b, c))
+        if c+f > 440:
+            if a+b+d+e < 80:
                 return True
         return False
 
-    def sectclear_checker(self):
+    def bosshp_checker(self):
         with open("gamename.txt") as f:
             gamename = f.readline()
         while not self.detect_boss_bar(gamename):
