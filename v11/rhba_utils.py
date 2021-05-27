@@ -237,13 +237,16 @@ class BotUtils:
                 return True
         return False
 
-    def detect_sect_clear(self, gamename):
-        wincap = WindowCapture(gamename, custom_rect=[819, 263, 855, 264])
+    def detect_boss_healthbar(gamename):
+        wincap = WindowCapture(gamename, custom_rect=[
+                               415+97, 105+533, 415+98, 105+534])
         image = wincap.get_screenshot()
+        # bgr
         a, b, c = [int(i) for i in image[0][0]]
-        d, e, f = [int(i) for i in image[0][-2]]
-        if a+b+c < 30:
-            if d+e+f > 700:
+        d, e, f = [int(i) for i in image[0][-1]]
+        # print("abc={},{},{}".format(a, b, c))
+        if c+f > 440:
+            if a+b+d+e < 80:
                 return True
         return False
 
