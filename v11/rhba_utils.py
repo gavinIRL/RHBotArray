@@ -249,29 +249,31 @@ class BotUtils:
             y += wincap.window_rect[1]
             return x, y
 
-    def grab_level_catalogue(self):
+    def grab_level_rects():
+        rects = {}
         # Load the translation from name to num
         with open("lvl_name_num.txt") as f:
-            self.num_names = f.readlines()
-        for i, entry in enumerate(self.num_names):
-            self.num_names[i] = entry.split("-")
+            num_names = f.readlines()
+        for i, entry in enumerate(num_names):
+            num_names[i] = entry.split("-")
         # Load the num to rect catalogue
         with open("catalogue.txt") as f:
             nums_rects = f.readlines()
         for i, entry in enumerate(nums_rects):
             nums_rects[i] = entry.split("-")
         # Then add each rect to the rects dict against name
-        for number, name in self.num_names:
+        for number, name in num_names:
             for num, area, rect in nums_rects:
                 if area == "FM" and num == number:
-                    self.rects[name.rstrip().replace(" ", "")] = rect.rstrip()
+                    rects[name.rstrip().replace(" ", "")] = rect.rstrip()
                     if "1" in name:
-                        self.rects[name.rstrip().replace(
+                        rects[name.rstrip().replace(
                             " ", "").replace("1", "L")] = rect.rstrip()
                     if "ri" in name:
-                        self.rects[name.rstrip().replace(
+                        rects[name.rstrip().replace(
                             " ", "").replace("ri", "n").replace("1", "L")] = rect.rstrip()
                     break
+        return rects
 
 
 class Vision:
@@ -332,6 +334,58 @@ class DynamicFilter:
     TRACKBAR_WINDOW = "Trackbars"
     # create gui window with controls for adjusting arguments in real-time
 
+    def __init__(self, needle_img_path, method=cv2.TM_CCOEFF_NORMED):
+        self.needle_img = cv2.imread(needle_img_path, cv2.IMREAD_UNCHANGED)
+        self.needle_w = self.needle_img.shape[1]
+        self.needle_h = self.needle_img.shape[0]
+        # TM_CCOEFF, TM_CCOEFF_NORMED, TM_CCORR, TM_CCORR_NORMED, TM_SQDIFF, TM_SQDIFF_NORMED
+        self.method = method
+
+    def find(self, haystack_img, threshold=0.7, epsilon=0.5):
+        result = cv2.matchTemplate(haystack_img, self.needle_img, self.method)
+        locations = np.where(result >= threshold)
+        locations = list(zip(*locations[::-1]))
+        if not locations:
+            return np.array([], dtype=np.int32).reshape(0, 4)
+        rectangles = []
+        for loc in locations:
+            rect = [int(loc[0]), int(loc[1]), self.needle_w, self.needle_h]
+            rectangles.append(rect)
+            rectangles.append(rect)
+        rectangles, weights = cv2.groupRectangles(
+            rectangles, groupThreshold=1, eps=epsilon)
+        return rectangles
+
+    def get_click_points(self, rectangles):
+        points = []
+        for (x, y, w, h) in rectangles:
+            center_x = x + int(w/2)
+            center_y = y + int(h/2)
+            points.append((center_x, center_y))
+        return points
+
+    def draw_rectangles(self, haystack_img, rectangles):
+        # BGR
+        line_color = (0, 255, 0)
+        line_type = cv2.LINE_4
+        for (x, y, w, h) in rectangles:
+            top_left = (x, y)
+            bottom_right = (x + w, y + h)
+            cv2.rectangle(haystack_img, top_left, bottom_right,
+                          line_color, lineType=line_type)
+        return haystack_img
+
+    def draw_crosshairs(self, haystack_img, points):
+        # BGR
+        marker_color = (255, 0, 255)
+        marker_type = cv2.MARKER_CROSS
+
+        for (center_x, center_y) in points:
+            cv2.drawMarker(haystack_img, (center_x, center_y),
+                           marker_color, marker_type)
+
+        return haystack_img
+
     def init_control_gui(self):
         cv2.namedWindow(self.TRACKBAR_WINDOW, cv2.WINDOW_NORMAL)
         cv2.resizeWindow(self.TRACKBAR_WINDOW, 350, 700)
@@ -375,3 +429,23 @@ class DynamicFilter:
         hsv_filter.vAdd = cv2.getTrackbarPos('VAdd', self.TRACKBAR_WINDOW)
         hsv_filter.vSub = cv2.getTrackbarPos('VSub', self.TRACKBAR_WINDOW)
         return hsv_filter
+
+    def apply_hsv_filter(self, original_image, hsv_filter=None):
+        hsv = cv2.cvtColor(original_image, cv2.COLOR_BGR2HSV)
+
+        if not hsv_filter:
+            hsv_filter = self.get_hsv_filter_from_controls()
+
+        h, s, v = cv2.split(hsv)
+        s = BotUtils.shift_channel(s, hsv_filter.sAdd)
+        s = BotUtils.shift_channel(s, -hsv_filter.sSub)
+        v = BotUtils.shift_channel(v, hsv_filter.vAdd)
+        v = BotUtils.shift_channel(v, -hsv_filter.vSub)
+        hsv = cv2.merge([h, s, v])
+
+        lower = np.array([hsv_filter.hMin, hsv_filter.sMin, hsv_filter.vMin])
+        upper = np.array([hsv_filter.hMax, hsv_filter.sMax, hsv_filter.vMax])
+        mask = cv2.inRange(hsv, lower, upper)
+        result = cv2.bitwise_and(hsv, hsv, mask=mask)
+        img = cv2.cvtColor(result, cv2.COLOR_HSV2BGR)
+        return img
