@@ -6,6 +6,8 @@ import win32gui
 import win32ui
 import win32con
 import pytesseract
+import pydirectinput
+from custom_input import CustomInput
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 
@@ -111,11 +113,19 @@ class BotUtils:
             else:
                 key = "up"
         time_reqd = abs(value/speed)
+        key_map = CustomInput.grab_key_dict()
         if not PAG:
-            self.press_key(self.key_map[key], key)
+            CustomInput.press_key(key_map[key], key)
+        else:
+            pydirectinput.keyDown(key)
+        try:
+            time.sleep(time_reqd-sleep_time)
+        except:
             pass
-        time.sleep(time_reqd-0.003)
-        self.release_key(self.key_map[key], key)
+        if not PAG:
+            CustomInput.release_key(key_map[key], key)
+        else:
+            pydirectinput.keyDown(key)
 
     def list_window_names():
         def winEnumHandler(hwnd, ctx):
