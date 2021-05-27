@@ -179,9 +179,7 @@ class BotUtils:
         wincap = WindowCapture(gamename, [1121, 31, 1248, 44])
         existing_image = wincap.get_screenshot()
         filter = HsvFilter(0, 0, 0, 169, 34, 255, 0, 0, 0, 0)
-        # cv2.imwrite("testy2.jpg", existing_image)
         save_image = BotUtils.apply_hsv_filter(existing_image, filter)
-        # cv2.imwrite("testy3.jpg", save_image)
         gray_image = cv2.cvtColor(save_image, cv2.COLOR_BGR2GRAY)
         (thresh, blackAndWhiteImage) = cv2.threshold(
             gray_image, 129, 255, cv2.THRESH_BINARY)
@@ -218,10 +216,30 @@ class BotUtils:
 
         return img
 
-    def detect_bigmap_open(self, gamename):
+    def detect_bigmap_open(gamename):
         wincap = WindowCapture(gamename, custom_rect=[819, 263, 855, 264])
         image = wincap.get_screenshot()
-        cv2.imwrite("testy.jpg", image)
+        a, b, c = [int(i) for i in image[0][0]]
+        d, e, f = [int(i) for i in image[0][-2]]
+        if a+b+c < 30:
+            if d+e+f > 700:
+                return True
+        return False
+
+    def detect_sect_clear(gamename):
+        wincap = WindowCapture(gamename, custom_rect=[
+            464+156, 640, 464+261, 641])
+        image = wincap.get_screenshot()
+        a, b, c = [int(i) for i in image[0][0]]
+        d, e, f = [int(i) for i in image[0][-1]]
+        if a+b+c > 700:
+            if d+e+f > 700:
+                return True
+        return False
+
+    def detect_sect_clear(self, gamename):
+        wincap = WindowCapture(gamename, custom_rect=[819, 263, 855, 264])
+        image = wincap.get_screenshot()
         a, b, c = [int(i) for i in image[0][0]]
         d, e, f = [int(i) for i in image[0][-2]]
         if a+b+c < 30:
