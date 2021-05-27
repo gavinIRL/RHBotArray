@@ -1,6 +1,11 @@
 # This file will automatically run through map 10
 import time
 import os
+import cv2
+from hsvfilter import HsvFilter
+from windowcapture import WindowCapture
+from vision import Vision
+import pydirectinput
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 
@@ -8,6 +13,10 @@ class Map10_MS30():
     def __init__(self, maxloops=1) -> None:
         self.rooms = self.load_map_rooms()
         self.maxloops = maxloops
+        self.speed = 22.5
+        self.map_rect = [561, 282, 1111, 666]
+        with open("gamename.txt") as f:
+            self.gamename = f.readline()
 
     def start(self):
         while self.maxloops > 0:
@@ -77,7 +86,48 @@ class Map10_MS30():
             self.repeat_level()
 
     def move_to(self, x, y, angle=90):
-        pass
+        if not self.detect_bigmap_open():
+            self.try_toggle_map()
+        player_pos = self.grab_player_pos()
+
+    def try_toggle_map(self):
+        pydirectinput.keyDown("m")
+        time.sleep(0.05)
+        pydirectinput.keyUp("m")
+        time.sleep(0.08)
+
+    def detect_bigmap_open(self):
+        wincap = WindowCapture(self.gamename, custom_rect=[819, 263, 855, 264])
+        image = wincap.get_screenshot()
+        cv2.imwrite("testy.jpg", image)
+        a, b, c = [int(i) for i in image[0][0]]
+        d, e, f = [int(i) for i in image[0][-2]]
+        if a+b+c < 30:
+            if d+e+f > 700:
+                # print("Working")
+                return True
+        return False
+
+    def grab_player_pos(self):
+        if not self.map_rect:
+            wincap = WindowCapture(self.gamename)
+        else:
+            wincap = WindowCapture(self.gamename, self.map_rect)
+        filter = HsvFilter(34, 160, 122, 50, 255, 255, 0, 0, 0, 0)
+        image = wincap.get_screenshot()
+        save_image = self.filter_blackwhite_invert(filter, image)
+        # cv2.imwrite("testy3.jpg", save_image)
+        vision_limestone = Vision('plyr.jpg')
+        rectangles = vision_limestone.find(
+            save_image, threshold=0.31, epsilon=0.5)
+        points = vision_limestone.get_click_points(rectangles)
+        x, y = points[0]
+        if not self.map_rect:
+            return x, y
+        else:
+            x += wincap.window_rect[0]
+            y += wincap.window_rect[1]
+            return x, y
 
     def roomclear_skill(self):
         pass
