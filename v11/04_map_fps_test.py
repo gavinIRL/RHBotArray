@@ -6,10 +6,12 @@ from vision import Vision
 from hsvfilter import HsvFilter
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
+with open("gamename.txt") as f:
+    gamename = f.readline()
 # Choose between either fullmap
-wincap = WindowCapture(custom_rect=[561, 282, 1111, 666])
+# wincap = WindowCapture(gamename, custom_rect=[561, 282, 1111, 666])
 # or room-only
-# wincap = WindowCapture(custom_rect=[649, 594, 755, 639])
+wincap = WindowCapture(gamename, custom_rect=[649, 594, 755, 639])
 
 vision_limestone = Vision('plyr.jpg')
 # initialize the trackbar window
@@ -30,7 +32,8 @@ while(True):
     rectangles = vision_limestone.find(
         output_image, threshold=0.61, epsilon=0.5)
     # draw the detection results onto the original image
-    output_image = vision_limestone.draw_rectangles(screenshot, rectangles)
+    points = vision_limestone.get_click_points(rectangles)
+    # output_image = vision_limestone.draw_rectangles(screenshot, rectangles)
     # display the processed image
     # cv.imshow('Matches', output_image)
     # cv.imshow('Filtered', filter_image)
