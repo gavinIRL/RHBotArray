@@ -11,13 +11,14 @@ wincap = WindowCapture(custom_rect=[561, 282, 1111, 666])
 # or room-only
 # wincap = WindowCapture(custom_rect=[649, 594, 755, 639])
 
-vision_limestone = Vision('normalenemytag.jpg')
+vision_limestone = Vision('plyr.jpg')
 # initialize the trackbar window
 # vision_limestone.init_control_gui()
 # limestone HSV filter
 hsv_filter = HsvFilter(34, 160, 122, 50, 255, 255, 0, 0, 0, 0)
 
 loop_time = time()
+counter = 0
 while(True):
 
     # get an updated image of the game
@@ -35,8 +36,11 @@ while(True):
     # cv.imshow('Filtered', filter_image)
 
     # debug the loop rate
-    # print('FPS {}'.format(1 / (time() - loop_time)))
-    # loop_time = time()
+    counter += 1
+    if counter >= 50:
+        print('FPS {}'.format(50 / (time() - loop_time)))
+        loop_time = time()
+        counter = 0
 
     if cv.waitKey(1) == ord('q'):
         cv.destroyAllWindows()
