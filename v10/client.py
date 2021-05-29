@@ -306,12 +306,15 @@ class ClientKeypressListener():
                 else:
                     print("Swapping to Custom")
             elif key == KeyCode(char='5'):
-                x, y = self.find_player()
-                for server in self.list_servers:
-                    server.send_message("regroup,{}|{}".format(x, y))
-                print("Regrouping...")
-                time.sleep(0.01)
-                self.close_map()
+                try:
+                    x, y = self.find_player()
+                    for server in self.list_servers:
+                        server.send_message("regroup,{}|{}".format(x, y))
+                    print("Regrouping...")
+                    time.sleep(0.01)
+                    self.close_map()
+                except:
+                    print("Unable to find player right now")
             elif key == KeyCode(char='6'):
                 self.autoloot_enabled = not self.autoloot_enabled
                 if self.autoloot_enabled:
@@ -448,13 +451,16 @@ class ClientKeypressListener():
         rectangles = vision_limestone.find(
             save_image, threshold=0.31, epsilon=0.5)
         points = vision_limestone.get_click_points(rectangles)
-        x, y = points[0]
-        if not self.map_rect:
-            return x, y
-        else:
-            x += self.map_rect[0]
-            y += self.map_rect[1]
-            return x, y
+        try:
+            x, y = points[0]
+            if not self.map_rect:
+                return x, y
+            else:
+                x += self.map_rect[0]
+                y += self.map_rect[1]
+                return x, y
+        except:
+            return False
 
     def on_release(self, key):
         if key == KeyCode(char='1'):
