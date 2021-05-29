@@ -954,9 +954,15 @@ class RHBotArrayServer():
             rely = int(y) - self.player_pos[1]
             # First take care of the x-dir
             if relx != 0:
-                self.resolve_dir_v2(relx, "x")
+                if relx > 150:
+                    raise Exception
+                else:
+                    self.resolve_dir_v2(relx, "x")
             if rely != 0:
-                self.resolve_dir_v2(rely, "y")
+                if rely > 150:
+                    raise Exception
+                else:
+                    self.resolve_dir_v2(rely, "y")
         except:
             if self.regroup_try_count < 2:
                 self.regroup_try_count += 1
