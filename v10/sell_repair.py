@@ -51,8 +51,8 @@ class SellRepair():
         self.open_store_if_necessary()
         # First go through all the equipment
         self.change_tab("Equipment")
-        time.sleep(0.2)
-        self.hover_mouse_all()
+        # time.sleep(0.2)
+        # self.hover_mouse_all()
         time.sleep(0.3)
         screenshot = self.inventory_wincap.get_screenshot()
         non_empty = self.remove_empty(screenshot)
@@ -60,8 +60,8 @@ class SellRepair():
         self.sell(junk_list, "Equipment")
         # Then go through all the other loot
         self.change_tab("Other")
-        time.sleep(0.2)
-        self.hover_mouse_all()
+        # time.sleep(0.2)
+        # self.hover_mouse_all()
         time.sleep(0.3)
         screenshot = self.inventory_wincap.get_screenshot()
         non_empty = self.remove_empty(screenshot)
