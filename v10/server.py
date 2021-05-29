@@ -152,6 +152,7 @@ class RHBotArrayServer():
         self.load_level_rects()
         self.key_map = self.load_key_dict()
         self.player_pos = None
+        self.regroup_try_count = 0
 
         # This is for the pag vs custom input town mode
         # False means custom mode, true means pag
@@ -911,13 +912,16 @@ class RHBotArrayServer():
         rectangles = vision_limestone.find(
             save_image, threshold=0.31, epsilon=0.5)
         points = vision_limestone.get_click_points(rectangles)
-        x, y = points[0]
-        if not self.map_rect:
-            return x, y
-        else:
-            x += self.map_rect[0]
-            y += self.map_rect[1]
-            return x, y
+        try:
+            x, y = points[0]
+            if not self.map_rect:
+                return x, y
+            else:
+                x += self.map_rect[0]
+                y += self.map_rect[1]
+                return x, y
+        except:
+            return False
 
     def pre_regroup_updates(self):
         self.level_name = self.detect_level_name()
@@ -945,16 +949,26 @@ class RHBotArrayServer():
         # first perform the pre-regroup updates
         self.pre_regroup_updates()
         # Then calculate the relative positions
-        relx = self.player_pos[0] - int(x)
-        rely = int(y) - self.player_pos[1]
-        # First take care of the x-dir
-        if relx != 0:
-            self.resolve_dir_v2(relx, "x")
-        if rely != 0:
-            self.resolve_dir_v2(rely, "y")
+        try:
+            relx = self.player_pos[0] - int(x)
+            rely = int(y) - self.player_pos[1]
+            # First take care of the x-dir
+            if relx != 0:
+                self.resolve_dir_v2(relx, "x")
+            if rely != 0:
+                self.resolve_dir_v2(rely, "y")
+        except:
+            if self.regroup_try_count < 2:
+                self.regroup_try_count += 1
+                pydirectinput.keyDown("right")
+                time.sleep(0.01)
+                pydirectinput.keyUp("right")
+                self.regroupv2(coords)
         # Finally close the map
         # if self.detect_bigmap_open():
         #     self.try_toggle_map()
+        self.player_pos = [0, 0]
+        self.regroup_try_count = 0
 
     def resolve_dir_v2(self, value, dir):
         if dir == "x":
