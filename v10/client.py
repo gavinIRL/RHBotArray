@@ -227,7 +227,7 @@ class ClientKeypressListener():
 
     def on_click(self, x, y, button, pressed):
         if self.selling_ongoing != 0:
-            if self.selling_ongoing < time.time() - 5:
+            if self.selling_ongoing < time.time() - 7.5:
                 self.selling_ongoing = 0
         elif self.quest_handle_clicks > 0:
             self.quest_handle_clicks -= 1
