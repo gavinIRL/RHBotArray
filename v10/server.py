@@ -475,6 +475,7 @@ class RHBotArrayServer():
                 elif line[0] == "Button.right":
                     ctypes.windll.user32.mouse_event(
                         0x0008, 0, 0, 0, 0)
+                    time.sleep(0.01)
                     ctypes.windll.user32.mouse_event(
                         0x0010, 0, 0, 0, 0)
             if line[1] == "questhandle":
