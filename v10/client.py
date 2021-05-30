@@ -581,7 +581,7 @@ class ClientKeypressListener():
     def create_random_delays(self):
         for index, _ in enumerate(self.list_servers):
             self.delay_spread.append(
-                self.delay_spacing + (index * self.delay_spacing * uniform(0.6, 1.8)))
+                self.delay_spacing + (index * self.delay_spacing * uniform(0.8, 1.2)))
 
     def send_batch(self, server, batch, index):
         delay = self.delay_spread[index]
