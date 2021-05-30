@@ -69,6 +69,19 @@ class SellRepair():
         self.sell(junk_list)
         # and finally repair gear
         self.repair()
+        # and now go through all the steps again minus repair to make sure
+        self.change_tab("Equipment")
+        time.sleep(0.3)
+        screenshot = self.inventory_wincap.get_screenshot()
+        non_empty = self.remove_empty(screenshot)
+        junk_list = self.identify_rarities_equip(non_empty, screenshot)
+        self.sell(junk_list, "Equipment")
+        self.change_tab("Other")
+        time.sleep(0.3)
+        screenshot = self.inventory_wincap.get_screenshot()
+        non_empty = self.remove_empty(screenshot)
+        junk_list = self.identify_items_other(non_empty, screenshot)
+        self.sell(junk_list)
 
     def open_store_if_necessary(self):
         # This will search to see if the inventory is open
@@ -173,6 +186,7 @@ class SellRepair():
             time.sleep(0.1)
             ctypes.windll.user32.mouse_event(
                 0x0008, 0, 0, 0, 0)
+            time.sleep(0.01)
             ctypes.windll.user32.mouse_event(
                 0x0010, 0, 0, 0, 0)
 
