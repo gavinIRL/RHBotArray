@@ -399,7 +399,7 @@ class RHBotArrayServer():
                     time.sleep(0.01)
                     # pydirectinput.keyUp("x")
                     self.release_key(self.key_map["x"])
-                    time.sleep(0.15)
+                    time.sleep(0.225)
                 else:
                     time.sleep(0.4)
             else:
