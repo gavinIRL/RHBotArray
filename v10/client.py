@@ -586,7 +586,8 @@ class ClientKeypressListener():
     def send_batch(self, server, batch, index):
         delay = self.delay_spread[index]
         time.sleep(delay)
-        server.send_message("batch,1\n"+batch)
+        if len(batch) > 1:
+            server.send_message("batch,1\n"+batch)
 
     def convert_click_to_ratio(self, truex, truey):
         # This will grab the current rectangle coords of game window
