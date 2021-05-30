@@ -444,51 +444,55 @@ class RHBotArrayServer():
             converted.append(line.rstrip('\n').split("|"))
         # first sleep until the first action time
         # print(converted)
-        time.sleep(float(converted[0][2]))
-        for idx, line in enumerate(converted):
-            action_start_time = time.time()
-            # do the action
-            if line[1] == "keyDown":
-                # print("Would press {} down now".format(line[0]))
-                k = self.convert_pynput_to_pag(line[0].strip("'"))
-                pydirectinput.keyDown(k)
-                # self.press_key(self.key_map[k], k)
-            elif line[1] == "keyUp":
-                # print("Would press {} down now".format(line[0]))
-                k = self.convert_pynput_to_pag(line[0].strip("'"))
-                pydirectinput.keyUp(k)
-                # self.press_key(self.key_map[k], k)
-            elif line[1] == "click":
-                xrat, yrat = line[3].split(",")
-                # print("Would click at {},{} now".format(x, y))
-                x, y = self.convert_ratio_to_click(
-                    float(xrat), float(yrat))
-                x = int(x)
-                y = int(y)
-                # pydirectinput.click(x, y, duration=0.025)
-                ctypes.windll.user32.SetCursorPos(x, y)
-                if line[0] == "Button.left":
-                    ctypes.windll.user32.mouse_event(
-                        0x0002, 0, 0, 0, 0)
-                    ctypes.windll.user32.mouse_event(
-                        0x0004, 0, 0, 0, 0)
-                elif line[0] == "Button.right":
-                    pydirectinput.rightClick(duration=0.01)
-            if line[1] == "questhandle":
-                self.quest_handle.start_quest_handle()
-            try:
-                next_action = converted[idx + 1]
-                if next_action[0] == "":
+        try:
+            time.sleep(float(converted[0][2]))
+            for idx, line in enumerate(converted):
+                action_start_time = time.time()
+                # do the action
+                if line[1] == "keyDown":
+                    # print("Would press {} down now".format(line[0]))
+                    k = self.convert_pynput_to_pag(line[0].strip("'"))
+                    pydirectinput.keyDown(k)
+                    # self.press_key(self.key_map[k], k)
+                elif line[1] == "keyUp":
+                    # print("Would press {} down now".format(line[0]))
+                    k = self.convert_pynput_to_pag(line[0].strip("'"))
+                    pydirectinput.keyUp(k)
+                    # self.press_key(self.key_map[k], k)
+                elif line[1] == "click":
+                    xrat, yrat = line[3].split(",")
+                    # print("Would click at {},{} now".format(x, y))
+                    x, y = self.convert_ratio_to_click(
+                        float(xrat), float(yrat))
+                    x = int(x)
+                    y = int(y)
+                    # pydirectinput.click(x, y, duration=0.025)
+                    ctypes.windll.user32.SetCursorPos(x, y)
+                    if line[0] == "Button.left":
+                        ctypes.windll.user32.mouse_event(
+                            0x0002, 0, 0, 0, 0)
+                        ctypes.windll.user32.mouse_event(
+                            0x0004, 0, 0, 0, 0)
+                    elif line[0] == "Button.right":
+                        pydirectinput.rightClick(duration=0.01)
+                if line[1] == "questhandle":
+                    self.quest_handle.start_quest_handle()
+                try:
+                    next_action = converted[idx + 1]
+                    if next_action[0] == "":
+                        break
+                except IndexError:
+                    # this was the last action in the list
                     break
-            except IndexError:
-                # this was the last action in the list
-                break
-            elapsed_time = float(next_action[2]) - float(line[2])
-            elapsed_time -= (time.time() - action_start_time)
-            if elapsed_time < 0:
-                elapsed_time = 0
+                elapsed_time = float(next_action[2]) - float(line[2])
+                elapsed_time -= (time.time() - action_start_time)
+                if elapsed_time < 0:
+                    elapsed_time = 0
 
-            time.sleep(elapsed_time)
+                time.sleep(elapsed_time)
+        except:
+            # This will only occur if there is an empty batch
+            pass
 
     def receive_message(self, client_socket):
         try:
