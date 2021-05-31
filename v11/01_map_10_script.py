@@ -1,6 +1,7 @@
 # This file will automatically run through map 10
 import time
 import os
+import numpy as np
 import cv2
 from hsvfilter import HsvFilter
 from windowcapture import WindowCapture
@@ -26,6 +27,7 @@ class Map10_MS30():
             self.maxloops -= 1
 
     def test(self):
+        time.sleep(2)
         room = self.rooms[0]
         self.move_to(int(room[1]), int(room[2]))
         self.roomclear_skill()
@@ -33,7 +35,7 @@ class Map10_MS30():
         start_time = time.time()
         while not self.sect_clear_detected():
             self.continue_clear()
-            if time.time > start_time + 4:
+            if time.time() > start_time + 4:
                 break
 
     def mainloop(self):
@@ -102,10 +104,13 @@ class Map10_MS30():
         if not self.detect_bigmap_open():
             self.try_toggle_map()
         player_pos = self.grab_player_pos()
+        print(player_pos)
         relx = player_pos[0] - int(x)
         rely = int(y) - player_pos[1]
-        self.resolve_dir_v2(relx, "x")
-        self.resolve_dir_v2(rely, "y")
+        if abs(rely) > 150 or rely == 0:
+            self.resolve_dir_v2(rely, "y")
+        if abs(relx) > 150 or relx == 0:
+            self.resolve_dir_v2(relx, "x")
 
     def resolve_dir_v2(self, value, dir):
         if dir == "x":
@@ -118,7 +123,9 @@ class Map10_MS30():
                 key = "down"
             else:
                 key = "up"
+        print("val={}".format(value))
         time_reqd = abs(value/self.speed)
+        print(self.key_dict[key])
         CustomInput.press_key(self.key_dict[key], key)
         time.sleep(time_reqd-0.003)
         CustomInput.release_key(self.key_dict[key], key)
@@ -132,7 +139,7 @@ class Map10_MS30():
     def detect_bigmap_open(self):
         wincap = WindowCapture(self.gamename, custom_rect=[819, 263, 855, 264])
         image = wincap.get_screenshot()
-        cv2.imwrite("testy.jpg", image)
+        # cv2.imwrite("testy.jpg", image)
         a, b, c = [int(i) for i in image[0][0]]
         d, e, f = [int(i) for i in image[0][-2]]
         if a+b+c < 30:
@@ -158,8 +165,8 @@ class Map10_MS30():
         if not self.map_rect:
             return x, y
         else:
-            x += wincap.window_rect[0]
-            y += wincap.window_rect[1]
+            x += self.map_rect[0]
+            y += self.map_rect[1]
             return x, y
 
     def roomclear_skill(self):
@@ -239,6 +246,48 @@ class Map10_MS30():
 
     def repeat_level(self):
         pass
+
+    def filter_blackwhite_invert(self, filter, existing_image):
+        hsv = cv2.cvtColor(existing_image, cv2.COLOR_BGR2HSV)
+        hsv_filter = filter
+        # add/subtract saturation and value
+        h, s, v = cv2.split(hsv)
+        s = self.shift_channel(s, hsv_filter.sAdd)
+        s = self.shift_channel(s, -hsv_filter.sSub)
+        v = self.shift_channel(v, hsv_filter.vAdd)
+        v = self.shift_channel(v, -hsv_filter.vSub)
+        hsv = cv2.merge([h, s, v])
+
+        # Set minimum and maximum HSV values to display
+        lower = np.array([hsv_filter.hMin, hsv_filter.sMin, hsv_filter.vMin])
+        upper = np.array([hsv_filter.hMax, hsv_filter.sMax, hsv_filter.vMax])
+        # Apply the thresholds
+        mask = cv2.inRange(hsv, lower, upper)
+        result = cv2.bitwise_and(hsv, hsv, mask=mask)
+
+        # convert back to BGR
+        img = cv2.cvtColor(result, cv2.COLOR_HSV2BGR)
+        # now change it to greyscale
+        grayImage = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        # now change it to black and white
+        (thresh, blackAndWhiteImage) = cv2.threshold(
+            grayImage, 67, 255, cv2.THRESH_BINARY)
+        # now invert it
+        inverted = (255-blackAndWhiteImage)
+        inverted = cv2.cvtColor(inverted, cv2.COLOR_GRAY2BGR)
+        return inverted
+
+    def shift_channel(self, c, amount):
+        if amount > 0:
+            lim = 255 - amount
+            c[c >= lim] = 255
+            c[c < lim] += amount
+        elif amount < 0:
+            amount = -amount
+            lim = amount
+            c[c <= lim] = 0
+            c[c > lim] -= amount
+        return c
 
 
 if __name__ == "__main__":
