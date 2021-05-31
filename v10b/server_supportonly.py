@@ -72,12 +72,12 @@ class Input(ctypes.Structure):
 
 
 class RHBotArrayServer():
-    def __init__(self, print_only=False, move_only=True, support=True) -> None:
+    def __init__(self, print_only=False, move_only=True) -> None:
         self.print_only = print_only
         self.move_only = move_only
         self.move_only_exclude_keys = ["a", "s", "d", "f", "g", "h"]
         self.support_keys = ["a", "h"]
-        self.support_only = support
+        self.support_only = move_only
 
         self.scaling = self.get_monitor_scaling()
         with open("gamename.txt") as f:
@@ -585,13 +585,33 @@ class RHBotArrayServer():
                 self.curr_player = direction
                 print("Admin player name is "+direction)
             elif button == "'x'":
-                if direction == "down":
-                    self.loot_if_available()
-                else:
-                    if self.inputmode:
-                        pydirectinput.keyUp("x")
+                if self.support_only:
+                    if direction == "down":
+                        self.loot_if_available()
                     else:
-                        self.release_key(self.key_map["x"])
+                        if self.inputmode:
+                            pydirectinput.keyUp("x")
+                        else:
+                            self.release_key(self.key_map["x"])
+                else:
+                    if self.allowx:
+                        if direction == "down":
+                            if self.inputmode:
+                                pydirectinput.keyDown("x")
+                            else:
+                                self.press_key(self.key_map["x"])
+                        else:
+                            if self.inputmode:
+                                pydirectinput.keyUp("x")
+                            else:
+                                self.release_key(self.key_map["x"])
+                    elif direction == "down":
+                        self.loot_if_available()
+                    else:
+                        if self.inputmode:
+                            pydirectinput.keyUp("x")
+                        else:
+                            self.release_key(self.key_map["x"])
             elif button == "regroup":
                 self.regroupv2(direction)
             elif button == "autoloot":
@@ -624,6 +644,7 @@ class RHBotArrayServer():
                 key = self.convert_pynput_to_pag(
                     button.replace("'", ""))
                 if self.move_only:
+                    button = button.strip()
                     if button not in self.move_only_exclude_keys:
                         if self.inputmode:
                             pydirectinput.keyDown(key)
