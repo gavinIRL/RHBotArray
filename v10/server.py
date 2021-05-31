@@ -72,12 +72,12 @@ class Input(ctypes.Structure):
 
 
 class RHBotArrayServer():
-    def __init__(self, print_only=False, move_only=True, support=True) -> None:
+    def __init__(self, print_only=False, move_only=False) -> None:
         self.print_only = print_only
         self.move_only = move_only
         self.move_only_exclude_keys = ["a", "s", "d", "f", "g", "h"]
         self.support_keys = ["a", "h"]
-        self.support_only = support
+        self.support_only = move_only
 
         self.scaling = self.get_monitor_scaling()
         with open("gamename.txt") as f:
