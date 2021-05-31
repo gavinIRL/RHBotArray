@@ -665,7 +665,7 @@ class ClientUtils():
 
 
 class RHBotClient():
-    def start(delay_spacing=12, test=False):
+    def start(delay_spacing=25, test=False):
         list_ips = ClientUtils.grab_online_servers()
         list_servers = []
         for ip in list_ips:
