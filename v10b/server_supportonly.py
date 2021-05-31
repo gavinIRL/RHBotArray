@@ -17,6 +17,7 @@ from quest_handle import QuestHandle
 from sell_repair import SellRepair
 import numpy as np
 from fuzzywuzzy import process
+import random
 
 # Change directory to current file location
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
@@ -71,10 +72,12 @@ class Input(ctypes.Structure):
 
 
 class RHBotArrayServer():
-    def __init__(self, print_only=False, move_only=False) -> None:
+    def __init__(self, print_only=False, move_only=True, support=True) -> None:
         self.print_only = print_only
         self.move_only = move_only
         self.move_only_exclude_keys = ["a", "s", "d", "f", "g", "h"]
+        self.support_keys = ["a", "h"]
+        self.support_only = support
 
         self.scaling = self.get_monitor_scaling()
         with open("gamename.txt") as f:
@@ -582,18 +585,7 @@ class RHBotArrayServer():
                 self.curr_player = direction
                 print("Admin player name is "+direction)
             elif button == "'x'":
-                if self.allowx:
-                    if direction == "down":
-                        if self.inputmode:
-                            pydirectinput.keyDown("x")
-                        else:
-                            self.press_key(self.key_map["x"])
-                    else:
-                        if self.inputmode:
-                            pydirectinput.keyUp("x")
-                        else:
-                            self.release_key(self.key_map["x"])
-                elif direction == "down":
+                if direction == "down":
                     self.loot_if_available()
                 else:
                     if self.inputmode:
@@ -632,11 +624,17 @@ class RHBotArrayServer():
                 key = self.convert_pynput_to_pag(
                     button.replace("'", ""))
                 if self.move_only:
-                    if button in self.move_only_exclude_keys:
+                    if button not in self.move_only_exclude_keys:
                         if self.inputmode:
                             pydirectinput.keyDown(key)
                         else:
                             self.press_key(self.key_map[key], key)
+                    elif self.support_only:
+                        k = random.choice(self.support_keys)
+                        if self.inputmode:
+                            pydirectinput.keyDown(k)
+                        else:
+                            self.press_key(self.key_map[k], k)
                 else:
                     if self.inputmode:
                         pydirectinput.keyDown(key)
