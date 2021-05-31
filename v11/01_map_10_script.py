@@ -3,10 +3,12 @@ import time
 import os
 import numpy as np
 import cv2
+import ctypes
 from hsvfilter import HsvFilter
 from windowcapture import WindowCapture
 from vision import Vision
 import pydirectinput
+from win32api import GetSystemMetrics
 from custom_input import CustomInput
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
@@ -20,6 +22,8 @@ class Map10_MS30():
         with open("gamename.txt") as f:
             self.gamename = f.readline()
         self.key_dict = CustomInput.grab_key_dict()
+        self.scaling = self.get_monitor_scaling()
+        self.game_wincap = WindowCapture(self.gamename)
 
     def start(self):
         while self.maxloops > 0:
@@ -315,6 +319,13 @@ class Map10_MS30():
     def close_esc_menu(self):
         pydirectinput.click(
             int(self.scaling*749+self.game_wincap.window_rect[0]), int(self.scaling*280+self.game_wincap.window_rect[1]))
+
+    def get_monitor_scaling(self):
+        user32 = ctypes.windll.user32
+        w_orig = GetSystemMetrics(0)
+        user32.SetProcessDPIAware()
+        [w, h] = [user32.GetSystemMetrics(0), user32.GetSystemMetrics(1)]
+        return float(("{:.2f}".format(w/w_orig)))
 
 
 if __name__ == "__main__":
