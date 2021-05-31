@@ -6,6 +6,7 @@ from hsvfilter import HsvFilter
 from windowcapture import WindowCapture
 from vision import Vision
 import pydirectinput
+from custom_input import CustomInput
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 
@@ -17,11 +18,20 @@ class Map10_MS30():
         self.map_rect = [561, 282, 1111, 666]
         with open("gamename.txt") as f:
             self.gamename = f.readline()
+        self.key_dict = CustomInput.grab_key_dict()
 
     def start(self):
         while self.maxloops > 0:
             self.mainloop()
             self.maxloops -= 1
+
+    def test(self):
+        room = self.rooms[0]
+        self.move_to(int(room[1]), int(room[2]))
+        self.roomclear_skill()
+        time.sleep(0.3)
+        while not self.sect_clear_detected():
+            self.continue_clear()
 
     def mainloop(self):
         # First assume that have entered the map
@@ -130,10 +140,26 @@ class Map10_MS30():
             return x, y
 
     def roomclear_skill(self):
-        pass
+        hex = self.key_dict["h"]
+        CustomInput.press_key(hex)
+        time.sleep(0.01)
+        CustomInput.release_key(hex)
 
     def continue_clear(self):
-        pass
+        hex = self.key_dict["a"]
+        CustomInput.press_key(hex)
+        time.sleep(0.01)
+        CustomInput.release_key(hex)
+        time.sleep(0.1)
+        hex = self.key_dict["f"]
+        CustomInput.press_key(hex)
+        time.sleep(0.01)
+        CustomInput.release_key(hex)
+        time.sleep(0.1)
+        hex = self.key_dict["g"]
+        CustomInput.press_key(hex)
+        time.sleep(0.01)
+        CustomInput.release_key(hex)
 
     def ident_farloot(self):
         pass
@@ -186,4 +212,4 @@ class Map10_MS30():
 
 if __name__ == "__main__":
     map10 = Map10_MS30(maxloops=1)
-    map10.start()
+    map10.test()
