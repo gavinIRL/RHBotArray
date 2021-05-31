@@ -189,6 +189,13 @@ class SellRepair():
             time.sleep(0.01)
             ctypes.windll.user32.mouse_event(
                 0x0010, 0, 0, 0, 0)
+            # Then click a second time to be sure
+            time.sleep(0.01)
+            ctypes.windll.user32.mouse_event(
+                0x0008, 0, 0, 0, 0)
+            time.sleep(0.01)
+            ctypes.windll.user32.mouse_event(
+                0x0010, 0, 0, 0, 0)
 
     def repair(self):
         self.game_wincap.update_window_position(border=False)
