@@ -24,6 +24,8 @@ class Map10_MS30():
         self.key_dict = CustomInput.grab_key_dict()
         self.scaling = self.get_monitor_scaling()
         self.game_wincap = WindowCapture(self.gamename)
+        # This is for determining wait time before next clear
+        self.last_clear = 0
 
     def start(self):
         while self.maxloops > 0:
@@ -177,6 +179,7 @@ class Map10_MS30():
         CustomInput.press_key(hex)
         time.sleep(0.01)
         CustomInput.release_key(hex)
+        self.last_clear = time.time()
 
     def continue_clear(self):
         hex = self.key_dict["a"]
