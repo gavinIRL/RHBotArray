@@ -30,8 +30,11 @@ class Map10_MS30():
         self.move_to(int(room[1]), int(room[2]))
         self.roomclear_skill()
         time.sleep(0.3)
+        start_time = time.time()
         while not self.sect_clear_detected():
             self.continue_clear()
+            if time.time > start_time + 4:
+                break
 
     def mainloop(self):
         # First assume that have entered the map
