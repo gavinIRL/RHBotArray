@@ -35,7 +35,7 @@ class Map10_MS30():
         room = self.rooms[0]
         self.move_to(int(room[1]), int(room[2]))
         self.roomclear_skill()
-        time.sleep(0.3)
+        time.sleep(0.6)
         start_time = time.time()
         while not self.sect_clear_detected():
             self.continue_clear()
@@ -109,13 +109,11 @@ class Map10_MS30():
             self.try_toggle_map()
         player_pos = self.grab_player_pos()
         self.clear_all()
-        print(player_pos)
+        # print(player_pos)
         relx = player_pos[0] - int(x)
         rely = int(y) - player_pos[1]
-        if abs(rely) > 150 or rely == 0:
-            self.resolve_dir_v2(rely, "y")
-        if abs(relx) > 150 or relx == 0:
-            self.resolve_dir_v2(relx, "x")
+        self.resolve_dir_v2(rely, "y")
+        self.resolve_dir_v2(relx, "x")
 
     def resolve_dir_v2(self, value, dir):
         if dir == "x":
@@ -128,7 +126,7 @@ class Map10_MS30():
                 key = "down"
             else:
                 key = "up"
-        print("val={}".format(value))
+        # print("val={}".format(value))
         time_reqd = abs(value/self.speed)
         if time_reqd > 0.003:
             CustomInput.press_key(self.key_dict[key], key)
