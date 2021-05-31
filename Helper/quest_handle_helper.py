@@ -54,10 +54,27 @@ class QuestHandle():
         self.xprompt_wincap = WindowCapture(gamename, self.xprompt_rect)
 
     def start_quest_handle(self):
+        wincap = WindowCapture(self.gamename, custom_rect=[595, 278, 621, 479])
+
         start_time = time.time()
-        while time.time() < start_time + 2:
+        while time.time() < start_time + 3:
             if self.check_for_accept():
-                break
+                start_time = time.time() + 3
+            else:
+                pydirectinput.keyDown('esc')
+                time.sleep(0.01)
+                pydirectinput.keyUp('esc')
+                time.sleep(0.2)
+                image = wincap.get_screenshot()
+                a, b, c = [int(i) for i in image[0][0]]
+                d, e, f = [int(i) for i in image[0][-1]]
+                # print("Sum abc:{}, def:{}".format(a+b+c, d+e+f))
+                if a+b+c > 700:
+                    if d+e+f > 700:
+                        pydirectinput.keyDown('esc')
+                        time.sleep(0.01)
+                        pydirectinput.keyUp('esc')
+                        break
 
     def convert_and_click(self, x, y, rect):
         # this will convert a click at a specific subrectangle point
