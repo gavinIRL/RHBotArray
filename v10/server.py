@@ -569,7 +569,13 @@ class RHBotArrayServer():
                 ctypes.windll.user32.SetCursorPos(x, y)
                 ctypes.windll.user32.mouse_event(
                     0x0008, 0, 0, 0, 0)
-                time.sleep(0.03)
+                time.sleep(0.015)
+                ctypes.windll.user32.mouse_event(
+                    0x00010, 0, 0, 0, 0)
+                # Perform click twice to ensure works
+                ctypes.windll.user32.mouse_event(
+                    0x0008, 0, 0, 0, 0)
+                time.sleep(0.015)
                 ctypes.windll.user32.mouse_event(
                     0x00010, 0, 0, 0, 0)
             elif button == "quit":
