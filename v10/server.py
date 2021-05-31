@@ -917,7 +917,7 @@ class RHBotArrayServer():
     def detect_bigmap_open(self):
         wincap = WindowCapture(self.gamename, custom_rect=[819, 263, 855, 264])
         image = wincap.get_screenshot()
-        cv2.imwrite("testy.jpg", image)
+        # cv2.imwrite("testy.jpg", image)
         a, b, c = [int(i) for i in image[0][0]]
         d, e, f = [int(i) for i in image[0][-2]]
         if a+b+c < 30:
@@ -1027,7 +1027,7 @@ class RHBotArrayServer():
     def detect_menu_open(self):
         wincap = WindowCapture(self.gamename, custom_rect=[595, 278, 621, 479])
         image = wincap.get_screenshot()
-        cv2.imwrite("testy.jpg", image)
+        # cv2.imwrite("testy.jpg", image)
         a, b, c = [int(i) for i in image[0][0]]
         d, e, f = [int(i) for i in image[0][-1]]
         # print("Sum abc:{}, def:{}".format(a+b+c, d+e+f))
