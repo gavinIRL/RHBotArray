@@ -130,10 +130,10 @@ class Map10_MS30():
                 key = "up"
         print("val={}".format(value))
         time_reqd = abs(value/self.speed)
-        print(self.key_dict[key])
-        CustomInput.press_key(self.key_dict[key], key)
-        time.sleep(time_reqd-0.003)
-        CustomInput.release_key(self.key_dict[key], key)
+        if time_reqd > 0.003:
+            CustomInput.press_key(self.key_dict[key], key)
+            time.sleep(time_reqd-0.003)
+            CustomInput.release_key(self.key_dict[key], key)
 
     def try_toggle_map(self):
         pydirectinput.keyDown("m")
