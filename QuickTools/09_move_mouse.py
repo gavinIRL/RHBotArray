@@ -12,8 +12,15 @@ class MoveMouse():
             self.game_wincap = WindowCapture(self.gamename)
 
     def move_mouse(self, x, y, rat=False):
-        if rat:
+        if rat and self.game:
             x, y = self.convert_ratio_to_click(x, y)
+            ctypes.windll.user32.SetCursorPos(x, y)
+        elif rat:
+            user32 = ctypes.windll.user32
+            user32.SetProcessDPIAware()
+            [w, h] = [user32.GetSystemMetrics(0), user32.GetSystemMetrics(1)]
+            x = int(x*w)
+            y = int(y*h)
             ctypes.windll.user32.SetCursorPos(x, y)
         elif self.game:
             x = x + self.wincap.window_rect[0]
