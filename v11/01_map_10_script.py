@@ -99,6 +99,26 @@ class Map10_MS30():
         if not self.detect_bigmap_open():
             self.try_toggle_map()
         player_pos = self.grab_player_pos()
+        relx = player_pos[0] - int(x)
+        rely = int(y) - player_pos[1]
+        self.resolve_dir_v2(relx, "x")
+        self.resolve_dir_v2(rely, "y")
+
+    def resolve_dir_v2(self, value, dir):
+        if dir == "x":
+            if value > 0:
+                key = "left"
+            else:
+                key = "right"
+        elif dir == "y":
+            if value > 0:
+                key = "down"
+            else:
+                key = "up"
+        time_reqd = abs(value/self.speed)
+        CustomInput.press_key(self.key_dict[key], key)
+        time.sleep(time_reqd-0.003)
+        CustomInput.release_key(self.key_dict[key], key)
 
     def try_toggle_map(self):
         pydirectinput.keyDown("m")
@@ -177,7 +197,15 @@ class Map10_MS30():
         pass
 
     def sect_clear_detected(self):
-        return True
+        wincap = WindowCapture(self.gamename, custom_rect=[
+            464+156, 640, 464+261, 641])
+        image = wincap.get_screenshot()
+        a, b, c = [int(i) for i in image[0][0]]
+        d, e, f = [int(i) for i in image[0][-1]]
+        if a+b+c > 700 and d+e+f > 700:
+            return True
+        else:
+            return False
 
     def boss_defeat_detected(self):
         return True
