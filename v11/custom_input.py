@@ -93,7 +93,7 @@ class CustomInput():
         }
         return KEYBOARD_MAPPING
 
-    def press_key(self, hexKeyCode, key="T"):
+    def press_key(hexKeyCode, key="T"):
         if key in ["up", "down", "left", "right"]:
             # Do the primary key
             hexKeyCode2 = 0xE0
@@ -120,7 +120,7 @@ class CustomInput():
             ctypes.windll.user32.SendInput(
                 1, ctypes.pointer(x), ctypes.sizeof(x))
 
-    def release_key(self, hexKeyCode, key="T"):
+    def release_key(hexKeyCode, key="T"):
         keybdFlags = 0x0008 | 0x0002
         if key in ["up", "down", "left", "right"]:
             keybdFlags |= 0x0001
