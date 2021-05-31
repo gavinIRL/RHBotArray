@@ -1,0 +1,19 @@
+01-Canals B3
+02-Canals B2
+03-Upper Plant
+04-Lower Plant
+05-Wine Cellar 1F
+06-Cellar Sewers
+07-Wine Cellar 2F
+08-Cafeteria 1F
+09-Library 1F
+10-Cafeteria 2F
+11-Library 2F
+12-Labyrinth
+13-Atrium 
+14-Abandoned Wing
+15-Public Baths
+16-Collapsed Halls
+17-Guest Villa
+18-Steamworks
+19-The Crack 1
