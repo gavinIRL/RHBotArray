@@ -54,8 +54,6 @@ class Map10_MS30():
             if time.time() > start_time + 4:
                 self.aim_am_enemies()
                 self.continue_clear()
-                for key in ["up", "down", "left", "right"]:
-                    CustomInput.release_key(self.key_dict[key], key)
                 if time.time() > start_time + 12:
                     os._exit()
             else:
@@ -74,16 +72,17 @@ class Map10_MS30():
         if sleep_time > 0:
             time.sleep(sleep_time)
         room = self.rooms[1]
-        self.move_to(int(room[1]), int(room[2]))
+        self.move_to(int(room[1]), int(room[2]), yfirst=True)
+        time.sleep(0.6)
         self.roomclear_skill()
         time.sleep(0.6)
         start_time = time.time()
         while not self.sect_clear_detected():
             if time.time() > start_time + 4:
+                calc_time = time.time()
                 self.aim_am_enemies()
+                print("Total aim time = {}".format(time.time()-calc_time))
                 self.continue_clear()
-                for key in ["up", "down", "left", "right"]:
-                    CustomInput.release_key(self.key_dict[key], key)
                 if time.time() > start_time + 12:
                     os._exit()
             else:
@@ -101,15 +100,19 @@ class Map10_MS30():
         if len(enemy_rectangles) >= 1:
             points = self.enemy_minimap_vision.get_click_points(
                 enemy_rectangles)
+            # print(points)
             # The square is 160 x 160
-            if points[0][0] < 80:
-                CustomInput.press_key(self.key_dict["left"], "left")
             if points[0][0] > 80:
+                CustomInput.press_key(self.key_dict["left"], "left")
+            if points[0][0] < 80:
                 CustomInput.press_key(self.key_dict["right"], "right")
-            if points[0][1] < 80:
-                CustomInput.press_key(self.key_dict["up"], "up")
             if points[0][1] > 80:
+                CustomInput.press_key(self.key_dict["up"], "up")
+            if points[0][1] < 80:
                 CustomInput.press_key(self.key_dict["down"], "down")
+            # time.sleep(0.001)
+            for key in ["up", "down", "left", "right"]:
+                CustomInput.release_key(self.key_dict[key], key)
 
     def mainloop(self):
         # First assume that have entered the map
@@ -173,7 +176,7 @@ class Map10_MS30():
         if self.maxloops > 0:
             self.repeat_level()
 
-    def move_to(self, x, y, angle=90):
+    def move_to(self, x, y, angle=90, yfirst=True):
         if not self.detect_bigmap_open():
             self.try_toggle_map()
         player_pos = self.grab_player_pos()
@@ -191,8 +194,12 @@ class Map10_MS30():
         # print(player_pos)
         relx = player_pos[0] - int(x)
         rely = int(y) - player_pos[1]
-        self.resolve_dir_v2(rely, "y")
-        self.resolve_dir_v2(relx, "x")
+        if not yfirst:
+            self.resolve_dir_v2(relx, "x")
+            self.resolve_dir_v2(rely, "y")
+        else:
+            self.resolve_dir_v2(rely, "y")
+            self.resolve_dir_v2(relx, "x")
 
     def resolve_dir_v2(self, value, dir):
         if dir == "x":
