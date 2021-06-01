@@ -133,6 +133,12 @@ class Map10_MS30():
         if not self.detect_bigmap_open():
             self.try_toggle_map()
         player_pos = self.grab_player_pos()
+        start_time = time.time()
+        while not player_pos:
+            player_pos = self.grab_player_pos()
+            if time.time() - start_time > 5:
+                print("Error with finding player")
+                os._exit(1)
         self.clear_all()
         # print(player_pos)
         relx = player_pos[0] - int(x)
@@ -194,18 +200,20 @@ class Map10_MS30():
         filter = HsvFilter(34, 160, 122, 50, 255, 255, 0, 0, 0, 0)
         image = wincap.get_screenshot()
         save_image = self.filter_blackwhite_invert(filter, image)
-        # cv2.imwrite("testy3.jpg", save_image)
         vision_limestone = Vision('plyr.jpg')
         rectangles = vision_limestone.find(
             save_image, threshold=0.31, epsilon=0.5)
         points = vision_limestone.get_click_points(rectangles)
-        x, y = points[0]
-        if not self.map_rect:
-            return x, y
-        else:
-            x += self.map_rect[0]
-            y += self.map_rect[1]
-            return x, y
+        try:
+            x, y = points[0]
+            if not self.map_rect:
+                return x, y
+            else:
+                x += self.map_rect[0]
+                y += self.map_rect[1]
+                return x, y
+        except:
+            return False
 
     def roomclear_skill(self):
         hex = self.key_dict["h"]
