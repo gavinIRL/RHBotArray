@@ -99,8 +99,6 @@ class Map10_MS30():
             enemy_output_image, threshold=0.61, epsilon=0.5)
         # then return answer to whether enemies are detected
         if len(enemy_rectangles) >= 1:
-            # Need to first update the current player location
-            self.can_find_current_player()
             points = self.enemy_minimap_vision.get_click_points(
                 enemy_rectangles)
             # The square is 160 x 160
