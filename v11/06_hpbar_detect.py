@@ -1,8 +1,11 @@
 import cv2
 import numpy as np
 import os
+import time
 from rhba_utils import BotUtils, HsvFilter
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
+
+start_time = time.time()
 
 original_image = cv2.imread(os.path.dirname(
     os.path.abspath(__file__)) + "/testimages/healthbars.jpg")
@@ -58,3 +61,5 @@ for (center_x, center_y) in points:
                    marker_color, marker_type)
 
 cv2.imwrite("testypoints.jpg", original_image)
+
+print("Time taken: {}".format(time.time()-start_time))
