@@ -28,6 +28,15 @@ class Map10_MS30():
         self.last_clear = 0
         self.clearskill_cd = 8.9
 
+        # The next block of code is setup for detecting enemies on minimap
+        # This uses same image as player minimap but dupe it due to error prevent
+        self.enemy_minimap_filter = HsvFilter(
+            0, 128, 82, 8, 255, 255, 0, 66, 30, 34)
+        enemy_custom_rect = [1100, 50, 1260, 210]
+        self.enemy_minimap_wincap = WindowCapture(
+            self.gamename, enemy_custom_rect)
+        self.enemy_minimap_vision = Vision('enemy67.jpg')
+
     def start(self):
         while self.maxloops > 0:
             self.mainloop()
@@ -37,13 +46,20 @@ class Map10_MS30():
         time.sleep(2)
         room = self.rooms[0]
         self.move_to(int(room[1]), int(room[2]))
+        time.sleep(0.4)
         self.roomclear_skill()
         time.sleep(0.6)
         start_time = time.time()
         while not self.sect_clear_detected():
-            self.continue_clear()
             if time.time() > start_time + 4:
-                break
+                self.aim_am_enemies()
+                self.continue_clear()
+                for key in ["up", "down", "left", "right"]:
+                    CustomInput.release_key(self.key_dict[key], key)
+                if time.time() > start_time + 12:
+                    os._exit()
+            else:
+                self.continue_clear()
 
     def test_room2(self):
         room = self.rooms[0]
@@ -63,9 +79,39 @@ class Map10_MS30():
         time.sleep(0.6)
         start_time = time.time()
         while not self.sect_clear_detected():
-            self.continue_clear()
             if time.time() > start_time + 4:
-                break
+                self.aim_am_enemies()
+                self.continue_clear()
+                for key in ["up", "down", "left", "right"]:
+                    CustomInput.release_key(self.key_dict[key], key)
+                if time.time() > start_time + 12:
+                    os._exit()
+            else:
+                self.continue_clear()
+
+    def aim_am_enemies(self):
+        minimap_screenshot = self.enemy_minimap_wincap.get_screenshot()
+        # pre-process the image to help with detection
+        enemy_output_image = self.enemy_minimap_vision.apply_hsv_filter(
+            minimap_screenshot, self.enemy_minimap_filter)
+        # do object detection, this time grab points
+        enemy_rectangles = self.enemy_minimap_vision.find(
+            enemy_output_image, threshold=0.61, epsilon=0.5)
+        # then return answer to whether enemies are detected
+        if len(enemy_rectangles) >= 1:
+            # Need to first update the current player location
+            self.can_find_current_player()
+            points = self.enemy_minimap_vision.get_click_points(
+                enemy_rectangles)
+            # The square is 160 x 160
+            if points[0][0] < 80:
+                CustomInput.press_key(self.key_dict["left"], "left")
+            if points[0][0] > 80:
+                CustomInput.press_key(self.key_dict["right"], "right")
+            if points[0][1] < 80:
+                CustomInput.press_key(self.key_dict["up"], "up")
+            if points[0][1] > 80:
+                CustomInput.press_key(self.key_dict["down"], "down")
 
     def mainloop(self):
         # First assume that have entered the map
