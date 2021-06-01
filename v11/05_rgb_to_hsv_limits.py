@@ -24,9 +24,9 @@ for rval in range(245, 256):
             if v > vmax:
                 vmax = v
 
-print("Hmin:{}, Hmax:{}".format(hmin, hmax))
-print("Smin:{}, Smax:{}".format(smin, smax))
-print("Vmin:{}, Vmax:{}".format(vmin, vmax))
+print("Hmin:{}, Hmax:{}".format(hmin*179, hmax*179))
+print("Smin:{}, Smax:{}".format(smin*255, smax*255))
+print("Vmin:{}, Vmax:{}".format(vmin*255, vmax*255))
 
 
 # def print_rgb_to_hsv(r, g, b):
