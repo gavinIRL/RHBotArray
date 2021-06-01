@@ -135,6 +135,10 @@ class Map10_MS30():
         player_pos = self.grab_player_pos()
         start_time = time.time()
         while not player_pos:
+            time.sleep(0.05)
+            if not self.detect_bigmap_open():
+                self.try_toggle_map()
+            time.sleep(0.05)
             player_pos = self.grab_player_pos()
             if time.time() - start_time > 5:
                 print("Error with finding player")
