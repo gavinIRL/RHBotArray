@@ -148,6 +148,8 @@ class BotUtils:
         contours, _ = cv2.findContours(
             thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
         contours = sorted(contours, key=cv2.contourArea, reverse=True)
+        if len(contours) < 2:
+            return False
         contours.pop(0)
         rectangles = []
         for contour in contours:
