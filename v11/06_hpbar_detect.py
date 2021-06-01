@@ -7,7 +7,7 @@ os.chdir(os.path.dirname(os.path.abspath(__file__)))
 original_image = cv2.imread(os.path.dirname(
     os.path.abspath(__file__)) + "/testimages/healthbars.jpg")
 
-filter = HsvFilter(20, 176, 245, 26, 193, 255, 0, 0, 0, 0)
+filter = HsvFilter(20, 174, 245, 26, 193, 255, 0, 0, 0, 0)
 # output_image = BotUtils.apply_hsv_filter(original_image, filter)
 output_image = BotUtils.filter_blackwhite_invert(filter, original_image)
 
@@ -17,90 +17,44 @@ cv2.imwrite("testytest.jpg", output_image)
 
 # imnorm = cv2.imread("testytest.jpg")
 im = cv2.imread("testytest.jpg", cv2.IMREAD_GRAYSCALE)
+im = cv2.blur(im, (2, 2))
 ret, thresh = cv2.threshold(im, 127, 255, 0)
 contours, hierarchy = cv2.findContours(
     thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
+contours = sorted(contours, key=cv2.contourArea, reverse=True)
+contours.pop(0)
+
+rectangles = []
+
 for contour in contours:
     (x, y), radius = cv2.minEnclosingCircle(contour)
-    center = (int(x), int(y))
-    print(center)
+    rectangles.append([x-10, y, 20, 5])
+    rectangles.append([x-10, y, 20, 5])
+    # center = (int(x), int(y))
+    # print(center)
+
+rectangles, weights = cv2.groupRectangles(
+    rectangles, groupThreshold=1, eps=0.8)
+
+points = []
+# Loop over all the rectangles
+for (x, y, w, h) in rectangles:
+    # Determine the center position
+    center_x = x + int(w/2)
+    center_y = y + int(h/2)
+    # Save the points
+    points.append((center_x, center_y))
+print(points)
 
 cv2.drawContours(original_image, contours, -1, (0, 255, 0), 3)
 cv2.imwrite("testycont.jpg", original_image)
 
-# # Set up the detector with default parameters.
-# params = cv2.SimpleBlobDetector_Params()
-# # Change thresholds
-# params.minThreshold = 10    # the graylevel of images
-# params.maxThreshold = 220
-# params.filterByColor = True
-# params.blobColor = 255
-# params.filterByCircularity = False
-# params.filterByConvexity = False
-# params.filterByInertia = False
-# # Filter by Area
-# params.filterByArea = True
-# params.minArea = 100
-# detector = cv2.SimpleBlobDetector(params)
-# # Detect blobs.
-# keypoints = detector.detect(im)
-# print(keypoints)
-# # Draw detected blobs as red circles.
-# # cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS ensures the size of the circle corresponds to the size of blob
-# im_with_keypoints = cv2.drawKeypoints(im, keypoints, np.array(
-#     []), (0, 0, 255), cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
-# # Show keypoints
-# cv2.imshow("Keypoints", im_with_keypoints)
-# cv2.waitKey(0)
+marker_color = (255, 0, 255)
+marker_type = cv2.MARKER_CROSS
+for (center_x, center_y) in points:
+    # draw the center point
+    cv2.drawMarker(original_image, (center_x, center_y),
+                   marker_color, marker_type)
 
-# img = output_image.copy()
-# detector = cv2.SimpleBlobDetector()
-# keypoints = detector.detect(img)
-# print(keypoints)
-# blank = np.zeros((1, 1))
-# blobs = cv2.drawKeypoints(img, keypoints, blank,
-#                           (0, 255, 255), cv2.DRAW_MATCHES_FLAGS_DEFAULT)
-# cv2.imwrite("testyblob.jpg", img)
-
-
-# cnts = cv2.findContours(output_image, cv2.RETR_EXTERNAL,
-#                         cv2.CHAIN_APPROX_SIMPLE)
-# cnts = cnts[0] if len(cnts) == 2 else cnts[1]
-# big_contour = max(cnts, key=cv2.contourArea)
-
-# blob_area_thresh = 10
-# blob_area = cv2.contourArea(big_contour)
-# if blob_area < blob_area_thresh:
-#     print("Blob Is Too Small")
-
-# cv2.drawContours(output_image, [big_contour], -1, (0, 0, 255), 1)
-# cv2.imwrite("testyblob.jpg", output_image)
-
-
-# params = cv2.SimpleBlobDetector_Params()
-# # Change thresholds
-# params.minThreshold = 0
-# params.maxThreshold = 20
-# # Filter by Area.
-# params.filterByColor = True
-# params.blobColor = 0
-# params.filterByArea = False
-# params.filterByCircularity = False
-# params.filterByConvexity = False
-# params.filterByInertia = False
-
-# # print(params.filterByColor)
-# # print(params.filterByArea)
-# # print(params.filterByCircularity)
-# # print(params.filterByInertia)
-# # print(params.filterByConvexity)
-
-# detector = cv2.SimpleBlobDetector(params)
-# keypoints = detector.detect(output_image)
-# print(keypoints)
-# output_keypoints = cv2.drawKeypoints(output_image, keypoints, np.array(
-#     []), (0, 0, 255), cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
-
-
-# cv2.imwrite("testyblob.jpg", output_keypoints)
+cv2.imwrite("testypoints.jpg", original_image)
