@@ -62,4 +62,7 @@ for (center_x, center_y) in points:
 
 cv2.imwrite("testypoints.jpg", original_image)
 
+
+start_time = time.time()
+print(BotUtils.grab_hpbar_locations())
 print("Time taken: {}".format(time.time()-start_time))

@@ -133,6 +133,36 @@ class BotUtils:
                 print(hex(hwnd), win32gui.GetWindowText(hwnd))
         win32gui.EnumWindows(winEnumHandler, None)
 
+    def grab_hpbar_locations(gamename=False):
+        if gamename:
+            wincap = WindowCapture(gamename, [100, 135, 1223, 688])
+            original_image = wincap.get_screenshot()
+        else:
+            original_image = cv2.imread(os.path.dirname(
+                os.path.abspath(__file__)) + "/testimages/healthbars.jpg")
+        filter = HsvFilter(20, 174, 245, 26, 193, 255, 0, 0, 0, 0)
+        output_image = BotUtils.filter_blackwhite_invert(
+            filter, original_image, True)
+        output_image = cv2.blur(output_image, (2, 2))
+        _, thresh = cv2.threshold(output_image, 127, 255, 0)
+        contours, _ = cv2.findContours(
+            thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+        contours = sorted(contours, key=cv2.contourArea, reverse=True)
+        contours.pop(0)
+        rectangles = []
+        for contour in contours:
+            (x, y), _ = cv2.minEnclosingCircle(contour)
+            rectangles.append([x-10, y, 20, 5])
+            rectangles.append([x-10, y, 20, 5])
+        rectangles, _ = cv2.groupRectangles(
+            rectangles, groupThreshold=1, eps=0.8)
+        points = []
+        for (x, y, w, h) in rectangles:
+            center_x = x + int(w/2)
+            center_y = y + int(h/2)
+            points.append((center_x, center_y))
+        return points
+
     def shift_channel(c, amount):
         if amount > 0:
             lim = 255 - amount
@@ -145,7 +175,7 @@ class BotUtils:
             c[c > lim] -= amount
         return c
 
-    def filter_blackwhite_invert(filter: HsvFilter, existing_image):
+    def filter_blackwhite_invert(filter: HsvFilter, existing_image, return_gray=False):
         hsv = cv2.cvtColor(existing_image, cv2.COLOR_BGR2HSV)
         hsv_filter = filter
         # add/subtract saturation and value
@@ -172,6 +202,8 @@ class BotUtils:
             grayImage, 67, 255, cv2.THRESH_BINARY)
         # now invert it
         inverted = (255-blackAndWhiteImage)
+        if return_gray:
+            return inverted
         inverted = cv2.cvtColor(inverted, cv2.COLOR_GRAY2BGR)
         return inverted
 
