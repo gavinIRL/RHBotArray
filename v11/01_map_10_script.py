@@ -26,15 +26,38 @@ class Map10_MS30():
         self.game_wincap = WindowCapture(self.gamename)
         # This is for determining wait time before next clear
         self.last_clear = 0
+        self.clearskill_cd = 8.9
 
     def start(self):
         while self.maxloops > 0:
             self.mainloop()
             self.maxloops -= 1
 
-    def test(self):
+    def test_room1(self):
         time.sleep(2)
         room = self.rooms[0]
+        self.move_to(int(room[1]), int(room[2]))
+        self.roomclear_skill()
+        time.sleep(0.6)
+        start_time = time.time()
+        while not self.sect_clear_detected():
+            self.continue_clear()
+            if time.time() > start_time + 4:
+                break
+
+    def test_room2(self):
+        room = self.rooms[0]
+        self.move_to(int(room[3]), int(room[4]))
+        time.sleep(0.4)
+        # Now calculate the travel time to figure out
+        # How long to sleep before moving to room2 spot
+        targetx = self.rooms[1][1]
+        targety = self.rooms[1][2]
+        travel_time = self.calculate_travel_time(targetx, targety)
+        sleep_time = self.last_clear + self.clearskill_cd - time.time() - travel_time
+        if sleep_time > 0:
+            time.sleep(sleep_time)
+        room = self.rooms[1]
         self.move_to(int(room[1]), int(room[2]))
         self.roomclear_skill()
         time.sleep(0.6)
@@ -134,6 +157,16 @@ class Map10_MS30():
             CustomInput.press_key(self.key_dict[key], key)
             time.sleep(time_reqd-0.003)
             CustomInput.release_key(self.key_dict[key], key)
+
+    def calculate_travel_time(self, x, y):
+        if not self.detect_bigmap_open():
+            self.try_toggle_map()
+        player_pos = self.grab_player_pos()
+        self.clear_all()
+        xdist = abs(player_pos[0] - int(x))
+        ydist = abs(int(y) - player_pos[1])
+        travel_time = (xdist+ydist)/self.speed
+        return travel_time
 
     def try_toggle_map(self):
         pydirectinput.keyDown("m")
@@ -331,4 +364,5 @@ class Map10_MS30():
 
 if __name__ == "__main__":
     map10 = Map10_MS30(maxloops=1)
-    map10.test()
+    map10.test_room1()
+    map10.test_room2()
