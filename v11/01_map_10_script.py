@@ -194,6 +194,14 @@ class Map10_MS30():
         # print(player_pos)
         relx = player_pos[0] - int(x)
         rely = int(y) - player_pos[1]
+        while abs(relx) > 100 or abs(rely > 100):
+            CustomInput.press_key(self.key_dict["right"], "right")
+            CustomInput.release_key(self.key_dict["right"], "right")
+            time.sleep(0.02)
+            player_pos = self.grab_player_pos()
+            relx = player_pos[0] - int(x)
+            rely = int(y) - player_pos[1]
+
         if not yfirst:
             self.resolve_dir_v2(relx, "x")
             self.resolve_dir_v2(rely, "y")
