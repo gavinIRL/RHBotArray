@@ -15,7 +15,7 @@ output_image = BotUtils.filter_blackwhite_invert(
 
 cv2.imwrite("testytest.jpg", output_image)
 
-output_image = cv2.blur(output_image, (3, 1))
+output_image = cv2.blur(output_image, (3, 2))
 _, thresh = cv2.threshold(output_image, 127, 255, 0)
 contours, _ = cv2.findContours(
     thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
