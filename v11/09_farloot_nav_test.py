@@ -21,6 +21,8 @@ def start(gamename, player_name):
     time.sleep(0.01)
     while time_remaining > 0:
         time.sleep(0.005)
+        if BotUtils.detect_xprompt(gamename):
+            break
         # Grab an updated image
         try:
             newx, newy = BotUtils.grab_farloot_locationsv2(gamename, rect)[0]
@@ -29,7 +31,7 @@ def start(gamename, player_name):
             speed = movementx/time_taken
             time_remaining = abs(relx/speed) - time_taken
             # print(time_remaining)
-            rect = [newx-100, newy-100, newx+100, newy+100]
+            rect = [newx-100, newy-30, newx+100, newy+30]
         except:
             time.sleep(time_remaining)
             break
