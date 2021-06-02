@@ -7,6 +7,7 @@ import win32ui
 import win32con
 import pytesseract
 import pydirectinput
+from fuzzywuzzy import process
 from custom_input import CustomInput
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
@@ -196,6 +197,28 @@ class BotUtils:
             center_y = y + int(h/2)
             points.append((center_x, center_y))
         return points
+
+    def grab_character_location(player_name, gamename=False):
+        player_chars = "".join(set(player_name))
+        if gamename:
+            wincap = WindowCapture(gamename, [200, 235, 1123, 688])
+            original_image = wincap.get_screenshot()
+        else:
+            original_image = cv2.imread(os.path.dirname(
+                os.path.abspath(__file__)) + "/testimages/test_sensitive.jpg")
+        filter = HsvFilter(0, 0, 119, 179, 49, 255, 0, 0, 0, 0)
+        output_image = BotUtils.filter_blackwhite_invert(
+            filter, original_image, return_gray=True)
+        rgb = cv2.cvtColor(output_image, cv2.COLOR_GRAY2RGB)
+        tess_config = '--psm 6 --oem 3 -c tessedit_char_whitelist=' + player_chars
+        results = pytesseract.image_to_data(
+            rgb, output_type=pytesseract.Output.DICT, lang='eng', config=tess_config)
+        best_match, _ = process.extractOne(
+            player_name, results["text"], score_cutoff=0.8)
+        i = results["text"].index(best_match)
+        x = int(results["left"][i] + (results["width"][i]/2))
+        y = int(results["top"][i] + (results["height"][i]/2))
+        return x, y
 
     def shift_channel(c, amount):
         if amount > 0:
