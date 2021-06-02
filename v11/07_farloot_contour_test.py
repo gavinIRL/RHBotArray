@@ -25,7 +25,7 @@ rectangles = []
 for contour in contours:
     (x, y), _ = cv2.minEnclosingCircle(contour)
     rectangles.append([x-50, y, 100, 5])
-    rectangles.append([x-50, y, 100, 5])
+    # rectangles.append([x-50, y, 100, 5])
 rectangles, _ = cv2.groupRectangles(
     rectangles, groupThreshold=1, eps=0.9)
 points = []
