@@ -15,13 +15,15 @@ def xprompt_checker():
     image = wincap.get_screenshot()
     a, b, c = [int(i) for i in image[0][0]]
     d, e, f = [int(i) for i in image[0][-1]]
-    print("abc: {},{},{}".format(a, b, c))
-    print("def: {},{},{}".format(d, e, f))
-    cv2.imwrite("testytest.jpg", image)
-    if a+b+d+e > 960 and c+f == 70:
+    # print("abc: {},{},{}".format(a, b, c))
+    # print("def: {},{},{}".format(d, e, f))
+    # cv2.imwrite("testytest.jpg", image)
+    if a+b+d+e > 960 and c+f == 140:
         return True
     else:
         return False
 
 
-xprompt_checker()
+start = time.time()
+if xprompt_checker():
+    print("Time taken: {}s".format(time.time()-start))
