@@ -28,6 +28,14 @@ class HsvFilter:
 
 
 class WindowCapture:
+    w = 0
+    h = 0
+    hwnd = None
+    cropped_x = 0
+    cropped_y = 0
+    offset_x = 0
+    offset_y = 0
+
     def __init__(self, window_name=None, custom_rect=None):
         self.custom_rect = custom_rect
         if window_name is None:
@@ -98,6 +106,12 @@ class WindowCapture:
 
 
 class BotUtils:
+    def try_toggle_map():
+        pydirectinput.keyDown("m")
+        time.sleep(0.05)
+        pydirectinput.keyUp("m")
+        time.sleep(0.08)
+
     def resolve_single_direction(speed, value, dir, PAG=False):
         if not PAG:
             sleep_time = 0.003
@@ -191,6 +205,50 @@ class BotUtils:
             # rectangles.append([x-50, y, 100, 5])
         rectangles, _ = cv2.groupRectangles(
             rectangles, groupThreshold=1, eps=0.9)
+        if len(rectangles) < 1:
+            return False
+        points = []
+        for (x, y, w, h) in rectangles:
+            center_x = x + int(w/2)
+            center_y = y + int(h/2)
+            points.append((center_x, center_y))
+        return points
+
+    def grab_farloot_locationsv2(gamename=False, rect=False):
+        if gamename:
+            if rect:
+                wincap = WindowCapture(gamename, rect)
+            else:
+                wincap = WindowCapture(gamename, [100, 135, 1223, 688])
+            original_image = wincap.get_screenshot()
+        else:
+            original_image = cv2.imread(os.path.dirname(
+                os.path.abspath(__file__)) + "/testimages/lootscene.jpg")
+        filter = HsvFilter(15, 180, 0, 20, 255, 63, 0, 0, 0, 0)
+        output_image = BotUtils.filter_blackwhite_invert(
+            filter, original_image, True, 0, 180)
+
+        output_image = cv2.blur(output_image, (8, 1))
+        output_image = cv2.blur(output_image, (8, 1))
+        output_image = cv2.blur(output_image, (8, 1))
+
+        # cv2.imwrite("testytest.jpg", output_image)
+        _, thresh = cv2.threshold(output_image, 127, 255, 0)
+        contours, _ = cv2.findContours(
+            thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+        contours = sorted(contours, key=cv2.contourArea, reverse=True)
+        if len(contours) < 2:
+            return False
+        contours.pop(0)
+        rectangles = []
+        for contour in contours:
+            (x, y), _ = cv2.minEnclosingCircle(contour)
+            rectangles.append([x-50, y, 100, 5])
+            rectangles.append([x-50, y, 100, 5])
+        rectangles, _ = cv2.groupRectangles(
+            rectangles, groupThreshold=1, eps=0.9)
+        if len(rectangles) < 1:
+            return False
         points = []
         for (x, y, w, h) in rectangles:
             center_x = x + int(w/2)
