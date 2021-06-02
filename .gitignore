@@ -16,3 +16,7 @@ currplayer.txt
 mainplayer.txt
 # sensitive test image
 test_sensitive.jpg
+# test images which may be sensitive
+testytest.jpg
+testycont.jpg
+testypoints.jpg
