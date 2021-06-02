@@ -642,3 +642,11 @@ class DynamicFilter:
         result = cv2.bitwise_and(hsv, hsv, mask=mask)
         img = cv2.cvtColor(result, cv2.COLOR_HSV2BGR)
         return img
+
+
+if __name__ == "__main__":
+    with open("gamename.txt") as f:
+        gamename = f.readline()
+    start = time.time()
+    BotUtils.detect_xprompt(gamename)
+    print("Time taken: {}s".format(time.time()-start))
