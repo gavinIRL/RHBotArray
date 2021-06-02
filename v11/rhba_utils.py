@@ -232,7 +232,7 @@ class BotUtils:
         output_image = cv2.blur(output_image, (8, 1))
         output_image = cv2.blur(output_image, (8, 1))
 
-        # cv2.imwrite("testytest.jpg", output_image)
+        cv2.imwrite("testytest.jpg", output_image)
         _, thresh = cv2.threshold(output_image, 127, 255, 0)
         contours, _ = cv2.findContours(
             thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
@@ -251,6 +251,14 @@ class BotUtils:
             return False
         points = []
         for (x, y, w, h) in rectangles:
+            # Account for the rect
+            if rect:
+                # Account for the rect
+                x += rect[0]
+                y += rect[1]
+            else:
+                x += 100
+                y += 135
             center_x = x + int(w/2)
             center_y = y + int(h/2)
             points.append((center_x, center_y))
@@ -277,6 +285,9 @@ class BotUtils:
             i = results["text"].index(best_match)
             x = int(results["left"][i] + (results["width"][i]/2))
             y = int(results["top"][i] + (results["height"][i]/2))
+            # Account for the rect
+            x += 200
+            y += 235
             return x, y
         except:
             return False, False
@@ -399,6 +410,17 @@ class BotUtils:
             if a+b+d+e < 80:
                 return True
         return False
+
+    def detect_xprompt(gamename):
+        wincap = WindowCapture(gamename, custom_rect=[
+            1137, 694, 1163, 695])
+        image = wincap.get_screenshot()
+        a, b, c = [int(i) for i in image[0][0]]
+        d, e, f = [int(i) for i in image[0][-1]]
+        if a+b+d+e > 960 and c+f == 140:
+            return True
+        else:
+            return False
 
     def grab_player_pos(gamename, map_rect=None):
         if not map_rect:
