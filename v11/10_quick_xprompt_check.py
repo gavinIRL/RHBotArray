@@ -10,7 +10,7 @@ def xprompt_checker():
     with open("gamename.txt") as f:
         gamename = f.readline()
     wincap = WindowCapture(gamename, custom_rect=[
-        1137, 694, 1163, 752])
+        1137, 694, 1163, 695])
     # while True:
     image = wincap.get_screenshot()
     a, b, c = [int(i) for i in image[0][0]]
