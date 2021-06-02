@@ -5,6 +5,7 @@ import re
 import cv2
 import time
 import pytesseract
+from fuzzywuzzy import process
 from rhba_utils import BotUtils, HsvFilter
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
@@ -26,4 +27,18 @@ tess_config = '--psm 6 --oem 3 -c tessedit_char_whitelist=' + player_chars
 results = pytesseract.image_to_data(
     rgb, output_type=pytesseract.Output.DICT, lang='eng', config=tess_config)  # [:-2]
 
-print(results["text"])
+best_match, score = process.extractOne(
+    player_name, results["text"], score_cutoff=0.8)
+
+i = results["text"].index(best_match)
+x = int(results["left"][i] + (results["width"][i]/2))
+y = int(results["top"][i] + (results["height"][i]/2))
+
+marker_color = (255, 0, 255)
+marker_type = cv2.MARKER_CROSS
+
+cv2.drawMarker(original_image, (x, y),
+               marker_color, marker_type)
+cv2.imwrite("testypoints.jpg", original_image)
+
+# print(best_match)
