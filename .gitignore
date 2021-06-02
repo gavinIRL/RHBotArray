@@ -14,3 +14,5 @@ currplayer.txt
 .vscode/
 # new file to send main player name
 mainplayer.txt
+# sensitive test image
+test_sensitive.jpg
