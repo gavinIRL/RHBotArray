@@ -213,12 +213,15 @@ class BotUtils:
         tess_config = '--psm 6 --oem 3 -c tessedit_char_whitelist=' + player_chars
         results = pytesseract.image_to_data(
             rgb, output_type=pytesseract.Output.DICT, lang='eng', config=tess_config)
-        best_match, _ = process.extractOne(
-            player_name, results["text"], score_cutoff=0.8)
-        i = results["text"].index(best_match)
-        x = int(results["left"][i] + (results["width"][i]/2))
-        y = int(results["top"][i] + (results["height"][i]/2))
-        return x, y
+        try:
+            best_match, _ = process.extractOne(
+                player_name, results["text"], score_cutoff=0.8)
+            i = results["text"].index(best_match)
+            x = int(results["left"][i] + (results["width"][i]/2))
+            y = int(results["top"][i] + (results["height"][i]/2))
+            return x, y
+        except:
+            return False, False
 
     def shift_channel(c, amount):
         if amount > 0:
