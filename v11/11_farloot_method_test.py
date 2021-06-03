@@ -14,7 +14,7 @@ def loot_nearest_item(gamename, player_name, ignore_closest=False):
     loot_list = BotUtils.grab_farloot_locationsv2(gamename)
     # If none then return False
     if not loot_list:
-        return False
+        return "noloot"
     # Then grab the player location
     playerx, playery = BotUtils.grab_character_location(
         player_name, gamename)
@@ -23,7 +23,7 @@ def loot_nearest_item(gamename, player_name, ignore_closest=False):
         playerx, playery = BotUtils.grab_character_location(
             player_name, gamename)
         if not playerx:
-            return False
+            return "noplayer"
     # Then convert lootlist to rel_pos list
     relatives = BotUtils.convert_list_to_rel(loot_list, playerx, playery, 275)
     # And find the closest
