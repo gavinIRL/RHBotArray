@@ -1,6 +1,7 @@
 import os
 import cv2
 import time
+import math
 import numpy as np
 import win32gui
 import win32ui
@@ -111,6 +112,18 @@ class BotUtils:
         time.sleep(0.05)
         pydirectinput.keyUp("m")
         time.sleep(0.08)
+
+    def grab_closest(rel_list: list):
+        closest_index = False
+        smallest_dist = 100000
+        for i, pair in enumerate(rel_list):
+            x = abs(pair[0])
+            y = abs(pair[1])
+            hypot = math.hypot(x, y)
+            if hypot < smallest_dist:
+                smallest_dist = hypot
+                closest_index = i
+        return closest_index
 
     def move_towards(value, dir):
         if dir == "x":
