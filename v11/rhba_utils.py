@@ -112,6 +112,19 @@ class BotUtils:
         pydirectinput.keyUp("m")
         time.sleep(0.08)
 
+    def move_towards(value, dir):
+        if dir == "x":
+            if value > 0:
+                key = "left"
+            else:
+                key = "right"
+        elif dir == "y":
+            if value > 0:
+                key = "down"
+            else:
+                key = "up"
+        CustomInput.press_key(CustomInput.key_map[key], key)
+
     def resolve_single_direction(speed, value, dir, PAG=False):
         if not PAG:
             sleep_time = 0.003
