@@ -137,7 +137,7 @@ class BotUtils:
         y_only = []
         for _, y in coords:
             y_only.append(y)
-        return sorted(range(len(y_only)), key=y_only.__getitem__, reverse=True)
+        return sorted(range(len(y_only)), key=y_only.__getitem__)
 
     def move_towards(value, dir):
         if dir == "x":
@@ -156,6 +156,7 @@ class BotUtils:
         if not BotUtils.detect_bigmap_open(gamename):
             BotUtils.try_toggle_map()
         player_pos = BotUtils.grab_player_pos(gamename)
+        print("Got here #1")
         start_time = time.time()
         while not player_pos:
             time.sleep(0.05)
@@ -169,6 +170,8 @@ class BotUtils:
         BotUtils.close_map_and_menu(gamename)
         relx = player_pos[0] - int(x)
         rely = int(y) - player_pos[1]
+        print("relx:{}, rely:{}".format(relx, rely))
+        print("Got here #2")
         while abs(relx) > 100 or abs(rely > 100):
             CustomInput.press_key(CustomInput.key_map["right"], "right")
             CustomInput.release_key(CustomInput.key_map["right"], "right")
@@ -176,7 +179,7 @@ class BotUtils:
             player_pos = BotUtils.grab_player_pos(gamename)
             relx = player_pos[0] - int(x)
             rely = int(y) - player_pos[1]
-
+        print("Got here #3")
         if not yfirst:
             BotUtils.resolve_dir_v2(relx, "x", speed)
             BotUtils.resolve_dir_v2(rely, "y", speed)
@@ -527,6 +530,8 @@ class BotUtils:
         points = vision.get_click_points(rectangles)
         x, y = points[0]
         if not map_rect:
+            x += 561
+            y += 282
             return x, y
         else:
             x += wincap.window_rect[0]
@@ -627,7 +632,7 @@ class BotUtils:
         if not confirmed:
             return False
 
-    def try_find_and_grab_loot(gamename, player_name, loot_nearest=False, loot_lowest=True):
+    def try_find_and_grab_loot(gamename, player_name, loot_nearest=False, loot_lowest=True, printout=False):
         # First need to close anything that might be in the way
         BotUtils.close_map_and_menu(gamename)
         # Then grab loot locations
@@ -674,10 +679,12 @@ class BotUtils:
             result = pytesseract.image_to_string(
                 rgb, lang='eng', config=tess_config)[:-2]
             if len(result) > 3:
+                if printout:
+                    print(result)
                 confirmed = loot_list[index]
                 break
         if not confirmed:
-            return False
+            return "noloot"
 
         relx = playerx - confirmed[0]
         rely = confirmed[1] - playery - 275
