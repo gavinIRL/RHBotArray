@@ -152,28 +152,28 @@ class BotUtils:
                 key = "up"
         CustomInput.press_key(CustomInput.key_map[key], key)
 
-    def move_to(x, y, angle=90, yfirst=True, speed=22.5):
-        if not BotUtils.detect_bigmap_open():
+    def move_to(gamename, x, y, angle=90, yfirst=True, speed=22.5):
+        if not BotUtils.detect_bigmap_open(gamename):
             BotUtils.try_toggle_map()
-        player_pos = BotUtils.grab_player_pos()
+        player_pos = BotUtils.grab_player_pos(gamename)
         start_time = time.time()
         while not player_pos:
             time.sleep(0.05)
-            if not BotUtils.detect_bigmap_open():
+            if not BotUtils.detect_bigmap_open(gamename):
                 BotUtils.try_toggle_map()
             time.sleep(0.05)
-            player_pos = BotUtils.grab_player_pos()
+            player_pos = BotUtils.grab_player_pos(gamename)
             if time.time() - start_time > 5:
                 print("Error with finding player")
                 os._exit(1)
-        BotUtils.close_map_and_menu()
+        BotUtils.close_map_and_menu(gamename)
         relx = player_pos[0] - int(x)
         rely = int(y) - player_pos[1]
         while abs(relx) > 100 or abs(rely > 100):
             CustomInput.press_key(CustomInput.key_map["right"], "right")
             CustomInput.release_key(CustomInput.key_map["right"], "right")
             time.sleep(0.02)
-            player_pos = BotUtils.grab_player_pos()
+            player_pos = BotUtils.grab_player_pos(gamename)
             relx = player_pos[0] - int(x)
             rely = int(y) - player_pos[1]
 
@@ -515,7 +515,7 @@ class BotUtils:
 
     def grab_player_pos(gamename, map_rect=None):
         if not map_rect:
-            wincap = WindowCapture(gamename)
+            wincap = WindowCapture(gamename, [561, 282, 1111, 666])
         else:
             wincap = WindowCapture(gamename, map_rect)
         filter = HsvFilter(34, 160, 122, 50, 255, 255, 0, 0, 0, 0)
