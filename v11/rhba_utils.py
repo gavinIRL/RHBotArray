@@ -127,6 +127,12 @@ class BotUtils:
                 closest_index = i
         return closest_index
 
+    def grab_order_closeness(relatives):
+        dists = []
+        for x, y in relatives:
+            dists.append(math.hypot(x, y))
+        return sorted(range(len(dists)), key=dists.__getitem__)
+
     def move_towards(value, dir):
         if dir == "x":
             if value > 0:
