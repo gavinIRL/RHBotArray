@@ -508,6 +508,14 @@ class BotUtils:
                 return True
         return False
 
+    def convert_list_to_rel(item_list, playerx, playery, yoffset=0):
+        return_list = []
+        for item in item_list:
+            relx = playerx - item[0]
+            rely = item[1] - playery - yoffset
+            return_list.append((relx, rely))
+        return return_list
+
     def close_map_and_menu():
         scaling = BotUtils.get_monitor_scaling()
         wincap = WindowCapture(gamename)
