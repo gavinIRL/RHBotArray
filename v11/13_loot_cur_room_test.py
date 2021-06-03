@@ -18,12 +18,14 @@ def grab_all_visible_loot(gamename, player_name):
     while True:
         if time.time() - start_time > 20:
             break
-        outcome = BotUtils.try_find_and_grab_loot(gamename, player_name)
+        outcome = BotUtils.try_find_and_grab_loot(
+            gamename, player_name, printout=True)
         if outcome == "noloot":
             break
         elif outcome == "noplayer":
             pydirectinput.press("right")
-            outcome = BotUtils.try_find_and_grab_loot(gamename, player_name)
+            outcome = BotUtils.try_find_and_grab_loot(
+                gamename, player_name, printout=True)
             if outcome == "noplayer":
                 break
         elif outcome == "falsepos":
@@ -39,12 +41,26 @@ def grab_all_visible_loot(gamename, player_name):
 
 
 def loot_current_room(search_points, gamename, player_name):
-    # Begin by grabbing visible loot
+    # Start by picking up loot already in range
+    BotUtils.close_map_and_menu(gamename)
+    count = 0
+    while BotUtils.detect_xprompt(gamename):
+        if count > 12:
+            break
+        pydirectinput.press("x")
+        count += 1
+        time.sleep(0.09)
+    # Then try grabbing all visible far loot
     grab_all_visible_loot(gamename, player_name)
     # Then once that is exhausted cycle through the searchpoints
     for point in search_points:
         x, y, first_dir = point
-        BotUtils.move_to(x, y, yfirst=first_dir == "y")
+
+        # print("x:{}, y:{}".format(x, y))
+        BotUtils.move_to(gamename, x, y, yfirst=first_dir == "y")
+        BotUtils.try_toggle_map()
+        time.sleep(0.02)
+        BotUtils.close_map_and_menu(gamename)
         grab_all_visible_loot(gamename, player_name)
     # Then are completely finished
     print("Done looting!")
