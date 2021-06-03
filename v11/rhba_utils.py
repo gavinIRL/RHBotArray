@@ -152,7 +152,7 @@ class BotUtils:
                 key = "up"
         CustomInput.press_key(CustomInput.key_map[key], key)
 
-    def move_to(x, y, angle=90, yfirst=True):
+    def move_to(x, y, angle=90, yfirst=True, speed=22.5):
         if not BotUtils.detect_bigmap_open():
             BotUtils.try_toggle_map()
         player_pos = BotUtils.grab_player_pos()
@@ -170,19 +170,36 @@ class BotUtils:
         relx = player_pos[0] - int(x)
         rely = int(y) - player_pos[1]
         while abs(relx) > 100 or abs(rely > 100):
-            CustomInput.press_key(CustomInput.key_dict["right"], "right")
-            CustomInput.release_key(CustomInput.key_dict["right"], "right")
+            CustomInput.press_key(CustomInput.key_map["right"], "right")
+            CustomInput.release_key(CustomInput.key_map["right"], "right")
             time.sleep(0.02)
             player_pos = BotUtils.grab_player_pos()
             relx = player_pos[0] - int(x)
             rely = int(y) - player_pos[1]
 
         if not yfirst:
-            BotUtils.resolve_dir_v2(relx, "x")
-            BotUtils.resolve_dir_v2(rely, "y")
+            BotUtils.resolve_dir_v2(relx, "x", speed)
+            BotUtils.resolve_dir_v2(rely, "y", speed)
         else:
-            BotUtils.resolve_dir_v2(rely, "y")
-            BotUtils.resolve_dir_v2(relx, "x")
+            BotUtils.resolve_dir_v2(rely, "y", speed)
+            BotUtils.resolve_dir_v2(relx, "x", speed)
+
+    def resolve_dir_v2(value, dir, speed):
+        if dir == "x":
+            if value > 0:
+                key = "left"
+            else:
+                key = "right"
+        elif dir == "y":
+            if value > 0:
+                key = "down"
+            else:
+                key = "up"
+        time_reqd = abs(value/speed)
+        if time_reqd > 0.003:
+            CustomInput.press_key(CustomInput.key_map[key], key)
+            time.sleep(time_reqd-0.003)
+            CustomInput.release_key(CustomInput.key_map[key], key)
 
     def resolve_single_direction(speed, value, dir, PAG=False):
         if not PAG:
