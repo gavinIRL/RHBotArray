@@ -506,6 +506,21 @@ class BotUtils:
                 return True
         return False
 
+    def close_map_and_menu(scaling):
+        wincap = WindowCapture(gamename)
+        if BotUtils.detect_menu_open(gamename):
+            BotUtils.close_esc_menu(scaling, wincap)
+        elif BotUtils.detect_bigmap_open(gamename):
+            BotUtils.close_map(scaling, wincap)
+
+    def close_map(scaling, game_wincap):
+        pydirectinput.click(
+            int(scaling*859+game_wincap.window_rect[0]), int(scaling*260+game_wincap.window_rect[1]))
+
+    def close_esc_menu(scaling, game_wincap):
+        pydirectinput.click(
+            int(scaling*749+game_wincap.window_rect[0]), int(scaling*280+game_wincap.window_rect[1]))
+
 
 class Vision:
     def __init__(self, needle_img_path, method=cv2.TM_CCOEFF_NORMED):
