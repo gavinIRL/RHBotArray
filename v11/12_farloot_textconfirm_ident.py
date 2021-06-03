@@ -9,7 +9,7 @@ import pytesseract
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 
-def confirm_loot_test(gamename, player_name, loot_nearest=False):
+def confirm_loot_test(gamename, player_name, loot_nearest=False, loot_lowest=True):
     # First need to close anything that might be in the way
     BotUtils.close_map_and_menu(gamename)
     # Then grab loot locations
@@ -32,7 +32,15 @@ def confirm_loot_test(gamename, player_name, loot_nearest=False):
         relatives = BotUtils.convert_list_to_rel(
             loot_list, playerx, playery, 275)
         # Grab the indexes in ascending order of closesness
-        order = grab_order_closeness(relatives)
+        order = BotUtils.grab_order_closeness(relatives)
+        # Then reorder the lootlist to match
+        loot_list = [x for _, x in sorted(zip(order, loot_list))]
+    # Otherwise if want to loot from bottom of screen to top
+    # Typically better as see all loot then
+    elif loot_lowest:
+        # Grab the indexes in ascending order of distance from
+        # bottom of the screen
+        order = BotUtils.grab_order_lowest_y(loot_list)
         # Then reorder the lootlist to match
         loot_list = [x for _, x in sorted(zip(order, loot_list))]
 
