@@ -8,7 +8,7 @@ os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 def loot_nearest_item(gamename, player_name, ignore_closest=False):
     # First need to close anything that might be in the way
-    BotUtils.close_map_and_menu()
+    BotUtils.close_map_and_menu(gamename)
     # Then grab loot locations
     loot_list = BotUtils.grab_farloot_locationsv2(gamename)
     # If none then return False

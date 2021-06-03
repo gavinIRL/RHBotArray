@@ -516,7 +516,7 @@ class BotUtils:
             return_list.append((relx, rely))
         return return_list
 
-    def close_map_and_menu():
+    def close_map_and_menu(gamename):
         scaling = BotUtils.get_monitor_scaling()
         wincap = WindowCapture(gamename)
         if BotUtils.detect_menu_open(gamename):
