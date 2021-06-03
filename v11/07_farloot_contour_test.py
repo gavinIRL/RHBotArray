@@ -1,21 +1,29 @@
 import cv2
 import os
 import time
-from rhba_utils import BotUtils, HsvFilter
+from rhba_utils import BotUtils, HsvFilter, WindowCapture
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 start_time = time.time()
+with open("gamename.txt") as f:
+    gamename = f.readline()
 
-original_image = cv2.imread(os.path.dirname(
-    os.path.abspath(__file__)) + "/testimages/lootscene.jpg")
+wincap = WindowCapture(gamename, [100, 135, 1223, 688])
+original_image = wincap.get_screenshot()
+# original_image = cv2.imread(os.path.dirname(
+#     os.path.abspath(__file__)) + "/testimages/lootscene.jpg")
 
-filter = HsvFilter(16, 140, 0, 26, 255, 49, 0, 0, 0, 0)
+filter = HsvFilter(15, 180, 0, 20, 255, 63, 0, 0, 0, 0)
 output_image = BotUtils.filter_blackwhite_invert(
     filter, original_image, True, 0, 180)
 
 cv2.imwrite("testytest.jpg", output_image)
 
-output_image = cv2.blur(output_image, (3, 2))
+output_image = cv2.blur(output_image, (8, 1))
+output_image = cv2.blur(output_image, (8, 1))
+output_image = cv2.blur(output_image, (8, 1))
+
+cv2.imwrite("testytest2.jpg", output_image)
 _, thresh = cv2.threshold(output_image, 127, 255, 0)
 contours, _ = cv2.findContours(
     thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
@@ -25,7 +33,7 @@ rectangles = []
 for contour in contours:
     (x, y), _ = cv2.minEnclosingCircle(contour)
     rectangles.append([x-50, y, 100, 5])
-    # rectangles.append([x-50, y, 100, 5])
+    rectangles.append([x-50, y, 100, 5])
 rectangles, _ = cv2.groupRectangles(
     rectangles, groupThreshold=1, eps=0.9)
 points = []
