@@ -64,18 +64,28 @@ def loot_nearest_item(gamename, player_name, ignore_closest=False):
         # After moving in opposite direction
         if time.time() - start_time > 10:
             # If have moved opposite with no result for equal amount
-            if time.time() - start_time > 16:
+            if time.time() - start_time > 14:
                 for key in ["up", "down"]:
                     CustomInput.release_key(CustomInput.key_map[key], key)
                 # Return ignore so that it will ignore this detection
                 return "ignore"
         # If no result for 3 seconds
-        elif time.time() - start_time > 3:
+        elif time.time() - start_time > 2:
             # Try moving in the opposite direction
             for key in ["up", "down"]:
                 CustomInput.release_key(CustomInput.key_map[key], key)
             BotUtils.move_towards(-1*relatives[closest_index][1], "y")
-            start_time -= 7
+            start_time -= 8
     for key in ["up", "down"]:
         CustomInput.release_key(CustomInput.key_map[key], key)
     return True
+
+
+with open("gamename.txt") as f:
+    gamename = f.readline()
+with open(os.path.dirname(os.path.abspath(__file__)) + "/testimages/mainplayer.txt") as f:
+    player_name = f.readline()
+time.sleep(3)
+while True:
+    if not loot_nearest_item(gamename, player_name):
+        break
