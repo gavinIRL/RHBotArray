@@ -152,6 +152,38 @@ class BotUtils:
                 key = "up"
         CustomInput.press_key(CustomInput.key_map[key], key)
 
+    def move_to(x, y, angle=90, yfirst=True):
+        if not BotUtils.detect_bigmap_open():
+            BotUtils.try_toggle_map()
+        player_pos = BotUtils.grab_player_pos()
+        start_time = time.time()
+        while not player_pos:
+            time.sleep(0.05)
+            if not BotUtils.detect_bigmap_open():
+                BotUtils.try_toggle_map()
+            time.sleep(0.05)
+            player_pos = BotUtils.grab_player_pos()
+            if time.time() - start_time > 5:
+                print("Error with finding player")
+                os._exit(1)
+        BotUtils.close_map_and_menu()
+        relx = player_pos[0] - int(x)
+        rely = int(y) - player_pos[1]
+        while abs(relx) > 100 or abs(rely > 100):
+            CustomInput.press_key(CustomInput.key_dict["right"], "right")
+            CustomInput.release_key(CustomInput.key_dict["right"], "right")
+            time.sleep(0.02)
+            player_pos = BotUtils.grab_player_pos()
+            relx = player_pos[0] - int(x)
+            rely = int(y) - player_pos[1]
+
+        if not yfirst:
+            BotUtils.resolve_dir_v2(relx, "x")
+            BotUtils.resolve_dir_v2(rely, "y")
+        else:
+            BotUtils.resolve_dir_v2(rely, "y")
+            BotUtils.resolve_dir_v2(relx, "x")
+
     def resolve_single_direction(speed, value, dir, PAG=False):
         if not PAG:
             sleep_time = 0.003
