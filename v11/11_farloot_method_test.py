@@ -1,3 +1,4 @@
+import pydirectinput
 from rhba_utils import BotUtils
 from custom_input import CustomInput
 import time
@@ -53,8 +54,11 @@ def loot_nearest_item(gamename, player_name, ignore_closest=False):
                 relatives[closest_index][0]/speed) - time_taken
             rect = [newx-100, newy-30, newx+100, newy+30]
         except:
-            time.sleep(time_remaining)
-            break
+            try:
+                time.sleep(time_remaining)
+                break
+            except:
+                return False
     for key in ["left", "right"]:
         CustomInput.release_key(CustomInput.key_map[key], key)
     BotUtils.move_towards(relatives[closest_index][1], "y")
@@ -87,5 +91,6 @@ with open(os.path.dirname(os.path.abspath(__file__)) + "/testimages/mainplayer.t
     player_name = f.readline()
 time.sleep(3)
 while True:
-    if not loot_nearest_item(gamename, player_name):
+    if loot_nearest_item(gamename, player_name) != True:
         break
+    pydirectinput.press("x")
