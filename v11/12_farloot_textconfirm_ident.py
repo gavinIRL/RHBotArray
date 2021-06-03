@@ -9,13 +9,33 @@ import pytesseract
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 
-def confirm_loot_test(gamename, player_name):
+def confirm_loot_test(gamename, player_name, loot_nearest=False):
     # First need to close anything that might be in the way
     BotUtils.close_map_and_menu(gamename)
     # Then grab loot locations
     loot_list = BotUtils.grab_farloot_locationsv2(gamename)
     if not loot_list:
         return "noloot"
+
+    playerx, playery = BotUtils.grab_character_location(
+        player_name, gamename)
+    # If didn't find player then try once more
+    if not playerx:
+        playerx, playery = BotUtils.grab_character_location(
+            player_name, gamename)
+        if not playerx:
+            return "noplayer"
+
+    # if want to always loot the nearest first despite the cpu hit
+    if loot_nearest:
+        # Then convert lootlist to rel_pos list
+        relatives = BotUtils.convert_list_to_rel(
+            loot_list, playerx, playery, 275)
+        # Grab the indexes in ascending order of closesness
+        order = grab_order_closeness(relatives)
+        # Then reorder the lootlist to match
+        loot_list = [x for _, x in sorted(zip(order, loot_list))]
+
     confirmed = False
     for index, coords in enumerate(loot_list):
         x, y = coords
@@ -28,18 +48,11 @@ def confirm_loot_test(gamename, player_name):
             rgb, lang='eng', config=tess_config)[:-2]
         if len(result) > 3:
             confirmed = loot_list[index]
-            print("Detected "+result)
+            # print("Detected "+result)
             break
     if not confirmed:
         return False
-    playerx, playery = BotUtils.grab_character_location(
-        player_name, gamename)
-    # If didn't find player then try once more
-    if not playerx:
-        playerx, playery = BotUtils.grab_character_location(
-            player_name, gamename)
-        if not playerx:
-            return "noplayer"
+
     relx = playerx - confirmed[0]
     rely = confirmed[1] - playery - 275
     rect = [confirmed[0]-100, confirmed[1] -
@@ -57,11 +70,12 @@ def confirm_loot_test(gamename, player_name):
             time_taken = time.time() - loop_time
             movementx = confirmed[0] - newx
             speed = movementx/time_taken
-            time_remaining = abs(
-                relx/speed) - time_taken
+            if speed != 0:
+                time_remaining = abs(
+                    relx/speed) - time_taken
             rect = [newx-100, newy-30, newx+100, newy+30]
         except:
-            print("Exited x due to no detect")
+            # print("Exited x due to no detect")
             try:
                 time.sleep(time_remaining)
                 break
@@ -91,6 +105,13 @@ def confirm_loot_test(gamename, player_name):
     for key in ["up", "down"]:
         CustomInput.release_key(CustomInput.key_map[key], key)
     return True
+
+
+def grab_order_closeness(relatives):
+    dists = []
+    for x, y in relatives:
+        dists.append(math.hypot(x, y))
+    return sorted(range(len(dists)), key=dists.__getitem__)
 
 
 time.sleep(2)
