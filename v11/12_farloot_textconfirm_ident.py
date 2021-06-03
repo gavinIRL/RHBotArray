@@ -39,7 +39,7 @@ def confirm_loot_test(gamename, player_name, loot_nearest=False):
     confirmed = False
     for index, coords in enumerate(loot_list):
         x, y = coords
-        wincap = WindowCapture(gamename, [x-75, y-12, x+75, y+10])
+        wincap = WindowCapture(gamename, [x-75, y-22, x+75, y+22])
         rgb = wincap.get_screenshot()
         filter = HsvFilter(0, 0, 131, 151, 255, 255, 0, 0, 0, 0)
         rgb = BotUtils.apply_hsv_filter(rgb, filter)
