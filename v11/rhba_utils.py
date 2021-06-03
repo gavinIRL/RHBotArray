@@ -2,14 +2,16 @@ import os
 import cv2
 import time
 import math
-import numpy as np
-import win32gui
+import ctypes
 import win32ui
+import win32gui
 import win32con
+import numpy as np
 import pytesseract
 import pydirectinput
 from fuzzywuzzy import process
 from custom_input import CustomInput
+from win32api import GetSystemMetrics
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 
@@ -506,7 +508,8 @@ class BotUtils:
                 return True
         return False
 
-    def close_map_and_menu(scaling):
+    def close_map_and_menu():
+        scaling = BotUtils.get_monitor_scaling()
         wincap = WindowCapture(gamename)
         if BotUtils.detect_menu_open(gamename):
             BotUtils.close_esc_menu(scaling, wincap)
@@ -520,6 +523,13 @@ class BotUtils:
     def close_esc_menu(scaling, game_wincap):
         pydirectinput.click(
             int(scaling*749+game_wincap.window_rect[0]), int(scaling*280+game_wincap.window_rect[1]))
+
+    def get_monitor_scaling():
+        user32 = ctypes.windll.user32
+        w_orig = GetSystemMetrics(0)
+        user32.SetProcessDPIAware()
+        [w, h] = [user32.GetSystemMetrics(0), user32.GetSystemMetrics(1)]
+        return float(("{:.3f}".format(w/w_orig)))
 
 
 class Vision:
