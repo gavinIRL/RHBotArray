@@ -14,7 +14,10 @@ os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 
 def grab_all_visible_loot(gamename, player_name):
+    start_time = time.time()
     while True:
+        if time.time() - start_time > 20:
+            break
         outcome = BotUtils.try_find_and_grab_loot(gamename, player_name)
         if outcome == "noloot":
             break
