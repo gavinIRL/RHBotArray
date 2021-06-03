@@ -23,4 +23,38 @@ def loot_nearest_item(gamename, player_name):
             player_name, gamename)
         if not playerx:
             return False
-    # Then convert lootlist to rel_pos list and find closest
+    # Then convert lootlist to rel_pos list
+    relatives = BotUtils.convert_list_to_rel(loot_list, playerx, playery, 275)
+    # And find the closest
+    closest_index = BotUtils.grab_closest(relatives)
+    closest = loot_list[closest_index]
+    # Create the rectangle for zoomed rapid tracking
+    rect = [closest[0]-100, closest[1]-30, closest[0]+100, closest[1]+30]
+
+    # Now need to start moving towards the loot in x direction
+    BotUtils.move_towards(relatives[closest_index][0], "x")
+    loop_time = time.time()
+    time_remaining = 0.1
+    time.sleep(0.01)
+    while time_remaining > 0:
+        time.sleep(0.003)
+        if BotUtils.detect_xprompt(gamename):
+            break
+        try:
+            newx, newy = BotUtils.grab_farloot_locationsv2(gamename, rect)[0]
+            time_taken = time.time() - loop_time
+            movementx = closest[0] - newx
+            speed = movementx/time_taken
+            time_remaining = abs(
+                relatives[closest_index][0]/speed) - time_taken
+            rect = [newx-100, newy-30, newx+100, newy+30]
+        except:
+            time.sleep(time_remaining)
+            break
+    for key in ["left", "right"]:
+        CustomInput.release_key(CustomInput.key_map[key], key)
+    BotUtils.move_towards(relatives[closest_index][1], "y")
+    while not BotUtils.detect_xprompt(gamename):
+        time.sleep(0.005)
+    for key in ["up", "down"]:
+        CustomInput.release_key(CustomInput.key_map[key], key)
