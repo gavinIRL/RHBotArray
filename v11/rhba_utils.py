@@ -133,6 +133,12 @@ class BotUtils:
             dists.append(math.hypot(x, y))
         return sorted(range(len(dists)), key=dists.__getitem__)
 
+    def grab_order_lowest_y(coords):
+        y_only = []
+        for _, y in coords:
+            y_only.append(y)
+        return sorted(range(len(y_only)), key=y_only.__getitem__, reverse=True)
+
     def move_towards(value, dir):
         if dir == "x":
             if value > 0:
