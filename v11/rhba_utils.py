@@ -254,7 +254,7 @@ class BotUtils:
             points.append((center_x, center_y))
         return points
 
-    def grab_farloot_locationsv2(gamename=False, rect=False):
+    def grab_farloot_locationsv2(gamename=False, rect=False, return_image=False):
         if gamename:
             if rect:
                 wincap = WindowCapture(gamename, rect)
@@ -302,6 +302,8 @@ class BotUtils:
             center_x = x + int(w/2)
             center_y = y + int(h/2)
             points.append((center_x, center_y))
+        if return_image:
+            return points, original_image, rect[0], rect[1]
         return points
 
     def grab_character_location(player_name, gamename=False):
@@ -555,23 +557,24 @@ class BotUtils:
         # This will be a lightweight check for any positive loot ident
         # Meant to be used when moving and normal looting has ceased
         # i.e. opportunistic looting
-        loot_list = BotUtils.grab_farloot_locationsv2(gamename)
+        loot_list, image, xoff, yoff = BotUtils.grab_farloot_locationsv2(
+            gamename, return_image=True)
         if not loot_list:
             return False
 
         confirmed = False
-        for index, coords in enumerate(loot_list):
+        for _, coords in enumerate(loot_list):
             x, y = coords
-            wincap = WindowCapture(gamename, [x-75, y-22, x+75, y+22])
-            rgb = wincap.get_screenshot()
+            x -= xoff
+            y -= yoff
+            rgb = image[y-22:y+22, x-75:x+75]
             filter = HsvFilter(0, 0, 131, 151, 255, 255, 0, 0, 0, 0)
             rgb = BotUtils.apply_hsv_filter(rgb, filter)
             tess_config = '--psm 7 --oem 3 -c tessedit_char_whitelist=ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
             result = pytesseract.image_to_string(
                 rgb, lang='eng', config=tess_config)[:-2]
             if len(result) > 3:
-                confirmed = loot_list[index]
-                break
+                return True
         if not confirmed:
             return False
 
