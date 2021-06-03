@@ -79,6 +79,9 @@ class WindowCapture:
 
         return img
 
+    def focus_window(self):
+        win32gui.SetForegroundWindow(self.hwnd)
+
     def update_window_position(self, border=True):
         self.window_rect = win32gui.GetWindowRect(self.hwnd)
         self.w = self.window_rect[2] - self.window_rect[0]
@@ -156,7 +159,7 @@ class BotUtils:
         if not BotUtils.detect_bigmap_open(gamename):
             BotUtils.try_toggle_map()
         player_pos = BotUtils.grab_player_pos(gamename)
-        print("Got here #1")
+        # print("Got here #1")
         start_time = time.time()
         while not player_pos:
             time.sleep(0.05)
@@ -170,8 +173,8 @@ class BotUtils:
         BotUtils.close_map_and_menu(gamename)
         relx = player_pos[0] - int(x)
         rely = int(y) - player_pos[1]
-        print("relx:{}, rely:{}".format(relx, rely))
-        print("Got here #2")
+        # print("relx:{}, rely:{}".format(relx, rely))
+        # print("Got here #2")
         while abs(relx) > 100 or abs(rely > 100):
             CustomInput.press_key(CustomInput.key_map["right"], "right")
             CustomInput.release_key(CustomInput.key_map["right"], "right")
@@ -179,7 +182,7 @@ class BotUtils:
             player_pos = BotUtils.grab_player_pos(gamename)
             relx = player_pos[0] - int(x)
             rely = int(y) - player_pos[1]
-        print("Got here #3")
+        # print("Got here #3")
         if not yfirst:
             BotUtils.resolve_dir_v2(relx, "x", speed)
             BotUtils.resolve_dir_v2(rely, "y", speed)
@@ -589,10 +592,12 @@ class BotUtils:
         wincap = WindowCapture(gamename)
         if BotUtils.detect_menu_open(gamename):
             BotUtils.close_esc_menu(scaling, wincap)
-        elif BotUtils.detect_bigmap_open(gamename):
-            BotUtils.close_map(scaling, wincap)
+        if BotUtils.detect_bigmap_open(gamename):
+            BotUtils.close_map(gamename, scaling)
 
-    def close_map(scaling, game_wincap):
+    def close_map(gamename, scaling):
+        game_wincap = WindowCapture(gamename)
+        print(game_wincap.window_rect[0])
         pydirectinput.click(
             int(scaling*859+game_wincap.window_rect[0]), int(scaling*260+game_wincap.window_rect[1]))
 
