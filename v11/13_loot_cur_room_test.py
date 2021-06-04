@@ -40,7 +40,7 @@ def grab_all_visible_loot(gamename, player_name):
                 time.sleep(0.09)
 
 
-def loot_current_room(search_points, gamename, player_name):
+def loot_current_room(gamename, player_name, search_points=False):
     # Start by picking up loot already in range
     BotUtils.close_map_and_menu(gamename)
     count = 0
@@ -53,15 +53,12 @@ def loot_current_room(search_points, gamename, player_name):
     # Then try grabbing all visible far loot
     grab_all_visible_loot(gamename, player_name)
     # Then once that is exhausted cycle through the searchpoints
-    for point in search_points:
-        x, y, first_dir = point
-
-        # print("x:{}, y:{}".format(x, y))
-        BotUtils.move_to(gamename, x, y, yfirst=first_dir == "y")
-        BotUtils.try_toggle_map()
-        time.sleep(0.02)
-        BotUtils.close_map_and_menu(gamename)
-        grab_all_visible_loot(gamename, player_name)
+    if search_points:
+        for point in search_points:
+            x, y, first_dir = point
+            BotUtils.move_to(gamename, x, y, yfirst=first_dir == "y")
+            BotUtils.close_map_and_menu(gamename)
+            grab_all_visible_loot(gamename, player_name)
     # Then are completely finished
     print("Done looting!")
 
@@ -73,4 +70,4 @@ with open("gamename.txt") as f:
 with open(os.path.dirname(os.path.abspath(__file__)) + "/testimages/mainplayer.txt") as f:
     player_name = f.readline()
 time.sleep(2)
-loot_current_room(search_points, gamename, player_name)
+loot_current_room(gamename, player_name, search_points)
