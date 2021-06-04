@@ -597,7 +597,6 @@ class BotUtils:
 
     def close_map(gamename, scaling):
         game_wincap = WindowCapture(gamename)
-        print(game_wincap.window_rect[0])
         pydirectinput.click(
             int(scaling*859+game_wincap.window_rect[0]), int(scaling*260+game_wincap.window_rect[1]))
 
