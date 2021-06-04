@@ -606,11 +606,8 @@ class BotUtils:
             int(scaling*749+game_wincap.window_rect[0]), int(scaling*280+game_wincap.window_rect[1]))
 
     def get_monitor_scaling():
-        user32 = ctypes.windll.user32
-        w_orig = GetSystemMetrics(0)
-        user32.SetProcessDPIAware()
-        [w, h] = [user32.GetSystemMetrics(0), user32.GetSystemMetrics(1)]
-        return float(("{:.3f}".format(w/w_orig)))
+        scaleFactor = ctypes.windll.shcore.GetScaleFactorForDevice(0) / 100
+        return float(scaleFactor)
 
     def find_and_verify_loot(gamename):
         # This will be a lightweight check for any positive loot ident
