@@ -142,6 +142,91 @@ class BotUtils:
             y_only.append(y)
         return sorted(range(len(y_only)), key=y_only.__getitem__)
 
+    # Angle is left->right travel of room angle, north being 0deg
+    def move_diagonal(gamename, x, y, angle=90, speed=20, rel=False):
+        # If not a direct relative move command
+        if not rel:
+            if not BotUtils.detect_bigmap_open(gamename):
+                BotUtils.try_toggle_map()
+            player_pos = BotUtils.grab_player_pos(gamename)
+            # print("Got here #1")
+            start_time = time.time()
+            while not player_pos:
+                time.sleep(0.05)
+                if not BotUtils.detect_bigmap_open(gamename):
+                    BotUtils.try_toggle_map()
+                time.sleep(0.05)
+                player_pos = BotUtils.grab_player_pos(gamename)
+                if time.time() - start_time > 5:
+                    print("Error with finding player")
+                    os._exit(1)
+            BotUtils.close_map_and_menu(gamename)
+            relx = player_pos[0] - int(x)
+            rely = int(y) - player_pos[1]
+            # print("relx:{}, rely:{}".format(relx, rely))
+            # print("Got here #2")
+            while abs(relx) > 100 or abs(rely > 100):
+                CustomInput.press_key(CustomInput.key_map["right"], "right")
+                CustomInput.release_key(CustomInput.key_map["right"], "right")
+                time.sleep(0.02)
+                player_pos = BotUtils.grab_player_pos(gamename)
+                relx = player_pos[0] - int(x)
+                rely = int(y) - player_pos[1]
+        # Otherwise treat x,y as direct commands
+        else:
+            relx = x
+            rely = y
+        mult = 0.707
+        start = time.time()
+        if relx > 0:
+            keyx = "left"
+            CustomInput.press_key(CustomInput.key_map["left"], "left")
+            timeleftx = float("{:.4f}".format(abs(relx/(speed*mult))))
+        elif relx < 0:
+            keyx = "right"
+            CustomInput.press_key(CustomInput.key_map["right"], "right")
+            timeleftx = float("{:.4f}".format(abs(relx/(speed*mult))))
+        else:
+            timeleftx = 0
+            mult = 1
+        if rely > 0:
+            keyy = "down"
+            CustomInput.press_key(CustomInput.key_map["down"], "down")
+            timelefty = float("{:.4f}".format(abs(rely/(speed*mult))))
+        elif rely < 0:
+            keyy = "up"
+            CustomInput.press_key(CustomInput.key_map["up"], "up")
+            timelefty = float("{:.4f}".format(abs(rely/(speed*mult))))
+        else:
+            timelefty = 0
+            if relx != 0:
+                timeleftx = float("{:.4f}".format(abs(relx/speed)))
+        first_sleep = min([timeleftx, timelefty])
+        second_sleep = max([timeleftx, timelefty])
+        first_key = [keyx, keyy][[timeleftx, timelefty].index(first_sleep)]
+        second_key = [keyx, keyy][[timeleftx, timelefty].index(second_sleep)]
+        print("{}".format(time.time()-start))
+        if first_sleep < 0.009:
+            if second_sleep < 0.009:
+                pass
+            else:
+                time.sleep(second_sleep-0.009)
+                CustomInput.release_key(
+                    CustomInput.key_map[second_key], second_key)
+        elif timelefty == timeleftx:
+            time.sleep(first_sleep-0.009)
+            CustomInput.release_key(CustomInput.key_map[first_key], first_key)
+            CustomInput.release_key(
+                CustomInput.key_map[second_key], second_key)
+        else:
+            time.sleep(first_sleep - 0.009)
+            print("{}".format(time.time()-start))
+            CustomInput.release_key(CustomInput.key_map[first_key], first_key)
+            time.sleep((second_sleep-first_sleep-0.009)*mult)
+            print("{}".format(time.time()-start))
+            CustomInput.release_key(
+                CustomInput.key_map[second_key], second_key)
+
     def move_towards(value, dir):
         if dir == "x":
             if value > 0:
@@ -1240,8 +1325,10 @@ class SellRepair():
 
 
 if __name__ == "__main__":
+    time.sleep(2)
     with open("gamename.txt") as f:
         gamename = f.readline()
-    start = time.time()
-    BotUtils.detect_xprompt(gamename)
-    print("Time taken: {}s".format(time.time()-start))
+    # start = time.time()
+    # BotUtils.detect_xprompt(gamename)
+    # print("Time taken: {}s".format(time.time()-start))
+    BotUtils.move_diagonal(gamename, 10, 12, speed=20, rel=True)
