@@ -7,9 +7,12 @@ from pynput import mouse, keyboard
 class KeyCodeChecker():
     def __init__(self) -> None:
         self.listener = None
+        self.start_time = 0
+        self.unreleased_keys = []
 
     def start(self):
         self.start_keypress_listener()
+        self.start_time = time.time()
         while True:
             time.sleep(0.5)
 
@@ -20,12 +23,15 @@ class KeyCodeChecker():
             self.listener.start()
 
     def on_press(self, key):
-        print(key)
+        if key not in self.unreleased_keys:
+            print("key:{}, time:{}".format(key, time.time()-self.start_time))
         if key == keyboard.Key.f11:
             os._exit(1)
+        self.unreleased_keys.append(key)
 
     def on_release(self, key):
-        pass
+        self.unreleased_keys.remove(key)
+        print("key:{}, time:{}".format(key, time.time()-self.start_time))
 
 
 if __name__ == "__main__":
