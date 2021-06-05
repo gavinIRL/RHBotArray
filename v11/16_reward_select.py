@@ -28,6 +28,18 @@ def detect_reward_choice(gamename):
     return False
 
 
+def detect_move_reward_screen(gamename):
+    wincap = WindowCapture(gamename, [503, 90, 535, 92])
+    image = wincap.get_screenshot()
+    a, b, c = [int(i) for i in image[0][0]]
+    d, e, f = [int(i) for i in image[0][-1]]
+    if a + d > 400:
+        if b + e > 500:
+            if c + f < 105:
+                return True
+    return False
+
+
 time.sleep(1)
 with open("gamename.txt") as f:
     gamename = f.readline()
