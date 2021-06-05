@@ -114,6 +114,11 @@ def detect_one_card(gamename):
         if b == 139:
             if c == 139:
                 return True
+    # Gold
+    if a == 38:
+        if b == 129:
+            if c == 160:
+                return True
     return False
 
 
