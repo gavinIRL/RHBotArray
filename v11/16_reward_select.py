@@ -33,7 +33,7 @@ def detect_reward_choice(gamename):
 def detect_move_reward_screen(gamename):
     wincap = WindowCapture(gamename, [581, 270, 593, 272])
     image = wincap.get_screenshot()
-    cv2.imwrite("testytest.jpg", image)
+    # cv2.imwrite("testytest.jpg", image)
     a, b, c = [int(i) for i in image[0][0]]
     d, e, f = [int(i) for i in image[0][-1]]
     if a + d > 360 and a + d < 400:
@@ -50,7 +50,7 @@ def detect_endlevel_chest(gamename):
     image = wincap.get_screenshot()
     a, b, c = [int(i) for i in image[0][0]]
     d, e, f = [int(i) for i in image[0][-1]]
-    cv2.imwrite("testytest2.jpg", image)
+    # cv2.imwrite("testytest2.jpg", image)
     if a + d < 50:
         if b + e > 480:
             if c + f > 290 and c+f < 320:
@@ -63,10 +63,24 @@ def detect_endlevel_bonus_area(gamename):
     image = wincap.get_screenshot()
     a, b, c = [int(i) for i in image[0][0]]
     d, e, f = [int(i) for i in image[0][-1]]
-    cv2.imwrite("testycont.jpg", image)
+    # cv2.imwrite("testycont.jpg", image)
     if a + d > 400:
         if b + e > 400:
             if c + f > 400:
+                return True
+    return False
+
+
+def detect_in_dungeon(gamename):
+    wincap = WindowCapture(gamename, [1090, 331, 1092, 353])
+    image = wincap.get_screenshot()
+    a, b, c = [int(i) for i in image[0][0]]
+    d, e, f = [int(i) for i in image[-1][0]]
+    # print("abc:{},{},{}, def:{},{},{}".format(a, b, c, d, e, f))
+    # cv2.imwrite("testycont.jpg", image)
+    if d < 20:
+        if a + b + e > 400 and a+b+e < 500:
+            if c + f > 480:
                 return True
     return False
 
@@ -78,3 +92,4 @@ with open("gamename.txt") as f:
 # print(detect_move_reward_screen(gamename))
 # print(detect_endlevel_chest(gamename))
 # print(detect_endlevel_bonus_area(gamename))
+print(detect_in_dungeon(gamename))
