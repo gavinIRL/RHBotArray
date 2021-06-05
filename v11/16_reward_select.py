@@ -9,12 +9,11 @@ os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 def choose_reward(gamename):
     wincap = WindowCapture(gamename)
-    posx = wincap.window_rect[0]
-    posx += (460+(180*random.randint(0, 2)))
-    posy = wincap.window_rect[1]
-    posy += (200+(132*random.randint(0, 3)))
-    pydirectinput.moveTo(int(posx), int(posy))
-    # pydirectinput.click(int(posx), int(posy))
+    posx = wincap.window_rect[0] + (460+(180*random.randint(0, 2)))
+    posy = wincap.window_rect[1] + (200+(132*random.randint(0, 3)))
+    pydirectinput.click(int(posx), int(posy))
+    # Now accept the reward
+    pydirectinput.click(wincap.window_rect[0]+750, wincap.window_rect[0]+720)
 
 
 def detect_reward_choice(gamename):
