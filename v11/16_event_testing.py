@@ -208,6 +208,18 @@ def grab_res_scroll_left(gamename):
     return int(result)
 
 
+def read_mission_name(gamename):
+    wincap = WindowCapture(gamename, [749, 152, 978, 170])
+    image = wincap.get_screenshot()
+    # filter = HsvFilter(0, 0, 0, 179, 18, 255, 0, 0, 0, 0)
+    # image = BotUtils.apply_hsv_filter(image, filter)
+    rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+    tess_config = '--psm 7 --oem 3 -c tessedit_char_whitelist=ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
+    result = pytesseract.image_to_string(
+        rgb, lang='eng', config=tess_config)[:-2]
+    return result
+
+
 # time.sleep(1)
 with open("gamename.txt") as f:
     gamename = f.readline()
@@ -223,6 +235,7 @@ start_time = time.time()
 # print(detect_one_card(gamename))
 # print(detect_yes_no(gamename))
 # click_yes(gamename)
-print(grab_res_scroll_left(gamename))
+# print(grab_res_scroll_left(gamename))
+print(read_mission_name(gamename))
 
 print("Time taken: {}s".format(time.time()-start_time))
