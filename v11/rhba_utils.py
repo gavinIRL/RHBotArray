@@ -207,7 +207,7 @@ class BotUtils:
             time.sleep(time_reqd-0.003)
             CustomInput.release_key(CustomInput.key_map[key], key)
 
-    def resolve_dir_with_looting(value, dir, speed):
+    def resolve_dir_with_looting(value, dir, speed, gamename):
         if dir == "x":
             if value > 0:
                 key = "left"
@@ -219,10 +219,27 @@ class BotUtils:
             else:
                 key = "up"
         time_reqd = abs(value/speed)
+        start_time = time.time()
         if time_reqd > 0.003:
             CustomInput.press_key(CustomInput.key_map[key], key)
-            time.sleep(time_reqd-0.003)
-            CustomInput.release_key(CustomInput.key_map[key], key)
+            # Maximum lootcheck time is about 0.3secs worst case
+            # Nominal is about 0.2s
+            if time_reqd < 2:
+                time.sleep(time_reqd-0.003)
+                CustomInput.release_key(CustomInput.key_map[key], key)
+            else:
+                BotUtils.close_map(gamename)
+                loops = math.floor(time_reqd/2)
+                for i in range(loops):
+                    time.sleep(1.65)
+                    result = Looting.check_for_loot(gamename)
+                    if result:
+                        CustomInput.release_key(CustomInput.key_map[key], key)
+                        return True
+                time_left = start_time+time_reqd-time.time()
+                time.sleep(time_left)
+                CustomInput.release_key(CustomInput.key_map[key], key)
+        return Looting.check_for_loot(gamename)
 
     def resolve_single_direction(speed, value, dir, PAG=False):
         if not PAG:
@@ -526,7 +543,9 @@ class BotUtils:
         if BotUtils.detect_bigmap_open(gamename):
             BotUtils.close_map(gamename, scaling)
 
-    def close_map(gamename, scaling):
+    def close_map(gamename, scaling=False):
+        if not scaling:
+            scaling = BotUtils.get_monitor_scaling()
         game_wincap = WindowCapture(gamename)
         pydirectinput.click(
             int(scaling*859+game_wincap.window_rect[0]), int(scaling*260+game_wincap.window_rect[1]))
