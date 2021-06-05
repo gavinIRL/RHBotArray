@@ -155,7 +155,7 @@ class BotUtils:
                 key = "up"
         CustomInput.press_key(CustomInput.key_map[key], key)
 
-    def move_to(gamename, x, y, angle=90, yfirst=True, speed=22.5):
+    def move_to(gamename, x, y, angle=90, yfirst=True, speed=22.5, loot=False, plyr=False):
         if not BotUtils.detect_bigmap_open(gamename):
             BotUtils.try_toggle_map()
         player_pos = BotUtils.grab_player_pos(gamename)
@@ -184,11 +184,49 @@ class BotUtils:
             rely = int(y) - player_pos[1]
         # print("Got here #3")
         if not yfirst:
-            BotUtils.resolve_dir_v2(relx, "x", speed)
-            BotUtils.resolve_dir_v2(rely, "y", speed)
+            if not loot:
+                BotUtils.resolve_dir_v2(relx, "x", speed)
+                BotUtils.resolve_dir_v2(rely, "y", speed)
+            else:
+                lootfound = BotUtils.resolve_dir_with_looting(
+                    relx, "x", speed, gamename)
+                if lootfound:
+                    Looting.grab_all_visible_loot(gamename, plyr)
+                    # Continue to destination without further looting (prevent stuck)
+                    BotUtils.move_to(gamename, x, y, angle, yfirst, speed)
+                    # When at destination check for loot again
+                    Looting.grab_all_visible_loot(gamename, plyr)
+                else:
+                    lootfound = BotUtils.resolve_dir_with_looting(
+                        rely, "y", speed, gamename)
+                    if lootfound:
+                        Looting.grab_all_visible_loot(gamename, plyr)
+                        # Continue to destination without further looting (prevent stuck)
+                        BotUtils.move_to(gamename, x, y, angle, yfirst, speed)
+                        # When at destination check for loot again
+                        Looting.grab_all_visible_loot(gamename, plyr)
         else:
-            BotUtils.resolve_dir_v2(rely, "y", speed)
-            BotUtils.resolve_dir_v2(relx, "x", speed)
+            if not loot:
+                BotUtils.resolve_dir_v2(rely, "y", speed)
+                BotUtils.resolve_dir_v2(relx, "x", speed)
+            else:
+                lootfound = BotUtils.resolve_dir_with_looting(
+                    rely, "y", speed, gamename)
+                if lootfound:
+                    Looting.grab_all_visible_loot(gamename, plyr)
+                    # Continue to destination without further looting (prevent stuck)
+                    BotUtils.move_to(gamename, x, y, angle, yfirst, speed)
+                    # When at destination check for loot again
+                    Looting.grab_all_visible_loot(gamename, plyr)
+                else:
+                    lootfound = BotUtils.resolve_dir_with_looting(
+                        relx, "x", speed, gamename)
+                    if lootfound:
+                        Looting.grab_all_visible_loot(gamename, plyr)
+                        # Continue to destination without further looting (prevent stuck)
+                        BotUtils.move_to(gamename, x, y, angle, yfirst, speed)
+                        # When at destination check for loot again
+                        Looting.grab_all_visible_loot(gamename, plyr)
 
     def resolve_dir_v2(value, dir, speed):
         if dir == "x":
