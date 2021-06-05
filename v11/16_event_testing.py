@@ -4,6 +4,7 @@ import time
 import os
 import cv2
 import random
+import pytesseract
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 
@@ -122,6 +123,19 @@ def detect_one_card(gamename):
     return False
 
 
+def detect_yes_no(gamename):
+    wincap = WindowCapture(gamename, [508, 426, 549, 441])
+    image = wincap.get_screenshot()
+    cv2.imwrite("testycont.jpg", image)
+    rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+    tess_config = '--psm 7 --oem 3 -c tessedit_char_whitelist=Yes'
+    result = pytesseract.image_to_string(
+        rgb, lang='eng', config=tess_config)[:-2]
+    if result == "Yes":
+        return True
+    return False
+
+
 # time.sleep(1)
 with open("gamename.txt") as f:
     gamename = f.readline()
@@ -134,6 +148,7 @@ start_time = time.time()
 # print(detect_endlevel_bonus_area(gamename))
 # print(detect_in_dungeon(gamename))
 # print(detect_go(gamename))
-print(detect_one_card(gamename))
+# print(detect_one_card(gamename))
+print(detect_yes_no(gamename))
 
 print("Time taken: {}s".format(time.time()-start_time))
