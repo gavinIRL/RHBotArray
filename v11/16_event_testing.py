@@ -177,6 +177,25 @@ def click_map_gate1(gamename, mapnum):
     pydirectinput.click(wincap.window_rect[0]+x, wincap.window_rect[1]+y)
 
 
+def choose_difficulty_and_enter(gamename, diff):
+    wincap = WindowCapture(gamename)
+    num_clicks = 0
+    if diff == "N":
+        num_clicks = 0
+    elif diff == "H":
+        num_clicks = 1
+    elif diff == "VH":
+        num_clicks == 2
+    elif diff == "BM":
+        num_clicks == 3
+    for i in range(num_clicks):
+        pydirectinput.click(
+            wincap.window_rect[0]+618, wincap.window_rect[1]+333)
+        time.sleep(0.3)
+    # Then click on enter dungeon
+    pydirectinput.click(wincap.window_rect[0]+1033, wincap.window_rect[1]+736)
+
+
 # time.sleep(1)
 with open("gamename.txt") as f:
     gamename = f.readline()
