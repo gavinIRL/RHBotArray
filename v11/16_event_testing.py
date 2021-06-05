@@ -14,7 +14,7 @@ def choose_reward(gamename):
     posy = wincap.window_rect[1] + (200+(132*random.randint(0, 3)))
     pydirectinput.click(int(posx), int(posy))
     # Now accept the reward
-    pydirectinput.click(wincap.window_rect[0]+750, wincap.window_rect[0]+720)
+    pydirectinput.click(wincap.window_rect[0]+750, wincap.window_rect[1]+720)
 
 
 def detect_reward_choice(gamename):
@@ -124,7 +124,7 @@ def detect_one_card(gamename):
 
 
 def detect_yes_no(gamename):
-    wincap = WindowCapture(gamename, [508, 426, 549, 441])
+    wincap = WindowCapture(gamename, [516, 426, 541, 441])
     image = wincap.get_screenshot()
     cv2.imwrite("testycont.jpg", image)
     rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
@@ -134,6 +134,11 @@ def detect_yes_no(gamename):
     if result == "Yes":
         return True
     return False
+
+
+def click_yes(gamename):
+    wincap = WindowCapture(gamename)
+    pydirectinput.click(wincap.window_rect[0]+528, wincap.window_rect[1]+433)
 
 
 # time.sleep(1)
@@ -149,6 +154,7 @@ start_time = time.time()
 # print(detect_in_dungeon(gamename))
 # print(detect_go(gamename))
 # print(detect_one_card(gamename))
-print(detect_yes_no(gamename))
+# print(detect_yes_no(gamename))
+click_yes(gamename)
 
 print("Time taken: {}s".format(time.time()-start_time))
