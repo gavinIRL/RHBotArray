@@ -72,7 +72,7 @@ class Map10_MS30():
         if sleep_time > 0:
             time.sleep(sleep_time)
         room = self.rooms[1]
-        self.move_to(int(room[1]), int(room[2]), yfirst=True)
+        self.move_to(int(room[1]), int(room[2]), yfirst=False)
         time.sleep(0.6)
         self.roomclear_skill()
         time.sleep(0.6)
@@ -314,7 +314,8 @@ class Map10_MS30():
         pass
 
     def x_attack_twice(self):
-        pass
+        pydirectinput.press("x")
+        pydirectinput.press("x")
 
     def sect_clear_detected(self):
         wincap = WindowCapture(self.gamename, custom_rect=[
