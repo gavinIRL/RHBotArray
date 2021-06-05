@@ -161,6 +161,22 @@ def click_back_to_town(gamename):
     pydirectinput.click(wincap.window_rect[0]+1150, wincap.window_rect[1]+328)
 
 
+def click_map_gate1(gamename, mapnum):
+    wincap = WindowCapture(gamename)
+    map_to_clickpoints = {
+        5: (728, 521),
+        6: (640, 631),
+        7: (605, 455),
+        8: (542, 350),
+        9: (293, 297),
+        10: (777, 406),
+        11: (140, 370),
+        12: (500, 246)
+    }
+    x, y = map_to_clickpoints[mapnum]
+    pydirectinput.click(wincap.window_rect[0]+x, wincap.window_rect[1]+y)
+
+
 # time.sleep(1)
 with open("gamename.txt") as f:
     gamename = f.readline()
