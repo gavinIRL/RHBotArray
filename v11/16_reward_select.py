@@ -59,14 +59,14 @@ def detect_endlevel_chest(gamename):
 
 
 def detect_endlevel_bonus_area(gamename):
-    wincap = WindowCapture(gamename, [503, 487, 513, 589])
+    wincap = WindowCapture(gamename, [503, 487, 514, 589])
     image = wincap.get_screenshot()
     a, b, c = [int(i) for i in image[0][0]]
     d, e, f = [int(i) for i in image[0][-1]]
     cv2.imwrite("testycont.jpg", image)
-    if a + d > 400 and a + d < 440:
-        if b + e > 400 and b + e < 440:
-            if c + f > 400 and c+f < 440:
+    if a + d > 400:
+        if b + e > 400:
+            if c + f > 400:
                 return True
     return False
 
@@ -76,5 +76,5 @@ with open("gamename.txt") as f:
     gamename = f.readline()
 # detect_reward_choice(gamename)
 # print(detect_move_reward_screen(gamename))
-print(detect_endlevel_chest(gamename))
-print(detect_endlevel_bonus_area(gamename))
+# print(detect_endlevel_chest(gamename))
+# print(detect_endlevel_bonus_area(gamename))
