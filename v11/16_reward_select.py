@@ -46,7 +46,7 @@ def detect_move_reward_screen(gamename):
 
 
 def detect_endlevel_chest(gamename):
-    wincap = WindowCapture(gamename, [454, 250, 526, 252])
+    wincap = WindowCapture(gamename, [454, 250, 525, 252])
     image = wincap.get_screenshot()
     a, b, c = [int(i) for i in image[0][0]]
     d, e, f = [int(i) for i in image[0][-1]]
@@ -59,7 +59,7 @@ def detect_endlevel_chest(gamename):
 
 
 def detect_endlevel_bonus_area(gamename):
-    wincap = WindowCapture(gamename, [502, 487, 512, 489])
+    wincap = WindowCapture(gamename, [503, 487, 513, 589])
     image = wincap.get_screenshot()
     a, b, c = [int(i) for i in image[0][0]]
     d, e, f = [int(i) for i in image[0][-1]]
@@ -75,6 +75,6 @@ def detect_endlevel_bonus_area(gamename):
 with open("gamename.txt") as f:
     gamename = f.readline()
 # detect_reward_choice(gamename)
-print(detect_move_reward_screen(gamename))
+# print(detect_move_reward_screen(gamename))
 print(detect_endlevel_chest(gamename))
 print(detect_endlevel_bonus_area(gamename))
