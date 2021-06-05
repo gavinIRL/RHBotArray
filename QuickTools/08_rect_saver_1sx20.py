@@ -27,7 +27,8 @@ class ScreenshotGrabber5Sec():
             print("Got here")
             with open("gamename.txt") as f:
                 gamename = f.readline()
-            wincap = WindowCapture(gamename, custom_rect=[464, 600, 855, 680])
+            # , custom_rect=[415, 533, 888, 700])
+            wincap = WindowCapture(gamename)
             counter = 0
             while counter < 20:
                 counter += 1
