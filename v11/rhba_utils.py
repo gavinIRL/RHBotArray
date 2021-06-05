@@ -777,7 +777,7 @@ class Looting:
         if not confirmed:
             return False
 
-    def try_find_and_grab_loot(gamename, player_name, loot_nearest=False, loot_lowest=True, printout=False):
+    def try_find_and_grab_loot(gamename, player_name, loot_lowest=True, printout=False):
         # First need to close anything that might be in the way
         BotUtils.close_map_and_menu(gamename)
         # Then grab loot locations
@@ -795,7 +795,7 @@ class Looting:
                 return "noplayer"
 
         # if want to always loot the nearest first despite the cpu hit
-        if loot_nearest:
+        if not loot_lowest:
             # Then convert lootlist to rel_pos list
             relatives = BotUtils.convert_list_to_rel(
                 loot_list, playerx, playery, 275)
@@ -806,7 +806,7 @@ class Looting:
         # Otherwise if want to loot from bottom of screen to top
         # Typically better as see all loot then in y direction
         # but potentially miss loot in x direction
-        elif loot_lowest:
+        else:
             # Grab the indexes in ascending order of distance from
             # bottom of the screen
             order = BotUtils.grab_order_lowest_y(loot_list)
