@@ -85,13 +85,28 @@ def detect_in_dungeon(gamename):
     return False
 
 
+def detect_go(gamename):
+    wincap = WindowCapture(gamename, [623, 247, 628, 249])
+    image = wincap.get_screenshot()
+    a, b, c = [int(i) for i in image[0][0]]
+    if a < 30:
+        if b > 240:
+            if c > 140:
+                return True
+    return False
+
+
 # time.sleep(1)
 with open("gamename.txt") as f:
     gamename = f.readline()
 start_time = time.time()
+
+
 # detect_reward_choice(gamename)
 # print(detect_move_reward_screen(gamename))
 # print(detect_endlevel_chest(gamename))
 # print(detect_endlevel_bonus_area(gamename))
-print(detect_in_dungeon(gamename))
+# print(detect_in_dungeon(gamename))
+print(detect_go(gamename))
+
 print("Time taken: {}s".format(time.time()-start_time))
