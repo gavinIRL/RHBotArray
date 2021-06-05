@@ -207,6 +207,23 @@ class BotUtils:
             time.sleep(time_reqd-0.003)
             CustomInput.release_key(CustomInput.key_map[key], key)
 
+    def resolve_dir_with_looting(value, dir, speed):
+        if dir == "x":
+            if value > 0:
+                key = "left"
+            else:
+                key = "right"
+        elif dir == "y":
+            if value > 0:
+                key = "down"
+            else:
+                key = "up"
+        time_reqd = abs(value/speed)
+        if time_reqd > 0.003:
+            CustomInput.press_key(CustomInput.key_map[key], key)
+            time.sleep(time_reqd-0.003)
+            CustomInput.release_key(CustomInput.key_map[key], key)
+
     def resolve_single_direction(speed, value, dir, PAG=False):
         if not PAG:
             sleep_time = 0.003
@@ -709,10 +726,9 @@ class Looting:
 
     def grab_farloot_locations(gamename=False, rect=False, return_image=False):
         if gamename:
-            if rect:
-                wincap = WindowCapture(gamename, rect)
-            else:
-                wincap = WindowCapture(gamename, [100, 135, 1223, 688])
+            if not rect:
+                rect = [100, 135, 1223, 688]
+            wincap = WindowCapture(gamename, rect)
             original_image = wincap.get_screenshot()
         else:
             original_image = cv2.imread(os.path.dirname(
