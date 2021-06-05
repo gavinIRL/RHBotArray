@@ -863,23 +863,27 @@ class Looting:
             CustomInput.release_key(CustomInput.key_map[key], key)
         BotUtils.move_towards(rely, "y")
         start_time = time.time()
+        if rely < 0:
+            expected_time = abs(rely/7.5)
+        else:
+            expected_time = abs(rely/5.5)
         while not BotUtils.detect_xprompt(gamename):
             time.sleep(0.005)
             # After moving in opposite direction
             if time.time() - start_time > 10:
                 # If have moved opposite with no result for equal amount
-                if time.time() - start_time > 12:
+                if time.time() - start_time > 10 + 2*(1 + expected_time):
                     for key in ["up", "down"]:
                         CustomInput.release_key(CustomInput.key_map[key], key)
                     # Return falsepos so that it will ignore this detection
                     return "falsepos"
             # If no result for 3 seconds
-            elif time.time() - start_time > 2:
+            elif time.time() - start_time > 1 + expected_time:
                 # Try moving in the opposite direction
                 for key in ["up", "down"]:
                     CustomInput.release_key(CustomInput.key_map[key], key)
                 BotUtils.move_towards(-1*rely, "y")
-                start_time -= 8
+                start_time -= 8.5
         for key in ["up", "down"]:
             CustomInput.release_key(CustomInput.key_map[key], key)
         pydirectinput.press("x")
