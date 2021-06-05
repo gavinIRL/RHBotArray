@@ -275,92 +275,6 @@ class BotUtils:
             points.append((center_x, center_y))
         return points
 
-    def grab_farloot_locations(gamename=False):
-        if gamename:
-            wincap = WindowCapture(gamename, [100, 135, 1223, 688])
-            original_image = wincap.get_screenshot()
-        else:
-            original_image = cv2.imread(os.path.dirname(
-                os.path.abspath(__file__)) + "/testimages/lootscene.jpg")
-        filter = HsvFilter(16, 140, 0, 26, 255, 49, 0, 0, 0, 0)
-        output_image = BotUtils.filter_blackwhite_invert(
-            filter, original_image, True, 0, 180)
-        output_image = cv2.blur(output_image, (3, 2))
-        _, thresh = cv2.threshold(output_image, 127, 255, 0)
-        contours, _ = cv2.findContours(
-            thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-        contours = sorted(contours, key=cv2.contourArea, reverse=True)
-        if len(contours) < 2:
-            return False
-        contours.pop(0)
-        rectangles = []
-        for contour in contours:
-            (x, y), _ = cv2.minEnclosingCircle(contour)
-            rectangles.append([x-50, y, 100, 5])
-            # rectangles.append([x-50, y, 100, 5])
-        rectangles, _ = cv2.groupRectangles(
-            rectangles, groupThreshold=1, eps=0.9)
-        if len(rectangles) < 1:
-            return False
-        points = []
-        for (x, y, w, h) in rectangles:
-            center_x = x + int(w/2)
-            center_y = y + int(h/2)
-            points.append((center_x, center_y))
-        return points
-
-    def grab_farloot_locationsv2(gamename=False, rect=False, return_image=False):
-        if gamename:
-            if rect:
-                wincap = WindowCapture(gamename, rect)
-            else:
-                wincap = WindowCapture(gamename, [100, 135, 1223, 688])
-            original_image = wincap.get_screenshot()
-        else:
-            original_image = cv2.imread(os.path.dirname(
-                os.path.abspath(__file__)) + "/testimages/lootscene.jpg")
-        filter = HsvFilter(15, 180, 0, 20, 255, 63, 0, 0, 0, 0)
-        output_image = BotUtils.filter_blackwhite_invert(
-            filter, original_image, True, 0, 180)
-
-        output_image = cv2.blur(output_image, (8, 1))
-        output_image = cv2.blur(output_image, (8, 1))
-        output_image = cv2.blur(output_image, (8, 1))
-
-        cv2.imwrite("testytest.jpg", output_image)
-        _, thresh = cv2.threshold(output_image, 127, 255, 0)
-        contours, _ = cv2.findContours(
-            thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-        contours = sorted(contours, key=cv2.contourArea, reverse=True)
-        if len(contours) < 2:
-            return False
-        contours.pop(0)
-        rectangles = []
-        for contour in contours:
-            (x, y), _ = cv2.minEnclosingCircle(contour)
-            rectangles.append([x-50, y, 100, 5])
-            rectangles.append([x-50, y, 100, 5])
-        rectangles, _ = cv2.groupRectangles(
-            rectangles, groupThreshold=1, eps=0.9)
-        if len(rectangles) < 1:
-            return False
-        points = []
-        for (x, y, w, h) in rectangles:
-            # Account for the rect
-            if rect:
-                # Account for the rect
-                x += rect[0]
-                y += rect[1]
-            else:
-                x += 100
-                y += 135
-            center_x = x + int(w/2)
-            center_y = y + int(h/2)
-            points.append((center_x, center_y))
-        if return_image:
-            return points, original_image, rect[0], rect[1]
-        return points
-
     def grab_character_location(player_name, gamename=False):
         player_chars = "".join(set(player_name))
         if gamename:
@@ -608,11 +522,63 @@ class BotUtils:
         scaleFactor = ctypes.windll.shcore.GetScaleFactorForDevice(0) / 100
         return float(scaleFactor)
 
-    def find_and_verify_loot(gamename):
+
+class Looting:
+    def loot_current_room(gamename, player_name, search_points=False):
+        # Start by picking up loot already in range
+        BotUtils.close_map_and_menu(gamename)
+        Looting.grab_nearby_loot(gamename)
+        # Then try grabbing all visible far loot
+        Looting.grab_all_visible_loot(gamename, player_name)
+        # Then once that is exhausted cycle through the searchpoints
+        if search_points:
+            for point in search_points:
+                x, y, first_dir = point
+                BotUtils.move_to(gamename, x, y, yfirst=first_dir == "y")
+                Looting.grab_nearby_loot(gamename)
+                BotUtils.close_map_and_menu(gamename)
+                Looting.grab_all_visible_loot(gamename, player_name)
+
+    def grab_nearby_loot(gamename):
+        count = 0
+        while BotUtils.detect_xprompt(gamename):
+            if count > 12:
+                break
+            pydirectinput.press("x")
+            count += 1
+            time.sleep(0.09)
+
+    def grab_all_visible_loot(gamename, player_name):
+        start_time = time.time()
+        while True:
+            if time.time() - start_time > 20:
+                break
+            outcome = Looting.try_find_and_grab_loot(
+                gamename, player_name)
+            if outcome == "noloot":
+                break
+            elif outcome == "noplayer":
+                pydirectinput.press("right")
+                outcome = Looting.try_find_and_grab_loot(
+                    gamename, player_name)
+                if outcome == "noplayer":
+                    break
+            elif outcome == "falsepos":
+                break
+            elif outcome == True:
+                count = 0
+                while BotUtils.detect_xprompt(gamename):
+                    if count > 12:
+                        break
+                    pydirectinput.press("x")
+                    count += 1
+                    time.sleep(0.09)
+
+    def check_for_loot(gamename):
         # This will be a lightweight check for any positive loot ident
         # Meant to be used when moving and normal looting has ceased
         # i.e. opportunistic looting
-        loot_list, image, xoff, yoff = BotUtils.grab_farloot_locationsv2(
+        loot_list, image, xoff, yoff = Looting.grab_farloot_locations(
             gamename, return_image=True)
         if not loot_list:
             return False
@@ -637,7 +603,7 @@ class BotUtils:
         # First need to close anything that might be in the way
         BotUtils.close_map_and_menu(gamename)
         # Then grab loot locations
-        loot_list = BotUtils.grab_farloot_locationsv2(gamename)
+        loot_list = Looting.grab_farloot_locations(gamename)
         if not loot_list:
             return "noloot"
 
@@ -700,7 +666,7 @@ class BotUtils:
             if BotUtils.detect_xprompt(gamename):
                 break
             try:
-                newx, newy = BotUtils.grab_farloot_locationsv2(gamename, rect)[
+                newx, newy = Looting.grab_farloot_locations(gamename, rect)[
                     0]
                 time_taken = time.time() - loop_time
                 movementx = confirmed[0] - newx
@@ -740,6 +706,58 @@ class BotUtils:
             CustomInput.release_key(CustomInput.key_map[key], key)
         pydirectinput.press("x")
         return True
+
+    def grab_farloot_locations(gamename=False, rect=False, return_image=False):
+        if gamename:
+            if rect:
+                wincap = WindowCapture(gamename, rect)
+            else:
+                wincap = WindowCapture(gamename, [100, 135, 1223, 688])
+            original_image = wincap.get_screenshot()
+        else:
+            original_image = cv2.imread(os.path.dirname(
+                os.path.abspath(__file__)) + "/testimages/lootscene.jpg")
+        filter = HsvFilter(15, 180, 0, 20, 255, 63, 0, 0, 0, 0)
+        output_image = BotUtils.filter_blackwhite_invert(
+            filter, original_image, True, 0, 180)
+
+        output_image = cv2.blur(output_image, (8, 1))
+        output_image = cv2.blur(output_image, (8, 1))
+        output_image = cv2.blur(output_image, (8, 1))
+
+        cv2.imwrite("testytest.jpg", output_image)
+        _, thresh = cv2.threshold(output_image, 127, 255, 0)
+        contours, _ = cv2.findContours(
+            thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+        contours = sorted(contours, key=cv2.contourArea, reverse=True)
+        if len(contours) < 2:
+            return False
+        contours.pop(0)
+        rectangles = []
+        for contour in contours:
+            (x, y), _ = cv2.minEnclosingCircle(contour)
+            rectangles.append([x-50, y, 100, 5])
+            rectangles.append([x-50, y, 100, 5])
+        rectangles, _ = cv2.groupRectangles(
+            rectangles, groupThreshold=1, eps=0.9)
+        if len(rectangles) < 1:
+            return False
+        points = []
+        for (x, y, w, h) in rectangles:
+            # Account for the rect
+            if rect:
+                # Account for the rect
+                x += rect[0]
+                y += rect[1]
+            else:
+                x += 100
+                y += 135
+            center_x = x + int(w/2)
+            center_y = y + int(h/2)
+            points.append((center_x, center_y))
+        if return_image:
+            return points, original_image, rect[0], rect[1]
+        return points
 
 
 class Vision:
