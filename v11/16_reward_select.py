@@ -96,6 +96,27 @@ def detect_go(gamename):
     return False
 
 
+def detect_one_card(gamename):
+    # Cards only show up once one has been picked
+    # Therefore need to check against bronze, gold, silver
+    wincap = WindowCapture(gamename, [833, 44, 835, 46])
+    image = wincap.get_screenshot()
+    a, b, c = [int(i) for i in image[0][0]]
+    print("abc:{},{},{}".format(a, b, c))
+    # cv2.imwrite("testycont.jpg", image)
+    # Bronze
+    if a == 27:
+        if b == 48:
+            if c == 87:
+                return True
+    # Silver
+    if a == 139:
+        if b == 139:
+            if c == 139:
+                return True
+    return False
+
+
 # time.sleep(1)
 with open("gamename.txt") as f:
     gamename = f.readline()
@@ -107,6 +128,7 @@ start_time = time.time()
 # print(detect_endlevel_chest(gamename))
 # print(detect_endlevel_bonus_area(gamename))
 # print(detect_in_dungeon(gamename))
-print(detect_go(gamename))
+# print(detect_go(gamename))
+print(detect_one_card(gamename))
 
 print("Time taken: {}s".format(time.time()-start_time))
