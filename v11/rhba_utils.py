@@ -918,7 +918,7 @@ class DynamicFilter:
 
 
 class SellRepair():
-    def __init__(self, rarity_cutoff=1, last_row_protect=False) -> None:
+    def __init__(self, rarity_cutoff=1, last_row_protect=True) -> None:
         # rarities are as follows:
         # nocolour=0, green=1, blue=2
         self.cutoff = rarity_cutoff
