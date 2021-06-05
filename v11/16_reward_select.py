@@ -88,8 +88,10 @@ def detect_in_dungeon(gamename):
 # time.sleep(1)
 with open("gamename.txt") as f:
     gamename = f.readline()
+start_time = time.time()
 # detect_reward_choice(gamename)
 # print(detect_move_reward_screen(gamename))
 # print(detect_endlevel_chest(gamename))
 # print(detect_endlevel_bonus_area(gamename))
 print(detect_in_dungeon(gamename))
+print("Time taken: {}s".format(time.time()-start_time))
