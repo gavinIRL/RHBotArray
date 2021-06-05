@@ -595,11 +595,12 @@ class Looting:
         # This will be a lightweight check for any positive loot ident
         # Meant to be used when moving and normal looting has ceased
         # i.e. opportunistic looting
-        loot_list, image, xoff, yoff = Looting.grab_farloot_locations(
+        data = Looting.grab_farloot_locations(
             gamename, return_image=True)
-        if not loot_list:
+        if not data:
             return False
-
+        else:
+            loot_list, image, xoff, yoff = data
         confirmed = False
         for _, coords in enumerate(loot_list):
             x, y = coords
@@ -727,8 +728,10 @@ class Looting:
     def grab_farloot_locations(gamename=False, rect=False, return_image=False):
         if gamename:
             if not rect:
-                rect = [100, 135, 1223, 688]
-            wincap = WindowCapture(gamename, rect)
+                rect1 = [100, 135, 1223, 688]
+                wincap = WindowCapture(gamename, rect1)
+            else:
+                wincap = WindowCapture(gamename, rect)
             original_image = wincap.get_screenshot()
         else:
             original_image = cv2.imread(os.path.dirname(
@@ -772,7 +775,10 @@ class Looting:
             center_y = y + int(h/2)
             points.append((center_x, center_y))
         if return_image:
-            return points, original_image, rect[0], rect[1]
+            if rect:
+                return points, original_image, rect[0], rect[1]
+            else:
+                return points, original_image, rect1[0], rect1[1]
         return points
 
 
