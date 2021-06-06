@@ -10,5 +10,5 @@
 14-WantedHoofMuchbeef
 15-WantedGutBaithook
 16-Wanted
-17-Wanted
+17-WantedSlabHunk
 18-Wanted
