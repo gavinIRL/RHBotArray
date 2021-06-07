@@ -1138,6 +1138,49 @@ class RHClick:
         pydirectinput.click(
             wincap.window_rect[0]+1033, wincap.window_rect[1]+736)
 
+    def go_to_change_character(gamename):
+        if not BotUtils.detect_menu_open(gamename):
+            pass
+        wincap = WindowCapture(gamename)
+        pydirectinput.click(
+            wincap.window_rect[0]+640, wincap.window_rect[1]+363)
+
+    def exit_game(gamename):
+        if not BotUtils.detect_menu_open(gamename):
+            pass
+        wincap = WindowCapture(gamename)
+        pydirectinput.click(
+            wincap.window_rect[0]+640, wincap.window_rect[1]+480)
+        time.sleep(0.2)
+        pydirectinput.click(
+            wincap.window_rect[0]+640, wincap.window_rect[1]+428)
+
+    def choose_character(gamename, charnum):
+        wincap = WindowCapture(gamename)
+        char_clickpoints = {
+            1: (1100, 140),
+            2: (1100, 210),
+            3: (1100, 280),
+            4: (1100, 350),
+            5: (1100, 420),
+            6: (1100, 490),
+            7: (1100, 560),
+            8: (1100, 630)
+        }
+        if charnum > 8:
+            pydirectinput.click(
+                wincap.window_rect[0]+1165, wincap.window_rect[1]+680)
+            x, y = char_clickpoints[charnum-8]
+        else:
+            pydirectinput.click(
+                wincap.window_rect[0]+1035, wincap.window_rect[1]+680)
+            x, y = char_clickpoints[charnum]
+        time.sleep(0.2)
+        pydirectinput.click(wincap.window_rect[0]+x, wincap.window_rect[1]+y)
+        time.sleep(0.2)
+        pydirectinput.click(
+            wincap.window_rect[0]+640, wincap.window_rect[1]+765)
+
 
 class Vision:
     def __init__(self, needle_img_path, method=cv2.TM_CCOEFF_NORMED):
