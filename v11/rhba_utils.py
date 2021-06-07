@@ -1058,6 +1058,33 @@ class Events:
         return False
 
 
+class RHClick:
+    def click_yes(gamename):
+        wincap = WindowCapture(gamename)
+        pydirectinput.click(
+            wincap.window_rect[0]+528, wincap.window_rect[1]+433)
+
+    def click_no(gamename):
+        wincap = WindowCapture(gamename)
+        pydirectinput.click(
+            wincap.window_rect[0]+763, wincap.window_rect[1]+433)
+
+    def click_choose_map(gamename):
+        wincap = WindowCapture(gamename)
+        pydirectinput.click(
+            wincap.window_rect[0]+1150, wincap.window_rect[1]+210)
+
+    def click_explore_again(gamename):
+        wincap = WindowCapture(gamename)
+        pydirectinput.click(
+            wincap.window_rect[0]+1150, wincap.window_rect[1]+152)
+
+    def click_back_to_town(gamename):
+        wincap = WindowCapture(gamename)
+        pydirectinput.click(
+            wincap.window_rect[0]+1150, wincap.window_rect[1]+328)
+
+
 class Vision:
     def __init__(self, needle_img_path, method=cv2.TM_CCOEFF_NORMED):
         self.needle_img = cv2.imread(needle_img_path, cv2.IMREAD_UNCHANGED)
