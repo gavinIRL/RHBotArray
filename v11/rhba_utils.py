@@ -1022,6 +1022,41 @@ class Events:
                     return True
         return False
 
+    def detect_one_card(gamename):
+        # Cards only show up once one has been picked
+        # Therefore need to check against bronze, gold, silver
+        wincap = WindowCapture(gamename, [833, 44, 835, 46])
+        image = wincap.get_screenshot()
+        a, b, c = [int(i) for i in image[0][0]]
+        # Bronze
+        if a == 27:
+            if b == 48:
+                if c == 87:
+                    return True
+        # Silver
+        if a == 139:
+            if b == 139:
+                if c == 139:
+                    return True
+        # Gold
+        if a == 38:
+            if b == 129:
+                if c == 160:
+                    return True
+        return False
+
+    def detect_yes_no(gamename):
+        wincap = WindowCapture(gamename, [516, 426, 541, 441])
+        image = wincap.get_screenshot()
+        # cv2.imwrite("testycont.jpg", image)
+        rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        tess_config = '--psm 7 --oem 3 -c tessedit_char_whitelist=Yes'
+        result = pytesseract.image_to_string(
+            rgb, lang='eng', config=tess_config)[:-2]
+        if result == "Yes":
+            return True
+        return False
+
 
 class Vision:
     def __init__(self, needle_img_path, method=cv2.TM_CCOEFF_NORMED):
