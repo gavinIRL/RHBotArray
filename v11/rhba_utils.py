@@ -968,6 +968,39 @@ class Events:
                     return True
         return False
 
+    def detect_move_reward_screen(gamename):
+        wincap = WindowCapture(gamename, [581, 270, 593, 272])
+        image = wincap.get_screenshot()
+        a, b, c = [int(i) for i in image[0][0]]
+        d, e, f = [int(i) for i in image[0][-1]]
+        if a + d > 360 and a + d < 400:
+            if b + e > 360 and b + e < 400:
+                if c + f < 10:
+                    return True
+        return False
+
+    def detect_endlevel_chest(gamename):
+        wincap = WindowCapture(gamename, [454, 250, 525, 252])
+        image = wincap.get_screenshot()
+        a, b, c = [int(i) for i in image[0][0]]
+        d, e, f = [int(i) for i in image[0][-1]]
+        if a + d < 50:
+            if b + e > 480:
+                if c + f > 290 and c+f < 320:
+                    return True
+        return False
+
+    def detect_endlevel_bonus_area(gamename):
+        wincap = WindowCapture(gamename, [503, 487, 514, 589])
+        image = wincap.get_screenshot()
+        a, b, c = [int(i) for i in image[0][0]]
+        d, e, f = [int(i) for i in image[0][-1]]
+        if a + d > 400:
+            if b + e > 400:
+                if c + f > 400:
+                    return True
+        return False
+
 
 class Vision:
     def __init__(self, needle_img_path, method=cv2.TM_CCOEFF_NORMED):
