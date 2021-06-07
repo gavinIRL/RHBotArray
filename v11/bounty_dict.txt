@@ -7,6 +7,7 @@
 11-Wanted
 12-WantedThickMcRunfast
 13-WantedFistRothbone
+13-BobJohnson
 14-WantedHoofMuchbeef
 15-WantedGutBaithook
 16-Wanted
