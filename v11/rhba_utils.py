@@ -3,6 +3,7 @@ import cv2
 import time
 import math
 import ctypes
+import random
 import win32ui
 import win32gui
 import win32con
@@ -944,6 +945,28 @@ class Looting:
             else:
                 return points, original_image, rect1[0], rect1[1]
         return points
+
+
+class Events:
+    def choose_random_reward(gamename):
+        wincap = WindowCapture(gamename)
+        posx = wincap.window_rect[0] + (460+(180*random.randint(0, 2)))
+        posy = wincap.window_rect[1] + (200+(132*random.randint(0, 3)))
+        pydirectinput.click(int(posx), int(posy))
+        # Now accept the reward
+        pydirectinput.click(
+            wincap.window_rect[0]+750, wincap.window_rect[1]+720)
+
+    def detect_reward_choice_open(gamename):
+        wincap = WindowCapture(gamename, [503, 90, 535, 92])
+        image = wincap.get_screenshot()
+        a, b, c = [int(i) for i in image[0][0]]
+        d, e, f = [int(i) for i in image[0][-1]]
+        if a + d > 400:
+            if b + e > 500:
+                if c + f < 105:
+                    return True
+        return False
 
 
 class Vision:
