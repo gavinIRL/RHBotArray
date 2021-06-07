@@ -1001,6 +1001,27 @@ class Events:
                     return True
         return False
 
+    def detect_in_dungeon(gamename):
+        wincap = WindowCapture(gamename, [1090, 331, 1092, 353])
+        image = wincap.get_screenshot()
+        a, b, c = [int(i) for i in image[0][0]]
+        d, e, f = [int(i) for i in image[-1][0]]
+        if d < 20:
+            if a + b + e > 400 and a+b+e < 500:
+                if c + f > 480:
+                    return True
+        return False
+
+    def detect_go(gamename):
+        wincap = WindowCapture(gamename, [623, 247, 628, 249])
+        image = wincap.get_screenshot()
+        a, b, c = [int(i) for i in image[0][0]]
+        if a < 30:
+            if b > 240:
+                if c > 140:
+                    return True
+        return False
+
 
 class Vision:
     def __init__(self, needle_img_path, method=cv2.TM_CCOEFF_NORMED):
