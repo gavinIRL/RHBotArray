@@ -700,6 +700,26 @@ class BotUtils:
         scaleFactor = ctypes.windll.shcore.GetScaleFactorForDevice(0) / 100
         return float(scaleFactor)
 
+    def grab_res_scroll_left(gamename):
+        wincap = WindowCapture(gamename, [112, 130, 125, 143])
+        image = wincap.get_screenshot()
+        filter = HsvFilter(0, 0, 0, 179, 18, 255, 0, 0, 0, 0)
+        image = BotUtils.apply_hsv_filter(image, filter)
+        rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        tess_config = '--psm 7 --oem 3 -c tessedit_char_whitelist=1234567890'
+        result = pytesseract.image_to_string(
+            rgb, lang='eng', config=tess_config)[:-2]
+        return int(result)
+
+    def read_mission_name(gamename):
+        wincap = WindowCapture(gamename, [749, 152, 978, 170])
+        image = wincap.get_screenshot()
+        rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        tess_config = '--psm 7 --oem 3 -c tessedit_char_whitelist=ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
+        result = pytesseract.image_to_string(
+            rgb, lang='eng', config=tess_config)[:-2]
+        return result
+
 
 class Looting:
     def loot_current_room(gamename, player_name, search_points=False):
