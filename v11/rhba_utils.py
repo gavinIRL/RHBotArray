@@ -1140,14 +1140,14 @@ class RHClick:
 
     def go_to_change_character(gamename):
         if not BotUtils.detect_menu_open(gamename):
-            pass
+            pydirectinput.press('esc')
         wincap = WindowCapture(gamename)
         pydirectinput.click(
             wincap.window_rect[0]+640, wincap.window_rect[1]+363)
 
     def exit_game(gamename):
         if not BotUtils.detect_menu_open(gamename):
-            pass
+            pydirectinput.press('esc')
         wincap = WindowCapture(gamename)
         pydirectinput.click(
             wincap.window_rect[0]+640, wincap.window_rect[1]+480)
