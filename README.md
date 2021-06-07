@@ -8,9 +8,9 @@ A family of socket-controlled video game bots derived from https://github.com/ga
 Almost all end-of-level and event handling has now been completed and tested piecemeal. The current focus is now briefly swapping to incorporating the follower bot from the original RHBot family with all of the updates developed as part of RHBA. The intention is for the follower mode to be turned on and off similar to autolooting. In addition, the autonomous looting option developed for the map10 test will also be incorporated into the servers. The intent is to allow an autonomous client control 3 servers at some point allowing for single point of control autonomous party play. Also, all status updates beyond the most recent 3 updates will now be put into a separate file as the readme was getting to be too long.
 
 ## Rough plan as of 4th June 2021
-~~1) Clean up and integrate autonomous looting into utils~~
-~~2) Add tests for detection and handling of events~~
-~~3) Add tests for endlevel handling~~
+1) DONE -> Clean up and integrate autonomous looting into utils
+2) DONE -> Add tests for detection and handling of events
+3) DONE -> Add tests for endlevel handling
 4) Implement endlevel handling, event handling, and autonomous looting into map10 bot
 5) Test improved autonomous combat capabilities
 6) Add handling for a party of bots
@@ -50,7 +50,8 @@ Almost all end-of-level and event handling has now been completed and tested pie
 * Version 12 - In progress
 * Version 13 - Not Started
 
-## Previous Status Updates (full list at https://github.com/gavinIRL/RHBotArray/blob/main/STATUS_UPDATES.txt)
+## Previous Status Updates 
+Full list at https://github.com/gavinIRL/RHBotArray/blob/main/STATUS_UPDATES.txt
 ### 4th June
 The past couple of weeks have mostly been focused initially at applying the required polish to v10 as planned, and more recently at assembling the required pieces for a fully autonomous bot. The 5 key functions of an autonomous bot are combat, looting, navigation, event handling, and end-of-level handling. Of these, the most difficult one (combat) has been initially tackled although most tests have been carried out to enable more complex revisions in the future. Looting has been thoroughly covered and can be considered to be fully completed bar some minor tidying up. Navigation has also been thoroughly carried out although requires some polish. Event handling is the final completely untouched topic and represents the least tested aspect. And finally end-of-level handling is lacking in progress but it is well understood what work is required to complete it. Based on current progress a basic but fully autonomous single-level bot should be ready for 13th June at the latest. The plan is to start gathering footage of the bots in the near future as proof of work and documenting progression.
 
