@@ -1084,6 +1084,40 @@ class RHClick:
         pydirectinput.click(
             wincap.window_rect[0]+1150, wincap.window_rect[1]+328)
 
+    def click_map_number(gamename, mapnum):
+        wincap = WindowCapture(gamename)
+        map_to_clickpoints = {
+            5: (728, 521),
+            6: (640, 631),
+            7: (605, 455),
+            8: (542, 350),
+            9: (293, 297),
+            10: (777, 406),
+            11: (140, 370),
+            12: (500, 246)
+        }
+        x, y = map_to_clickpoints[mapnum]
+        pydirectinput.click(wincap.window_rect[0]+x, wincap.window_rect[1]+y)
+
+    def choose_difficulty_and_enter(gamename, diff):
+        wincap = WindowCapture(gamename)
+        num_clicks = 0
+        if diff == "N":
+            num_clicks = 0
+        elif diff == "H":
+            num_clicks = 1
+        elif diff == "VH":
+            num_clicks == 2
+        elif diff == "BM":
+            num_clicks == 3
+        for i in range(num_clicks):
+            pydirectinput.click(
+                wincap.window_rect[0]+618, wincap.window_rect[1]+333)
+            time.sleep(0.3)
+        # Then click on enter dungeon
+        pydirectinput.click(
+            wincap.window_rect[0]+1033, wincap.window_rect[1]+736)
+
 
 class Vision:
     def __init__(self, needle_img_path, method=cv2.TM_CCOEFF_NORMED):
