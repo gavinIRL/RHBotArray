@@ -150,7 +150,6 @@ class BotUtils:
             if not BotUtils.detect_bigmap_open(gamename):
                 BotUtils.try_toggle_map()
             player_pos = BotUtils.grab_player_pos(gamename)
-            # print("Got here #1")
             start_time = time.time()
             while not player_pos:
                 time.sleep(0.05)
@@ -164,8 +163,6 @@ class BotUtils:
             BotUtils.close_map_and_menu(gamename)
             relx = player_pos[0] - int(x)
             rely = int(y) - player_pos[1]
-            # print("relx:{}, rely:{}".format(relx, rely))
-            # print("Got here #2")
             while abs(relx) > 100 or abs(rely > 100):
                 CustomInput.press_key(CustomInput.key_map["right"], "right")
                 CustomInput.release_key(CustomInput.key_map["right"], "right")
@@ -178,7 +175,6 @@ class BotUtils:
             relx = x
             rely = y
         mult = 0.707
-        start = time.time()
         if relx > 0:
             keyx = "left"
             CustomInput.press_key(CustomInput.key_map["left"], "left")
@@ -206,7 +202,6 @@ class BotUtils:
         second_sleep = max([timeleftx, timelefty])
         first_key = [keyx, keyy][[timeleftx, timelefty].index(first_sleep)]
         second_key = [keyx, keyy][[timeleftx, timelefty].index(second_sleep)]
-        print("{}".format(time.time()-start))
         if first_sleep < 0.009:
             if second_sleep < 0.009:
                 pass
@@ -221,10 +216,8 @@ class BotUtils:
                 CustomInput.key_map[second_key], second_key)
         else:
             time.sleep(first_sleep - 0.009)
-            print("{}".format(time.time()-start))
             CustomInput.release_key(CustomInput.key_map[first_key], first_key)
             time.sleep((second_sleep-first_sleep-0.009)*mult)
-            print("{}".format(time.time()-start))
             CustomInput.release_key(
                 CustomInput.key_map[second_key], second_key)
 
@@ -246,7 +239,6 @@ class BotUtils:
             if not BotUtils.detect_bigmap_open(gamename):
                 BotUtils.try_toggle_map()
             player_pos = BotUtils.grab_player_pos(gamename)
-            # print("Got here #1")
             start_time = time.time()
             while not player_pos:
                 time.sleep(0.05)
@@ -260,8 +252,6 @@ class BotUtils:
             BotUtils.close_map_and_menu(gamename)
             relx = player_pos[0] - int(x)
             rely = int(y) - player_pos[1]
-            # print("relx:{}, rely:{}".format(relx, rely))
-            # print("Got here #2")
             while abs(relx) > 100 or abs(rely > 100):
                 CustomInput.press_key(CustomInput.key_map["right"], "right")
                 CustomInput.release_key(CustomInput.key_map["right"], "right")
@@ -269,7 +259,6 @@ class BotUtils:
                 player_pos = BotUtils.grab_player_pos(gamename)
                 relx = player_pos[0] - int(x)
                 rely = int(y) - player_pos[1]
-            # print("Got here #3")
         else:
             relx = x
             rely = y
@@ -592,7 +581,6 @@ class BotUtils:
         # bgr
         a, b, c = [int(i) for i in image[0][0]]
         d, e, f = [int(i) for i in image[0][-1]]
-        # print("abc={},{},{}".format(a, b, c))
         if c+f > 440:
             if a+b+d+e < 80:
                 return True
@@ -660,10 +648,8 @@ class BotUtils:
     def detect_menu_open(gamename):
         wincap = WindowCapture(gamename, custom_rect=[595, 278, 621, 281])
         image = wincap.get_screenshot()
-        # cv2.imwrite("testy.jpg", image)
         a, b, c = [int(i) for i in image[0][0]]
         d, e, f = [int(i) for i in image[0][-1]]
-        # print("Sum abc:{}, def:{}".format(a+b+c, d+e+f))
         if a+b+c > 700:
             if d+e+f > 700:
                 return True
@@ -929,7 +915,6 @@ class Looting:
         output_image = cv2.blur(output_image, (8, 1))
         output_image = cv2.blur(output_image, (8, 1))
 
-        cv2.imwrite("testytest.jpg", output_image)
         _, thresh = cv2.threshold(output_image, 127, 255, 0)
         contours, _ = cv2.findContours(
             thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
@@ -1068,7 +1053,6 @@ class Events:
     def detect_yes_no(gamename):
         wincap = WindowCapture(gamename, [516, 426, 541, 441])
         image = wincap.get_screenshot()
-        # cv2.imwrite("testycont.jpg", image)
         rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         tess_config = '--psm 7 --oem 3 -c tessedit_char_whitelist=Yes'
         result = pytesseract.image_to_string(
@@ -1459,7 +1443,6 @@ class SellRepair():
         pix2 = int(pix2[0]) + int(pix2[1]) + int(pix2[2])
         if pix1 == 103 and pix2 == 223:
             pass
-            # print("It matches")
         else:
             # need to open the store
             self.game_wincap.update_window_position(border=False)
