@@ -260,7 +260,21 @@ def choose_character(gamename, charnum):
     pydirectinput.click(wincap.window_rect[0]+640, wincap.window_rect[1]+765)
 
 
-# time.sleep(1)
+def detect_resurrect_prompt(gamename):
+    wincap = WindowCapture(gamename, [763, 490, 818, 492])
+    image = wincap.get_screenshot()
+    a, b, c = [int(i) for i in image[0][0]]
+    d, e, f = [int(i) for i in image[-1][0]]
+    cv2.imwrite("testycont.jpg", image)
+    print("abc:{},{},{}, def:{},{},{}".format(a, b, c, d, e, f))
+    if a + d > 500:
+        if b + e > 500:
+            if c + f > 500:
+                return True
+    return False
+
+
+time.sleep(1)
 with open("gamename.txt") as f:
     gamename = f.readline()
 start_time = time.time()
@@ -277,5 +291,6 @@ start_time = time.time()
 # click_yes(gamename)
 # print(grab_res_scroll_left(gamename))
 # print(read_mission_name(gamename))
+print(detect_resurrect_prompt(gamename))
 
 print("Time taken: {}s".format(time.time()-start_time))
