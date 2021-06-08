@@ -1114,7 +1114,13 @@ class RHClick:
             9: (293, 297),
             10: (777, 406),
             11: (140, 370),
-            12: (500, 246)
+            12: (500, 246),
+            13: (500, 672),
+            14: (419, 478),
+            15: (423, 263),
+            16: (563, 562),
+            17: (642, 432),
+            18: (249, 325)
         }
         x, y = map_to_clickpoints[mapnum]
         pydirectinput.click(wincap.window_rect[0]+x, wincap.window_rect[1]+y)
