@@ -1077,6 +1077,17 @@ class Events:
             return True
         return False
 
+    def detect_resurrect_prompt(gamename):
+        wincap = WindowCapture(gamename, [763, 490, 818, 492])
+        image = wincap.get_screenshot()
+        a, b, c = [int(i) for i in image[0][0]]
+        d, e, f = [int(i) for i in image[-1][0]]
+        if a + d > 500:
+            if b + e > 500:
+                if c + f > 500:
+                    return True
+        return False
+
 
 class RHClick:
     def click_yes(gamename):
