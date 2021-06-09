@@ -14,5 +14,6 @@
 15-WantedGutBaithook
 15-WantedCastRustrod
 16-WantedLardBigpudge
+16-FattyMcFatso
 17-WantedSlabHunk
 18-Wanted
