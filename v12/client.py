@@ -89,8 +89,6 @@ class ClientKeypressListener():
         self.quest_handle = QuestHandle()
         self.quest_handle_clicks = 0
 
-        self.scaling = ClientUtils.get_monitor_scaling()
-        # print("Scaling={}".format(self.scaling))
         with open("gamename.txt") as f:
             self.gamename = f.readline()
         if not self.test:
@@ -110,77 +108,12 @@ class ClientKeypressListener():
         # These are for allowing x in all cases
         self.xallow = False
 
-        # These are for the v2 regroup command
-        self.map_rect = None
         self.level_name = None
         self.speed = 20
-        self.rects = {}
-        self.speeds = {}
-        self.num_names = []
-        self.load_level_rects()
-        self.player_pos = None
+        self.rects, self.speeds = BotUtils.grab_level_rects_and_speeds()
 
         # Input mode, true = pag, false = custom
         self.inputmode = False
-
-    def try_toggle_map(self):
-        # print("Toggling map")
-        # time.sleep(0.1)
-        # pydirectinput.keyDown("m")
-        # time.sleep(0.18)
-        # pydirectinput.keyUp("m")
-        # time.sleep(0.08)
-        pydirectinput.click(
-            int(self.scaling*1262+self.game_wincap.window_rect[0]), int(self.scaling*64+self.game_wincap.window_rect[1]))
-        # print("Finished toggling map")
-
-    def close_map(self):
-        pydirectinput.click(
-            int(self.scaling*859+self.game_wincap.window_rect[0]), int(self.scaling*260+self.game_wincap.window_rect[1]))
-
-    def string_to_rect(self, string: str):
-        return [int(i) for i in string.split(',')]
-
-    def load_level_rects(self):
-        # Load the translation from name to num
-        with open("lvl_name_num.txt") as f:
-            self.num_names = f.readlines()
-        for i, entry in enumerate(self.num_names):
-            self.num_names[i] = entry.split("-")
-        # Load the num to rect catalogue
-        with open("catalogue.txt") as f:
-            nums_rects = f.readlines()
-        for i, entry in enumerate(nums_rects):
-            nums_rects[i] = entry.split("-")
-        # Finally load the level speeds
-        with open("lvl_speed.txt") as f:
-            num_speeds = f.readlines()
-        for i, entry in enumerate(num_speeds):
-            num_speeds[i] = entry.split("|")
-        # Then add each rect to the rects dict against name
-        # Also add each speed to the speed dict against name
-        for number, name in self.num_names:
-            for num, area, rect in nums_rects:
-                if area == "FM" and num == number:
-                    self.rects[name.rstrip().replace(" ", "")] = rect.rstrip()
-                    if "1" in name:
-                        self.rects[name.rstrip().replace(
-                            " ", "").replace("1", "L")] = rect.rstrip()
-                    if "ri" in name:
-                        self.rects[name.rstrip().replace(
-                            " ", "").replace("ri", "n").replace("1", "L")] = rect.rstrip()
-                    break
-            for num, speed in num_speeds:
-                if num == number:
-                    self.speeds[name.rstrip().replace(
-                        " ", "")] = float(speed.rstrip())
-                    if "1" in name:
-                        self.speeds[name.rstrip().replace(
-                            " ", "").replace("1", "L")] = float(speed.rstrip())
-                    if "ri" in name:
-                        self.speeds[name.rstrip().replace(
-                            " ", "").replace("ri", "n").replace("1", "L")] = float(speed.rstrip())
-                    break
 
     def detect_name(self):
         plyrname_rect = [165, 45, 320, 65]
@@ -227,7 +160,8 @@ class ClientKeypressListener():
                     # Need to get the ratio compared to window top left
                     # This will allow common usage on other size monitors
                     # print("x={}, y={}".format(x, y))
-                    xratio, yratio = self.convert_click_to_ratio(x, y)
+                    xratio, yratio = BotUtils.convert_click_to_ratio(
+                        self.gamename, x, y)
                     # print("xrat={}, yrat={}".format(xratio, yratio))
                     if self.batch_recording_ongoing:
                         self.batch += str(button) + "|click|" + \
@@ -297,7 +231,7 @@ class ClientKeypressListener():
                         server.send_message("regroup,{}|{}".format(x, y))
                     print("Regrouping...")
                     time.sleep(0.01)
-                    self.close_map()
+                    BotUtils.close_map()
                 except:
                     print("Unable to find player right now")
             elif key == KeyCode(char='6'):
@@ -368,46 +302,22 @@ class ClientKeypressListener():
         self.level_name = self.detect_level_name()
         # Then grab the right rect for the level
         try:
-            self.map_rect = self.string_to_rect(self.rects[self.level_name])
+            map_rect = BotUtils.string_to_rect(self.rects[self.level_name])
             self.speed = self.speeds[self.level_name]
         except:
             try:
                 best_match = process.extractOne(
                     self.level_name, self.rects, score_cutoff=0.8)
-                self.map_rect = self.string_to_rect(
+                map_rect = self.string_to_rect(
                     self.rects[best_match])
                 self.speed = self.speeds[best_match]
             except:
-                self.map_rect = [362, 243, 1105, 748]
+                map_rect = [362, 243, 1105, 748]
                 self.speed = 30
         # Then open the map
-        if not self.detect_bigmap_open():
-            self.try_toggle_map()
-        return self.grab_player_pos()
-
-    def grab_player_pos(self):
-        if not self.map_rect:
-            wincap = WindowCapture(self.gamename)
-        else:
-            wincap = WindowCapture(self.gamename, self.map_rect)
-        filter = HsvFilter(34, 160, 122, 50, 255, 255, 0, 0, 0, 0)
-        image = wincap.get_screenshot()
-        save_image = self.filter_blackwhite_invert(filter, image)
-        # cv2.imwrite("testy3.jpg", save_image)
-        vision_limestone = Vision('plyr.jpg')
-        rectangles = vision_limestone.find(
-            save_image, threshold=0.31, epsilon=0.5)
-        points = vision_limestone.get_click_points(rectangles)
-        try:
-            x, y = points[0]
-            if not self.map_rect:
-                return x, y
-            else:
-                x += self.map_rect[0]
-                y += self.map_rect[1]
-                return x, y
-        except:
-            return False
+        if not BotUtils.detect_bigmap_open(self.gamename):
+            BotUtils.try_toggle_map()
+        return BotUtils.grab_player_pos(self.gamename, map_rect)
 
     def on_release(self, key):
         if key == KeyCode(char='1'):
@@ -512,18 +422,6 @@ class ClientKeypressListener():
             rgb, lang='eng', config=tess_config)[:-2]
         return result
 
-    def detect_bigmap_open(self):
-        wincap = WindowCapture(self.gamename, custom_rect=[819, 263, 855, 264])
-        image = wincap.get_screenshot()
-        cv2.imwrite("testy.jpg", image)
-        a, b, c = [int(i) for i in image[0][0]]
-        d, e, f = [int(i) for i in image[0][-2]]
-        if a+b+c < 30:
-            if d+e+f > 700:
-                # print("Working")
-                return True
-        return False
-
     def create_random_delays(self):
         for index, _ in enumerate(self.list_servers):
             self.delay_spread.append(
@@ -534,56 +432,6 @@ class ClientKeypressListener():
         time.sleep(delay)
         if len(batch) > 1:
             server.send_message("batch,1\n"+batch)
-
-    def convert_click_to_ratio(self, truex, truey):
-        # This will grab the current rectangle coords of game window
-        # and then turn the click values into a ratio of positions
-        # versus the game window
-        self.game_wincap.update_window_position(border=False)
-        # Turn the screen pos into window pos
-        relx = (truex - self.game_wincap.window_rect[0]) * self.scaling
-        rely = (truey - self.game_wincap.window_rect[1]) * self.scaling
-        # print("relx={}, rely={}".format(relx, rely))
-        # print("winx={}, winy={}".format(
-        #     self.game_wincap.window_rect[0], self.game_wincap.window_rect[1]))
-        # print("winwidth={}".format(self.game_wincap.w))
-        # Then convert to a ratio
-        ratx = relx/(self.game_wincap.w*self.scaling)
-        raty = rely/(self.game_wincap.h*self.scaling)
-        # Test convert back to a click
-        # convx, convy = self.convert_ratio_to_click(ratx, raty)
-        # print("convx={}, convy={}".format(convx, convy))
-        return ratx, raty
-
-    def on_click_test(self, x, y, button, pressed):
-        # when pressed is False, that means it's a release event.
-        # let's listen only to mouse click releases
-        if self.transmitting:
-            if not pressed:
-                # Need to get the ratio compared to window top left
-                # This will allow common usage on other size monitors
-                # xratio, yratio = self.convert_click_to_ratio(x, y)
-                for server in self.list_servers:
-                    server.send_message("click,"+str(x)+"|"+str(y))
-
-    def on_press_test(self, key):
-        if key == keyboard.Key.f4:
-            print("Exiting bot")
-            for server in self.list_servers:
-                server.delay = 0
-                server.send_message("quit,1")
-            os._exit(1)
-        if self.transmitting:
-            if str(key) not in self.unreleased_keys:
-                for server in self.list_servers:
-                    server.send_message(str(key)+",down")
-                self.unreleased_keys.append(str(key))
-
-    def on_release_test(self, key):
-        if self.transmitting:
-            for server in self.list_servers:
-                server.send_message(str(key)+",up")
-            self.unreleased_keys.remove(str(key))
 
 
 class ClientUtils():
@@ -601,13 +449,6 @@ class ClientUtils():
         for server in list_servers:
             t = threading.Thread(target=server.main_loop)
             t.start()
-
-    def get_monitor_scaling():
-        user32 = ctypes.windll.user32
-        w_orig = GetSystemMetrics(0)
-        user32.SetProcessDPIAware()
-        [w, h] = [user32.GetSystemMetrics(0), user32.GetSystemMetrics(1)]
-        return float(("{:.2f}".format(w/w_orig)))
 
 
 class RHBotClient():
