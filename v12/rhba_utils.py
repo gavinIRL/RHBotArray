@@ -7,8 +7,8 @@ import random
 import win32ui
 import win32gui
 import win32con
-import numpy as np
 import pytesseract
+import numpy as np
 import pydirectinput
 from fuzzywuzzy import process
 from custom_input import CustomInput
@@ -1603,6 +1603,194 @@ class SellRepair():
             0x0002, 0, 0, 0, 0)
         ctypes.windll.user32.mouse_event(
             0x0004, 0, 0, 0, 0)
+
+
+class QuestHandle():
+    def __init__(self) -> None:
+        with open("gamename.txt") as f:
+            gamename = f.readline()
+        self.game_wincap = WindowCapture(gamename)
+        self.white_text_filter = HsvFilter(
+            0, 0, 102, 45, 65, 255, 0, 0, 0, 0)
+        self.yellow_text_filter = HsvFilter(
+            16, 71, 234, 33, 202, 255, 0, 0, 0, 0)
+        self.blue_text_filter = HsvFilter(
+            83, 126, 85, 102, 255, 255, 0, 0, 0, 0)
+        self.all_text_filter = HsvFilter(
+            0, 0, 61, 78, 255, 255, 0, 255, 0, 0)
+        self.vision = Vision('xprompt67filtv2.jpg')
+        self.accept_rect = [725, 525, 925, 595]
+        self.accept_wincap = WindowCapture(gamename, self.accept_rect)
+        self.skip_rect = [730, 740, 890, 780]
+        self.skip_wincap = WindowCapture(gamename, self.skip_rect)
+        self.next_rect = [880, 740, 1040, 780]
+        self.next_wincap = WindowCapture(gamename, self.next_rect)
+        self.quest_rect = [310, 160, 1055, 650]
+        self.quest_wincap = WindowCapture(gamename, self.quest_rect)
+        self.questlist_rect = [740, 240, 1050, 580]
+        self.questlist_wincap = WindowCapture(gamename, self.questlist_rect)
+        self.complete_wincap = WindowCapture(gamename, self.next_rect)
+        self.xprompt_rect = [1130, 670, 1250, 720]
+        self.xprompt_wincap = WindowCapture(gamename, self.xprompt_rect)
+
+    def start_quest_handle(self):
+        start_time = time.time()
+        while time.time() < start_time + 2:
+            if self.check_for_accept():
+                break
+
+    def convert_and_click(self, x, y, rect):
+        self.game_wincap.update_window_position(border=False)
+        truex = int(x + self.game_wincap.window_rect[0] + rect[0])
+        truey = int(y + self.game_wincap.window_rect[1] + rect[1])
+        ctypes.windll.user32.SetCursorPos(truex, truey)
+        ctypes.windll.user32.mouse_event(
+            0x0002, 0, 0, 0, 0)
+        ctypes.windll.user32.mouse_event(
+            0x0004, 0, 0, 0, 0)
+
+    def check_for_accept(self):
+        image = self.accept_wincap.get_screenshot()
+        image = self.vision.apply_hsv_filter(
+            image, self.white_text_filter)
+        rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        results = pytesseract.image_to_data(
+            rgb, output_type=pytesseract.Output.DICT, lang='eng')
+        detection = False
+        for i in range(0, len(results["text"])):
+            if "Accept" in results["text"][i]:
+                x = results["left"][i] + (results["width"][i]/2)
+                y = results["top"][i] + (results["height"][i]/2)
+                self.convert_and_click(x, y, self.accept_rect)
+                detection = True
+                break
+        if not detection:
+            return self.check_for_skip()
+        else:
+            return True
+
+    def check_for_skip(self):
+        image = self.skip_wincap.get_screenshot()
+        image = self.vision.apply_hsv_filter(
+            image, self.white_text_filter)
+        rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        results = pytesseract.image_to_data(
+            rgb, output_type=pytesseract.Output.DICT, lang='eng')
+        detection = False
+        for i in range(0, len(results["text"])):
+            if "Skip" in results["text"][i]:
+                x = results["left"][i] + (results["width"][i]/2)
+                y = results["top"][i] + (results["height"][i]/2)
+                self.convert_and_click(x, y, self.skip_rect)
+                detection = True
+                break
+        if not detection:
+            return self.check_for_next()
+        else:
+            return True
+
+    def check_for_next(self):
+        image = self.next_wincap.get_screenshot()
+        image = self.vision.apply_hsv_filter(
+            image, self.white_text_filter)
+        rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        results = pytesseract.image_to_data(
+            rgb, output_type=pytesseract.Output.DICT, lang='eng')
+        detection = False
+        for i in range(0, len(results["text"])):
+            if "Next" in results["text"][i]:
+                x = results["left"][i] + (results["width"][i]/2)
+                y = results["top"][i] + (results["height"][i]/2)
+                self.convert_and_click(x, y, self.next_rect)
+                detection = True
+                break
+        if not detection:
+            return self.check_for_quest()
+        else:
+            return True
+
+    def check_for_quest(self):
+        image = self.quest_wincap.get_screenshot()
+        image = self.vision.apply_hsv_filter(
+            image, self.white_text_filter)
+        rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        tess_config = '--psm 6 --oem 3 -c tessedit_char_whitelist=Quest'
+        results = pytesseract.image_to_data(
+            rgb, output_type=pytesseract.Output.DICT, lang='eng', config=tess_config)
+        detection = False
+        for i in range(0, len(results["text"])):
+            if "Quest" in results["text"][i]:
+                x = results["left"][i] + (results["width"][i]/2)
+                y = results["top"][i] + (results["height"][i]/2)
+                self.convert_and_click(x, y, self.quest_rect)
+                detection = True
+                break
+        if not detection:
+            return self.check_for_questlist()
+        else:
+            return True
+
+    def check_for_questlist(self):
+        image = self.questlist_wincap.get_screenshot()
+        image = self.vision.apply_hsv_filter(
+            image, self.all_text_filter)
+        rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        results = pytesseract.image_to_data(
+            rgb, output_type=pytesseract.Output.DICT, lang='eng')
+        detection = False
+        for i in range(0, len(results["text"])):
+            if "LV" in results["text"][i]:
+                # at this point need to grab the centre of the rect
+                x = results["left"][i] + (results["width"][i]/2)
+                y = results["top"][i] + (results["height"][i]/2)
+                # and then click at this position
+                self.convert_and_click(x, y, self.questlist_rect)
+                detection = True
+                break
+        if not detection:
+            return self.check_for_complete()
+        else:
+            return True
+
+    def check_for_complete(self):
+        image = self.complete_wincap.get_screenshot()
+        image = self.vision.apply_hsv_filter(
+            image, self.white_text_filter)
+        rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        results = pytesseract.image_to_data(
+            rgb, output_type=pytesseract.Output.DICT, lang='eng')
+        detection = False
+        for i in range(0, len(results["text"])):
+            if "Com" in results["text"][i]:
+                x = results["left"][i] + (results["width"][i]/2)
+                y = results["top"][i] + (results["height"][i]/2)
+                self.convert_and_click(x, y, self.next_rect)
+                detection = True
+                break
+        if not detection:
+            return self.check_for_xprompt()
+        else:
+            return True
+
+    def check_for_xprompt(self):
+        image = self.xprompt_wincap.get_screenshot()
+        image = self.vision.apply_hsv_filter(
+            image, self.blue_text_filter)
+        rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        results = pytesseract.image_to_data(
+            rgb, output_type=pytesseract.Output.DICT, lang='eng')
+        detection = False
+        for i in range(0, len(results["text"])):
+            if "Press" in results["text"][i]:
+                pydirectinput.keyDown("x")
+                time.sleep(0.1)
+                pydirectinput.keyUp("x")
+                detection = True
+                break
+        if not detection:
+            return False
+        else:
+            return True
 
 
 if __name__ == "__main__":
