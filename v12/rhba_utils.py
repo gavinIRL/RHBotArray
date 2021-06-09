@@ -549,16 +549,6 @@ class BotUtils:
 
         return img
 
-    def detect_bigmap_open(gamename):
-        wincap = WindowCapture(gamename, custom_rect=[819, 263, 855, 264])
-        image = wincap.get_screenshot()
-        a, b, c = [int(i) for i in image[0][0]]
-        d, e, f = [int(i) for i in image[0][-2]]
-        if a+b+c < 30:
-            if d+e+f > 700:
-                return True
-        return False
-
     def detect_sect_clear(gamename):
         wincap = WindowCapture(gamename, custom_rect=[
             464+156, 640, 464+261, 641])
@@ -641,7 +631,23 @@ class BotUtils:
                     break
         return rects
 
-    def detect_menu_open(gamename):
+    def detect_bigmap_open(gamename=False):
+        if not gamename:
+            with open("gamename.txt") as f:
+                gamename = f.readline()
+        wincap = WindowCapture(gamename, custom_rect=[819, 263, 855, 264])
+        image = wincap.get_screenshot()
+        a, b, c = [int(i) for i in image[0][0]]
+        d, e, f = [int(i) for i in image[0][-2]]
+        if a+b+c < 30:
+            if d+e+f > 700:
+                return True
+        return False
+
+    def detect_menu_open(gamename=False):
+        if not gamename:
+            with open("gamename.txt") as f:
+                gamename = f.readline()
         wincap = WindowCapture(gamename, custom_rect=[595, 278, 621, 281])
         image = wincap.get_screenshot()
         a, b, c = [int(i) for i in image[0][0]]
@@ -677,11 +683,19 @@ class BotUtils:
         pydirectinput.click(
             int(1262+game_wincap.window_rect[0]), int(64+game_wincap.window_rect[1]))
 
-    def close_map(game_wincap):
+    def close_map(game_wincap=False):
+        if not game_wincap:
+            with open("gamename.txt") as f:
+                gamename = f.readline()
+            game_wincap = WindowCapture(gamename)
         pydirectinput.click(
             int(859+game_wincap.window_rect[0]), int(260+game_wincap.window_rect[1]))
 
-    def close_esc_menu(game_wincap):
+    def close_esc_menu(game_wincap=False):
+        if not game_wincap:
+            with open("gamename.txt") as f:
+                gamename = f.readline()
+            game_wincap = WindowCapture(gamename)
         pydirectinput.click(
             int(749+game_wincap.window_rect[0]), int(280+game_wincap.window_rect[1]))
 
