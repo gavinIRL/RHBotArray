@@ -631,6 +631,10 @@ class BotUtils:
                     break
         return rects
 
+    def string_to_rect(self, string: str):
+        # This converts the rect from catalogue into int list
+        return [int(i) for i in string.split(',')]
+
     def detect_bigmap_open(gamename=False):
         if not gamename:
             with open("gamename.txt") as f:
