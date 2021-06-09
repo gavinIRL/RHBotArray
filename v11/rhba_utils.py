@@ -707,62 +707,32 @@ class BotUtils:
         return result
 
     def convert_click_to_ratio(gamename, truex, truey):
-        # This will grab the current rectangle coords of game window
-        # and then turn the click values into a ratio of positions
-        # versus the game window
         wincap = WindowCapture(gamename)
         scaling = BotUtils.get_monitor_scaling()
-        # Turn the screen pos into window pos
         relx = (truex - wincap.window_rect[0]) * scaling
         rely = (truey - wincap.window_rect[1]) * scaling
-        # print("relx={}, rely={}".format(relx, rely))
-        # print("winx={}, winy={}".format(
-        #     self.game_wincap.window_rect[0], self.game_wincap.window_rect[1]))
-        # print("winwidth={}".format(self.game_wincap.w))
-        # Then convert to a ratio
         ratx = relx/(wincap.w*scaling)
         raty = rely/(wincap.h*scaling)
-        # Test convert back to a click
-        # convx, convy = self.convert_ratio_to_click(ratx, raty)
-        # print("convx={}, convy={}".format(convx, convy))
         return ratx, raty
 
     def convert_click_to_ratio_noscale(gamename, truex, truey):
-        # This will grab the current rectangle coords of game window
-        # and then turn the click values into a ratio of positions
-        # versus the game window
         wincap = WindowCapture(gamename)
-        # Turn the screen pos into window pos
         relx = (truex - wincap.window_rect[0])
         rely = (truey - wincap.window_rect[1])
-        # print("relx={}, rely={}".format(relx, rely))
-        # print("winx={}, winy={}".format(
-        #     self.game_wincap.window_rect[0], self.game_wincap.window_rect[1]))
-        # print("winwidth={}".format(self.game_wincap.w))
-        # Then convert to a ratio
         ratx = relx/(wincap.w)
         raty = rely/(wincap.h)
-        # Test convert back to a click
-        # convx, convy = self.convert_ratio_to_click(ratx, raty)
-        # print("convx={}, convy={}".format(convx, convy))
         return ratx, raty
 
     def convert_ratio_to_click(gamename, ratx, raty):
-        # This will grab the current rectangle coords of game window
-        # and then turn the ratio of positions versus the game window
-        # into true x,y coords
         wincap = WindowCapture(gamename)
-        # Turn the ratios into relative
         relx = int(ratx * wincap.w)
         rely = int(raty * wincap.h)
-        # Turn the relative into true
         truex = int((relx + wincap.window_rect[0]))
         truey = int((rely + wincap.window_rect[1]))
         return truex, truey
 
     def convert_true_to_window(gamename, truex, truey):
         wincap = WindowCapture(gamename)
-        # Turn the screen pos into window pos
         relx = (truex - wincap.window_rect[0])
         rely = (truey - wincap.window_rect[1])
         return relx, rely
