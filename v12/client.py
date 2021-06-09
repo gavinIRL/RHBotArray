@@ -10,7 +10,6 @@ import threading
 import time
 import os
 from cryptography.fernet import Fernet
-from hsvfilter import grab_object_preset
 import cv2
 import pytesseract
 from fuzzywuzzy import process
@@ -124,13 +123,6 @@ class ClientKeypressListener():
         # Input mode, true = pag, false = custom
         self.inputmode = False
 
-        # Autoloot support client-side
-        self.xprompt_filter, xprompt_custom_rect = grab_object_preset(
-            object_name="prompt_press_x_pickup")
-        self.xprompt_wincap = WindowCapture(
-            self.gamename, xprompt_custom_rect)
-        self.xprompt_vision = Vision("xprompt67filtv2.jpg")
-
     def try_toggle_map(self):
         # print("Toggling map")
         # time.sleep(0.1)
@@ -194,11 +186,10 @@ class ClientKeypressListener():
         plyrname_rect = [165, 45, 320, 65]
         plyrname_wincap = WindowCapture(self.gamename, plyrname_rect)
         plyrname_filt = HsvFilter(0, 0, 103, 89, 104, 255, 0, 0, 0, 0)
-        plyrmname_vision = Vision('xprompt67filtv2.jpg')
         # get an updated image of the game
         image = plyrname_wincap.get_screenshot()
         # pre-process the image
-        image = plyrmname_vision.apply_hsv_filter(
+        image = BotUtils.apply_hsv_filter(
             image, plyrname_filt)
         rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         results = pytesseract.image_to_data(
@@ -373,44 +364,6 @@ class ClientKeypressListener():
             self.batch_recording_ongoing = False
             print("TRANSMIT ON")
 
-    def auto_loot(self):
-        consec_xpress = 0
-        while self.autoloot_enabled:
-            if self.loot_if_available():
-                consec_xpress += 1
-                if not consec_xpress > 6:
-                    time.sleep(0.01)
-                    pydirectinput.keyUp("x")
-                    # self.release_key(self.key_map["x"])
-                    time.sleep(0.15)
-                else:
-                    time.sleep(0.4)
-            else:
-                time.sleep(0.1)
-                consec_xpress = 0
-
-    def autoloot_thread_start(self):
-        t = threading.Thread(target=self.auto_loot, daemon=True)
-        self.autoloot_enabled = True
-        t.start()
-
-    def loot_if_available(self):
-        # get an updated image of the game at specified area
-        xprompt_screenshot = self.xprompt_wincap.get_screenshot()
-        # pre-process the image to help with detection
-        xprompt_output_image = self.xprompt_vision.apply_hsv_filter(
-            xprompt_screenshot, self.xprompt_filter)
-        # do object detection, this time grab rectangles
-        xprompt_rectangles = self.xprompt_vision.find(
-            xprompt_output_image, threshold=0.61, epsilon=0.5)
-        # then return answer to whether currently in dungeon
-        if len(xprompt_rectangles) == 1:
-            # self.press_key(self.key_map["x"])
-            pydirectinput.keyDown("x")
-            # keyup performed in main loop
-            # return True for autoloot
-            return True
-
     def find_player(self):
         self.level_name = self.detect_level_name()
         # Then grab the right rect for the level
@@ -544,9 +497,8 @@ class ClientKeypressListener():
         wincap = WindowCapture(self.gamename, [1121, 31, 1248, 44])
         existing_image = wincap.get_screenshot()
         filter = HsvFilter(0, 0, 0, 169, 34, 255, 0, 0, 0, 0)
-        vision_limestone = Vision('plyr.jpg')
         # cv2.imwrite("testy2.jpg", existing_image)
-        save_image = vision_limestone.apply_hsv_filter(existing_image, filter)
+        save_image = BotUtils.apply_hsv_filter(existing_image, filter)
         # cv2.imwrite("testy3.jpg", save_image)
         gray_image = cv2.cvtColor(save_image, cv2.COLOR_BGR2GRAY)
         (thresh, blackAndWhiteImage) = cv2.threshold(
