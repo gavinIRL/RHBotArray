@@ -711,15 +711,6 @@ class BotUtils:
 
     def convert_click_to_ratio(gamename, truex, truey):
         wincap = WindowCapture(gamename)
-        scaling = BotUtils.get_monitor_scaling()
-        relx = (truex - wincap.window_rect[0]) * scaling
-        rely = (truey - wincap.window_rect[1]) * scaling
-        ratx = relx/(wincap.w*scaling)
-        raty = rely/(wincap.h*scaling)
-        return ratx, raty
-
-    def convert_click_to_ratio_noscale(gamename, truex, truey):
-        wincap = WindowCapture(gamename)
         relx = (truex - wincap.window_rect[0])
         rely = (truey - wincap.window_rect[1])
         ratx = relx/(wincap.w)
