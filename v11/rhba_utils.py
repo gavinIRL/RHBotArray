@@ -754,6 +754,12 @@ class BotUtils:
         rely = (truey - wincap.window_rect[1])
         return relx, rely
 
+    def convert_window_to_true(gamename, relx, rely):
+        wincap = WindowCapture(gamename)
+        truex = int(relx + wincap.window_rect[0])
+        truey = int(rely + wincap.window_rect[1])
+        return truex, truey
+
 
 class Looting:
     def loot_current_room(gamename, player_name, search_points=False):
