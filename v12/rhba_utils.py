@@ -631,6 +631,50 @@ class BotUtils:
                     break
         return rects
 
+    def grab_level_rects_and_speeds():
+        rects = {}
+        speeds = {}
+        # Load the translation from name to num
+        with open("lvl_name_num.txt") as f:
+            num_names = f.readlines()
+        for i, entry in enumerate(num_names):
+            num_names[i] = entry.split("-")
+        # Load the num to rect catalogue
+        with open("catalogue.txt") as f:
+            nums_rects = f.readlines()
+        for i, entry in enumerate(nums_rects):
+            nums_rects[i] = entry.split("-")
+        # Finally load the level speeds
+        with open("lvl_speed.txt") as f:
+            num_speeds = f.readlines()
+        for i, entry in enumerate(num_speeds):
+            num_speeds[i] = entry.split("|")
+        # Then add each rect to the rects dict against name
+        # Also add each speed to the speed dict against name
+        for number, name in num_names:
+            for num, area, rect in nums_rects:
+                if area == "FM" and num == number:
+                    rects[name.rstrip().replace(" ", "")] = rect.rstrip()
+                    if "1" in name:
+                        rects[name.rstrip().replace(
+                            " ", "").replace("1", "L")] = rect.rstrip()
+                    if "ri" in name:
+                        rects[name.rstrip().replace(
+                            " ", "").replace("ri", "n").replace("1", "L")] = rect.rstrip()
+                    break
+            for num, speed in num_speeds:
+                if num == number:
+                    speeds[name.rstrip().replace(
+                        " ", "")] = float(speed.rstrip())
+                    if "1" in name:
+                        speeds[name.rstrip().replace(
+                            " ", "").replace("1", "L")] = float(speed.rstrip())
+                    if "ri" in name:
+                        speeds[name.rstrip().replace(
+                            " ", "").replace("ri", "n").replace("1", "L")] = float(speed.rstrip())
+                    break
+        return rects, speeds
+
     def string_to_rect(self, string: str):
         # This converts the rect from catalogue into int list
         return [int(i) for i in string.split(',')]
