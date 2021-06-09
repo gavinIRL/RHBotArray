@@ -747,6 +747,13 @@ class BotUtils:
         # print("convx={}, convy={}".format(convx, convy))
         return ratx, raty
 
+    def convert_true_to_window(gamename, truex, truey):
+        wincap = WindowCapture(gamename)
+        # Turn the screen pos into window pos
+        relx = (truex - wincap.window_rect[0])
+        rely = (truey - wincap.window_rect[1])
+        return relx, rely
+
 
 class Looting:
     def loot_current_room(gamename, player_name, search_points=False):
