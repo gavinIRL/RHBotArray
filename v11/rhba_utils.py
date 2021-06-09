@@ -747,6 +747,19 @@ class BotUtils:
         # print("convx={}, convy={}".format(convx, convy))
         return ratx, raty
 
+    def convert_ratio_to_click(gamename, ratx, raty):
+        # This will grab the current rectangle coords of game window
+        # and then turn the ratio of positions versus the game window
+        # into true x,y coords
+        wincap = WindowCapture(gamename)
+        # Turn the ratios into relative
+        relx = int(ratx * wincap.w)
+        rely = int(raty * wincap.h)
+        # Turn the relative into true
+        truex = int((relx + wincap.window_rect[0]))
+        truey = int((rely + wincap.window_rect[1]))
+        return truex, truey
+
     def convert_true_to_window(gamename, truex, truey):
         wincap = WindowCapture(gamename)
         # Turn the screen pos into window pos
