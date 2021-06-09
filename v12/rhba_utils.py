@@ -6,6 +6,7 @@ import ctypes
 import random
 import win32ui
 import win32gui
+import warnings
 import win32con
 import pytesseract
 import numpy as np
@@ -14,6 +15,7 @@ from fuzzywuzzy import process
 from custom_input import CustomInput
 from win32api import GetSystemMetrics
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
+warnings.simplefilter("ignore", DeprecationWarning)
 
 
 class HsvFilter:
@@ -113,12 +115,6 @@ class WindowCapture:
 
 
 class BotUtils:
-    def try_toggle_map():
-        pydirectinput.keyDown("m")
-        time.sleep(0.05)
-        pydirectinput.keyUp("m")
-        time.sleep(0.08)
-
     def grab_closest(rel_list: list):
         closest_index = False
         smallest_dist = 100000
@@ -664,23 +660,30 @@ class BotUtils:
         return return_list
 
     def close_map_and_menu(gamename):
-        scaling = BotUtils.get_monitor_scaling()
-        wincap = WindowCapture(gamename)
+        game_wincap = WindowCapture(gamename)
         if BotUtils.detect_menu_open(gamename):
-            BotUtils.close_esc_menu(scaling, wincap)
+            BotUtils.close_esc_menu(game_wincap)
         if BotUtils.detect_bigmap_open(gamename):
-            BotUtils.close_map(gamename, scaling)
+            BotUtils.close_map(game_wincap)
 
-    def close_map(gamename, scaling=False):
-        if not scaling:
-            scaling = BotUtils.get_monitor_scaling()
+    def try_toggle_map():
+        pydirectinput.keyDown("m")
+        time.sleep(0.05)
+        pydirectinput.keyUp("m")
+        time.sleep(0.08)
+
+    def try_toggle_map_clicking(gamename):
         game_wincap = WindowCapture(gamename)
         pydirectinput.click(
-            int(scaling*859+game_wincap.window_rect[0]), int(scaling*260+game_wincap.window_rect[1]))
+            int(1262+game_wincap.window_rect[0]), int(64+game_wincap.window_rect[1]))
 
-    def close_esc_menu(scaling, game_wincap):
+    def close_map(game_wincap):
         pydirectinput.click(
-            int(scaling*749+game_wincap.window_rect[0]), int(scaling*280+game_wincap.window_rect[1]))
+            int(859+game_wincap.window_rect[0]), int(260+game_wincap.window_rect[1]))
+
+    def close_esc_menu(game_wincap):
+        pydirectinput.click(
+            int(749+game_wincap.window_rect[0]), int(280+game_wincap.window_rect[1]))
 
     def get_monitor_scaling():
         scaleFactor = ctypes.windll.shcore.GetScaleFactorForDevice(0) / 100
@@ -1800,4 +1803,4 @@ if __name__ == "__main__":
     # start = time.time()
     # BotUtils.detect_xprompt(gamename)
     # print("Time taken: {}s".format(time.time()-start))
-    BotUtils.move_diagonal(gamename, 10, 12, speed=20, rel=True)
+    BotUtils.close_map_and_menu(gamename)
