@@ -73,8 +73,7 @@ class RHBotClientConnection():
 
 
 class ClientKeypressListener():
-    def __init__(self, list_servers, test=False, delay_spacing=12) -> None:
-        self.test = test
+    def __init__(self, list_servers, delay_spacing=12) -> None:
         self.list_servers = list_servers
         self.listener = None
         self.unreleased_keys = []
@@ -91,8 +90,7 @@ class ClientKeypressListener():
 
         with open("gamename.txt") as f:
             self.gamename = f.readline()
-        if not self.test:
-            self.game_wincap = WindowCapture(self.gamename)
+        self.game_wincap = WindowCapture(self.gamename)
 
         # These are for batch recording and sending
         self.batch_recording_ongoing = False
@@ -135,12 +133,8 @@ class ClientKeypressListener():
         return name
 
     def start_mouse_listener(self):
-        if not self.test:
-            self.mouse_listener = mouse.Listener(
-                on_click=self.on_click)
-        else:
-            self.mouse_listener = mouse.Listener(
-                on_click=self.on_click_test)
+        self.mouse_listener = mouse.Listener(
+            on_click=self.on_click)
         self.mouse_listener.start()
 
     def on_click(self, x, y, button, pressed):
@@ -174,12 +168,8 @@ class ClientKeypressListener():
 
     def start_keypress_listener(self):
         if self.listener == None:
-            if not self.test:
-                self.listener = Listener(on_press=self.on_press,
-                                         on_release=self.on_release)
-            else:
-                self.listener = Listener(on_press=self.on_press_test,
-                                         on_release=self.on_release_test)
+            self.listener = Listener(on_press=self.on_press,
+                                     on_release=self.on_release)
             self.listener.start()
 
     def on_press(self, key):
@@ -299,7 +289,7 @@ class ClientKeypressListener():
             print("TRANSMIT ON")
 
     def find_player(self):
-        self.level_name = self.detect_level_name()
+        self.level_name = BotUtils.detect_level_name()
         # Then grab the right rect for the level
         try:
             map_rect = BotUtils.string_to_rect(self.rects[self.level_name])
@@ -403,25 +393,6 @@ class ClientKeypressListener():
             c[c > lim] -= amount
         return c
 
-    def detect_level_name(self):
-        wincap = WindowCapture(self.gamename, [1121, 31, 1248, 44])
-        existing_image = wincap.get_screenshot()
-        filter = HsvFilter(0, 0, 0, 169, 34, 255, 0, 0, 0, 0)
-        # cv2.imwrite("testy2.jpg", existing_image)
-        save_image = BotUtils.apply_hsv_filter(existing_image, filter)
-        # cv2.imwrite("testy3.jpg", save_image)
-        gray_image = cv2.cvtColor(save_image, cv2.COLOR_BGR2GRAY)
-        (thresh, blackAndWhiteImage) = cv2.threshold(
-            gray_image, 129, 255, cv2.THRESH_BINARY)
-        # now invert it
-        inverted = (255-blackAndWhiteImage)
-        save_image = cv2.cvtColor(inverted, cv2.COLOR_GRAY2BGR)
-        rgb = cv2.cvtColor(save_image, cv2.COLOR_BGR2RGB)
-        tess_config = '--psm 7 --oem 3 -c tessedit_char_whitelist=01234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
-        result = pytesseract.image_to_string(
-            rgb, lang='eng', config=tess_config)[:-2]
-        return result
-
     def create_random_delays(self):
         for index, _ in enumerate(self.list_servers):
             self.delay_spread.append(
@@ -434,31 +405,14 @@ class ClientKeypressListener():
             server.send_message("batch,1\n"+batch)
 
 
-class ClientUtils():
-    def grab_online_servers():
-        output = subprocess.run("arp -a", capture_output=True).stdout.decode()
-        list_ips = []
-        with open("servers.txt", "r") as f:
-            lines = f.readlines()
-            for ip in lines:
-                if ip.strip() in output:
-                    list_ips.append(ip.strip())
-        return list_ips
-
-    def start_server_threads(list_servers):
-        for server in list_servers:
-            t = threading.Thread(target=server.main_loop)
-            t.start()
-
-
 class RHBotClient():
-    def start(delay_spacing=12, test=False):
-        list_ips = ClientUtils.grab_online_servers()
+    def start(delay_spacing=12):
+        list_ips = BotUtils.grab_online_servers()
         list_servers = []
         for ip in list_ips:
             list_servers.append(RHBotClientConnection(ip))
         ckl = ClientKeypressListener(
-            list_servers, test, delay_spacing)
+            list_servers, delay_spacing)
         ckl.start_mouse_listener()
         ckl.start_keypress_listener()
 
@@ -469,7 +423,7 @@ class RHBotClient():
         # except:
         #     pass
         # for server in list_servers:
-        ClientUtils.start_server_threads(list_servers)
+        BotUtils.start_server_threads(list_servers)
         time.sleep(0.25)
         for server in list_servers:
             server.send_message("mainplayer,"+mainplayer)
@@ -487,4 +441,4 @@ class RHBotClient():
 
 
 if __name__ == "__main__":
-    RHBotClient.start(test=False)
+    RHBotClient.start()
