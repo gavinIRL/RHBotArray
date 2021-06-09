@@ -8,6 +8,8 @@ import win32ui
 import win32gui
 import warnings
 import win32con
+import threading
+import subprocess
 import pytesseract
 import numpy as np
 import pydirectinput
@@ -115,6 +117,21 @@ class WindowCapture:
 
 
 class BotUtils:
+    def grab_online_servers():
+        output = subprocess.run("arp -a", capture_output=True).stdout.decode()
+        list_ips = []
+        with open("servers.txt", "r") as f:
+            lines = f.readlines()
+            for ip in lines:
+                if ip.strip() in output:
+                    list_ips.append(ip.strip())
+        return list_ips
+
+    def start_server_threads(list_servers):
+        for server in list_servers:
+            t = threading.Thread(target=server.main_loop)
+            t.start()
+
     def grab_closest(rel_list: list):
         closest_index = False
         smallest_dist = 100000
