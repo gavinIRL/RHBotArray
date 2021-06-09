@@ -8,6 +8,7 @@
 12-WantedThickMcRunfast
 13-WantedFistRothbone
 13-BobJohnson
+13-BoltBigflank
 14-WantedHoofMuchbeef
 15-WantedGutBaithook
 15-WantedCastRustrod
