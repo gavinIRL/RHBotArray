@@ -113,24 +113,8 @@ class ClientKeypressListener():
         # Input mode, true = pag, false = custom
         self.inputmode = False
 
-    def detect_name(self):
-        plyrname_rect = [165, 45, 320, 65]
-        plyrname_wincap = WindowCapture(self.gamename, plyrname_rect)
-        plyrname_filt = HsvFilter(0, 0, 103, 89, 104, 255, 0, 0, 0, 0)
-        # get an updated image of the game
-        image = plyrname_wincap.get_screenshot()
-        # pre-process the image
-        image = BotUtils.apply_hsv_filter(
-            image, plyrname_filt)
-        rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-        results = pytesseract.image_to_data(
-            rgb, output_type=pytesseract.Output.DICT, lang='eng')
-        biggest = 0
-        for entry in results["text"]:
-            if len(entry) > biggest:
-                name = entry
-                biggest = len(entry)
-        return name
+        # Follower mode
+        self.followmode = False
 
     def start_mouse_listener(self):
         self.mouse_listener = mouse.Listener(
@@ -200,9 +184,16 @@ class ClientKeypressListener():
                     print("Ending batch record")
                     self.batch = ""
             elif key == KeyCode(char='3'):
-                for server in self.list_servers:
-                    server.send_message("revive,1")
-                print("Reviving...")
+                # This will be changed to follower on/off
+                self.followmode = not self.followmode
+                if self.followmode:
+                    for server in self.list_servers:
+                        server.send_message("follow,1")
+                        print("FOLLOW ON")
+                else:
+                    for server in self.list_servers:
+                        server.send_message("follow,0")
+                        print("FOLLOW OFF")
             elif key == KeyCode(char='4'):
                 self.inputmode = not self.inputmode
                 for server in self.list_servers:
@@ -351,48 +342,6 @@ class ClientKeypressListener():
                         # print(self.batch)
                         self.batch = ""
 
-    def filter_blackwhite_invert(self, filter, existing_image):
-        hsv = cv2.cvtColor(existing_image, cv2.COLOR_BGR2HSV)
-        hsv_filter = filter
-        # add/subtract saturation and value
-        h, s, v = cv2.split(hsv)
-        s = self.shift_channel(s, hsv_filter.sAdd)
-        s = self.shift_channel(s, -hsv_filter.sSub)
-        v = self.shift_channel(v, hsv_filter.vAdd)
-        v = self.shift_channel(v, -hsv_filter.vSub)
-        hsv = cv2.merge([h, s, v])
-
-        # Set minimum and maximum HSV values to display
-        lower = np.array([hsv_filter.hMin, hsv_filter.sMin, hsv_filter.vMin])
-        upper = np.array([hsv_filter.hMax, hsv_filter.sMax, hsv_filter.vMax])
-        # Apply the thresholds
-        mask = cv2.inRange(hsv, lower, upper)
-        result = cv2.bitwise_and(hsv, hsv, mask=mask)
-
-        # convert back to BGR
-        img = cv2.cvtColor(result, cv2.COLOR_HSV2BGR)
-        # now change it to greyscale
-        grayImage = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        # now change it to black and white
-        (thresh, blackAndWhiteImage) = cv2.threshold(
-            grayImage, 67, 255, cv2.THRESH_BINARY)
-        # now invert it
-        inverted = (255-blackAndWhiteImage)
-        inverted = cv2.cvtColor(inverted, cv2.COLOR_GRAY2BGR)
-        return inverted
-
-    def shift_channel(self, c, amount):
-        if amount > 0:
-            lim = 255 - amount
-            c[c >= lim] = 255
-            c[c < lim] += amount
-        elif amount < 0:
-            amount = -amount
-            lim = amount
-            c[c <= lim] = 0
-            c[c > lim] -= amount
-        return c
-
     def create_random_delays(self):
         for index, _ in enumerate(self.list_servers):
             self.delay_spread.append(
@@ -418,11 +367,6 @@ class RHBotClient():
 
         with open("mainplayer.txt") as f:
             mainplayer = f.readline()
-        # try:
-        #     mainplayer = ckl.detect_name()
-        # except:
-        #     pass
-        # for server in list_servers:
         BotUtils.start_server_threads(list_servers)
         time.sleep(0.25)
         for server in list_servers:
