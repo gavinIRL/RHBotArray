@@ -1,6 +1,8 @@
+from re import S
 import socket
 import select
 import threading
+from v12.rhba_utils import BotUtils
 import pydirectinput
 import time
 import subprocess
@@ -157,6 +159,9 @@ class RHBotArrayServer():
         # This is for the pag vs custom input town mode
         # False means custom mode, true means pag
         self.inputmode = False
+
+        # This is for follow mode
+        self.followmode = False
 
     def try_toggle_map(self):
         # pydirectinput.keyDown("m")
@@ -1018,6 +1023,18 @@ class RHBotArrayServer():
     def close_esc_menu(self):
         pydirectinput.click(
             int(self.scaling*749+self.game_wincap.window_rect[0]), int(self.scaling*280+self.game_wincap.window_rect[1]))
+
+    def create_follower_thread(self):
+        t = threading.Thread(target=self.follower)
+        t.start()
+
+    def follower(self):
+        while self.followmode:
+            if BotUtils.check_in_dungeon():
+                loc = BotUtils.find_other_player()
+                if loc:
+                    BotUtils.navigate_towards(loc)
+        BotUtils.stop_movement()
 
 
 if __name__ == "__main__":
