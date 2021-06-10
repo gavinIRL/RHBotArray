@@ -4,7 +4,7 @@
 08-Wanted
 09-Wanted
 10-WantedRipSteakface
-11-Wanted
+11-WantedFlintIrongstag
 12-WantedThickMcRunfast
 12-WantedSplintChesthair
 13-WantedFistRothbone
