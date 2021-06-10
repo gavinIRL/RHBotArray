@@ -2,7 +2,7 @@ from re import S
 import socket
 import select
 import threading
-from v12.rhba_utils import BotUtils
+from v12.rhba_utils import BotUtils, Events
 import pydirectinput
 import time
 import subprocess
@@ -1029,11 +1029,18 @@ class RHBotArrayServer():
         t.start()
 
     def follower(self):
+        dung_cap = WindowCapture(self.gamename, [1090, 331, 1092, 353])
+        detect_count = 0
         while self.followmode:
-            if BotUtils.check_in_dungeon():
-                loc = BotUtils.find_other_player()
+            if Events.detect_in_dungeon(dung_cap):
+                loc = BotUtils.find_other_player(self.gamename)
                 if loc:
                     BotUtils.navigate_towards(loc)
+                    detect_count += 1
+                elif detect_count > 0:
+                    detect_count -= 1
+                else:
+                    BotUtils.stop_movement()
         BotUtils.stop_movement()
 
 
