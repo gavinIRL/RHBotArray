@@ -835,6 +835,13 @@ class BotUtils:
         truey = int(rely + wincap.window_rect[1])
         return truex, truey
 
+    def find_other_player(wincap=False):
+        if not wincap:
+            with open("gamename.txt") as f:
+                gamename = f.readline()
+            wincap = WindowCapture(gamename, [1090, 331, 1092, 353])
+        image = wincap.get_screenshot()
+
 
 class Looting:
     def loot_current_room(gamename, player_name, search_points=False):
@@ -1135,8 +1142,11 @@ class Events:
                     return True
         return False
 
-    def detect_in_dungeon(gamename):
-        wincap = WindowCapture(gamename, [1090, 331, 1092, 353])
+    def detect_in_dungeon(wincap=False):
+        if not wincap:
+            with open("gamename.txt") as f:
+                gamename = f.readline()
+            wincap = WindowCapture(gamename, [1090, 331, 1092, 353])
         image = wincap.get_screenshot()
         a, b, c = [int(i) for i in image[0][0]]
         d, e, f = [int(i) for i in image[-1][0]]
