@@ -73,7 +73,7 @@ class RHBotClientConnection():
 
 
 class ClientKeypressListener():
-    def __init__(self, list_servers, delay_spacing=12) -> None:
+    def __init__(self, list_servers) -> None:
         self.list_servers = list_servers
         self.listener = None
         self.unreleased_keys = []
@@ -81,7 +81,7 @@ class ClientKeypressListener():
         # Hotkey handling
         self.transmitting = True
         self.single_server = None
-        self.delay_spacing = delay_spacing
+        self.delay_spacing = 12
         self.x_loot_only = True
         self.autoloot_enabled = False
 
@@ -256,6 +256,14 @@ class ClientKeypressListener():
                 for server in self.list_servers:
                     server.send_message("clearall,1")
                 print("Clearing All...")
+            elif key == KeyCode(char='='):
+                self.delay_spread = []
+                if self.delay_spacing != 25:
+                    self.delay_spacing = 30
+                else:
+                    self.delay_spacing = 12
+                self.create_random_delays()
+                print("Changing delay to be {}s".format(self.delay_spacing))
             elif self.autoloot_enabled and key == KeyCode(char='x'):
                 pass
             elif GetWindowText(GetForegroundWindow()) == self.gamename:
@@ -355,13 +363,12 @@ class ClientKeypressListener():
 
 
 class RHBotClient():
-    def start(delay_spacing=12):
+    def start():
         list_ips = BotUtils.grab_online_servers()
         list_servers = []
         for ip in list_ips:
             list_servers.append(RHBotClientConnection(ip))
-        ckl = ClientKeypressListener(
-            list_servers, delay_spacing)
+        ckl = ClientKeypressListener(list_servers)
         ckl.start_mouse_listener()
         ckl.start_keypress_listener()
 
