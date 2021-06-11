@@ -1,76 +1,22 @@
-from re import S
 import socket
 import select
 import threading
-from v12.rhba_utils import BotUtils, Events
+from v12.rhba_utils import BotUtils, Events, QuestHandle, SellRepair
 import pydirectinput
 import time
 import subprocess
 import os
-from win32api import GetSystemMetrics
 from windowcapture import WindowCapture
 import ctypes
 from cryptography.fernet import Fernet
 from vision import Vision
-from hsvfilter import grab_object_preset, HsvFilter
-import cv2
-import pytesseract
-from quest_handle import QuestHandle
-from sell_repair import SellRepair
+from hsvfilter import grab_object_preset
 import numpy as np
 from fuzzywuzzy import process
 from custom_input import CustomInput
 
 # Change directory to current file location
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
-
-# Required code for custom input
-SendInput = ctypes.windll.user32.SendInput
-MapVirtualKey = ctypes.windll.user32.MapVirtualKeyW
-KEYEVENTF_EXTENDEDKEY = 0x0001
-KEYEVENTF_KEYUP = 0x0002
-KEYEVENTF_SCANCODE = 0x0008
-KEYEVENTF_UNICODE = 0x0004
-MAPVK_VK_TO_CHAR = 2
-MAPVK_VK_TO_VSC = 0
-MAPVK_VSC_TO_VK = 1
-MAPVK_VSC_TO_VK_EX = 3
-# C struct redefinitions
-PUL = ctypes.POINTER(ctypes.c_ulong)
-
-
-class KeyBdInput(ctypes.Structure):
-    _fields_ = [("wVk", ctypes.c_ushort),
-                ("wScan", ctypes.c_ushort),
-                ("dwFlags", ctypes.c_ulong),
-                ("time", ctypes.c_ulong),
-                ("dwExtraInfo", PUL)]
-
-
-class HardwareInput(ctypes.Structure):
-    _fields_ = [("uMsg", ctypes.c_ulong),
-                ("wParamL", ctypes.c_short),
-                ("wParamH", ctypes.c_ushort)]
-
-
-class MouseInput(ctypes.Structure):
-    _fields_ = [("dx", ctypes.c_long),
-                ("dy", ctypes.c_long),
-                ("mouseData", ctypes.c_ulong),
-                ("dwFlags", ctypes.c_ulong),
-                ("time", ctypes.c_ulong),
-                ("dwExtraInfo", PUL)]
-
-
-class Input_I(ctypes.Union):
-    _fields_ = [("ki", KeyBdInput),
-                ("mi", MouseInput),
-                ("hi", HardwareInput)]
-
-
-class Input(ctypes.Structure):
-    _fields_ = [("type", ctypes.c_ulong),
-                ("ii", Input_I)]
 
 
 class RHBotArrayServer():
