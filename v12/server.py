@@ -387,11 +387,13 @@ class RHBotArrayServer():
         t.start()
 
     def support_MS(self):
+        dung_cap = WindowCapture(self.gamename, [1090, 331, 1092, 353])
         while self.followmode and self.support:
-            if BotUtils.find_enemy(self.gamename):
-                for key in ["h", "a", "f", "s"]:
-                    CustomInput.press_key(CustomInput.key_map[key])
-                    CustomInput.release_key(CustomInput.key_map[key])
+            if Events.detect_in_dungeon(dung_cap):
+                if BotUtils.find_enemy(self.gamename):
+                    for key in ["h", "a", "f", "s"]:
+                        CustomInput.press_key(CustomInput.key_map[key])
+                        CustomInput.release_key(CustomInput.key_map[key])
             time.sleep(0.005)
 
     def create_revive_thread(self):
