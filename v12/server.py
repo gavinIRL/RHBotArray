@@ -15,8 +15,9 @@ os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 
 class RHBotArrayServer():
-    def __init__(self, print_only=False, move_only=False) -> None:
+    def __init__(self, print_only=False, move_only=False, support=True) -> None:
         self.print_only = print_only
+        self.support = support
         self.move_only = move_only
         self.move_only_exclude_keys = ["a", "s", "d", "f", "g", "h"]
 
@@ -267,6 +268,14 @@ class RHBotArrayServer():
                 BotUtils.close_map_and_menu(self.gamename)
             elif button == "sellrepair":
                 self.sell_repair.ident_sell_repair()
+            elif button == "follow":
+                if direction == "1":
+                    self.followmode = True
+                    self.create_follower_thread()
+                    if self.support:
+                        self.create_support_thread()
+                else:
+                    self.followmode = False
             elif button == "xallow":
                 if direction == "1":
                     self.allowx = True
@@ -372,9 +381,10 @@ class RHBotArrayServer():
 
     def support_MS(self):
         while self.followmode:
-            for key in ["h", "a", "f", "s"]:
-                CustomInput.press_key(CustomInput.key_map[key])
-                CustomInput.release_key(CustomInput.key_map[key])
+            if BotUtils.detect_enemy(self.gamename):
+                for key in ["h", "a", "f", "s"]:
+                    CustomInput.press_key(CustomInput.key_map[key])
+                    CustomInput.release_key(CustomInput.key_map[key])
             time.sleep(0.005)
 
     def create_revive_thread(self):
