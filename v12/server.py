@@ -19,6 +19,7 @@ from quest_handle import QuestHandle
 from sell_repair import SellRepair
 import numpy as np
 from fuzzywuzzy import process
+from custom_input import CustomInput
 
 # Change directory to current file location
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
@@ -1041,7 +1042,19 @@ class RHBotArrayServer():
                     detect_count -= 1
                 else:
                     BotUtils.stop_movement()
+            time.sleep(0.005)
         BotUtils.stop_movement()
+
+    def create_support_thread(self):
+        t = threading.Thread(target=self.support_MS)
+        t.start()
+
+    def support_MS(self):
+        while self.followmode:
+            for key in ["h", "a", "f", "s"]:
+                CustomInput.press_key(CustomInput.key_map[key])
+                CustomInput.release_key(CustomInput.key_map[key])
+            time.sleep(0.005)
 
 
 if __name__ == "__main__":
