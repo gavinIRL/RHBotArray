@@ -651,30 +651,7 @@ class RHBotArrayServer():
                     else:
                         CustomInput.release_key(CustomInput.key_map[key], key)
 
-    def grab_player_pos(self):
-        if not self.map_rect:
-            wincap = WindowCapture(self.gamename)
-        else:
-            wincap = WindowCapture(self.gamename, self.map_rect)
-        filter = HsvFilter(34, 160, 122, 50, 255, 255, 0, 0, 0, 0)
-        image = wincap.get_screenshot()
-        save_image = BotUtils.filter_blackwhite_invert(filter, image)
-        vision_limestone = Vision('plyr.jpg')
-        rectangles = vision_limestone.find(
-            save_image, threshold=0.31, epsilon=0.5)
-        points = vision_limestone.get_click_points(rectangles)
-        try:
-            x, y = points[0]
-            if not self.map_rect:
-                return x, y
-            else:
-                x += self.map_rect[0]
-                y += self.map_rect[1]
-                return x, y
-        except:
-            return False
-
-    def pre_regroup_updates(self):
+    def pre_regroup_updates(self, x, y):
         self.level_name = BotUtils.detect_level_name(self.gamename)
         # Then grab the right rect for the level
         try:
@@ -693,12 +670,13 @@ class RHBotArrayServer():
         # Then open the map
         if not BotUtils.detect_bigmap_open():
             BotUtils.try_toggle_map()
-        self.player_pos = self.grab_player_pos()
+        self.player_pos = BotUtils.grab_player_pos(
+            self.gamename, [x-100, y-100, x+100, y+100])
 
     def regroup(self, coords: str):
         x, y = coords.split("|")
         # first perform the pre-regroup updates
-        self.pre_regroup_updates()
+        self.pre_regroup_updates(int(x), int(y))
         # Then calculate the relative positions
         try:
             relx = self.player_pos[0] - int(x)
