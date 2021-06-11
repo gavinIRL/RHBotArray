@@ -9,8 +9,6 @@ import os
 from windowcapture import WindowCapture
 import ctypes
 from cryptography.fernet import Fernet
-from vision import Vision
-from hsvfilter import grab_object_preset
 import numpy as np
 from fuzzywuzzy import process
 from custom_input import CustomInput
@@ -47,19 +45,11 @@ class RHBotArrayServer():
 
         self.last_mouse_move = time.time() - 10
 
-        self.xprompt_filter, xprompt_custom_rect = grab_object_preset(
-            object_name="prompt_press_x_pickup")
-        self.xprompt_wincap = WindowCapture(
-            self.gamename, xprompt_custom_rect)
-        self.xprompt_vision = Vision("xprompt67filtv2.jpg")
-
         # These are related to the autoloot function
         self.autoloot_enabled = False
 
         # These are related to the questhandling
         self.quest_handle = QuestHandle()
-
-        # These are related to sell and repair
         self.sell_repair = SellRepair()
 
         # These are related to allow x in all cases
@@ -300,7 +290,7 @@ class RHBotArrayServer():
             elif button == "clearall":
                 BotUtils.close_map_and_menu(self.gamename)
             elif button == "sellrepair":
-                os.popen('python sell_repair.py')
+                self.sell_repair.ident_sell_repair()
             elif button == "xallow":
                 if direction == "1":
                     self.allowx = True
