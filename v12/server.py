@@ -1056,6 +1056,21 @@ class RHBotArrayServer():
                 CustomInput.release_key(CustomInput.key_map[key])
             time.sleep(0.005)
 
+    def create_revive_thread(self):
+        t = threading.Thread(target=self.auto_revive)
+        t.start()
+
+    def auto_revive(self):
+        dung_cap = WindowCapture(self.gamename, [1090, 331, 1092, 353])
+        while True:
+            try:
+                if Events.detect_in_dungeon(dung_cap):
+                    if Events.detect_resurrect_prompt(self.gamename):
+                        CustomInput.press_key(CustomInput.key_map["x"])
+                        CustomInput.release_key(CustomInput.key_map["x"])
+            except:
+                time.sleep(2)
+
 
 if __name__ == "__main__":
     lst = RHBotArrayServer(print_only=False)
