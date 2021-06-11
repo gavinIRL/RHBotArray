@@ -127,6 +127,14 @@ class BotUtils:
                     list_ips.append(ip.strip())
         return list_ips
 
+    def grab_current_lan_ip():
+        output = subprocess.run(
+            "ipconfig", capture_output=True).stdout.decode()
+        _, output = output.split("IPv4 Address. . . . . . . . . . . : 169")
+        output, _ = output.split("Subnet Mask", maxsplit=1)
+        current_lan_ip = "169" + output.strip()
+        return current_lan_ip
+
     def start_server_threads(list_servers):
         for server in list_servers:
             t = threading.Thread(target=server.main_loop)
