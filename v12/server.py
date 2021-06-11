@@ -276,6 +276,13 @@ class RHBotArrayServer():
                         self.create_support_thread()
                 else:
                     self.followmode = False
+            elif button == "follow":
+                if direction == "1":
+                    self.support = True
+                    if self.followmode:
+                        self.create_support_thread()
+                else:
+                    self.support = False
             elif button == "xallow":
                 if direction == "1":
                     self.allowx = True
@@ -380,8 +387,8 @@ class RHBotArrayServer():
         t.start()
 
     def support_MS(self):
-        while self.followmode:
-            if BotUtils.detect_enemy(self.gamename):
+        while self.followmode and self.support:
+            if BotUtils.find_enemy(self.gamename):
                 for key in ["h", "a", "f", "s"]:
                     CustomInput.press_key(CustomInput.key_map[key])
                     CustomInput.release_key(CustomInput.key_map[key])
