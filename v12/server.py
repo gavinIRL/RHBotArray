@@ -169,7 +169,7 @@ class RHBotArrayServer():
         CustomInput.press_key(CustomInput.key_map["m"])
         time.sleep(0.05)
         # pydirectinput.keyUp("m")
-        self.release_key(self.key_map["m"])
+        CustomInput.release_key(CustomInput.key_map["m"])
         time.sleep(0.08)
 
     def string_to_rect(self, string: str):
@@ -356,7 +356,7 @@ class RHBotArrayServer():
                 time.sleep(0.05-move_time)
             for key in ["up", "down", "left", "right"]:
                 # pydirectinput.keyUp(key)
-                self.release_key(self.key_map[key], key)
+                CustomInput.release_key(CustomInput.key_map[key], key)
             end_time = time.time() - start_time
 
             last_rel_dists = self.get_relative_dists()
@@ -371,13 +371,13 @@ class RHBotArrayServer():
                     CustomInput.press_key(CustomInput.key_map[key1], key1)
                     time.sleep((end_time)/percent_moved)
                     # pydirectinput.keyUp(key1)
-                    self.release_key(self.key_map[key1], key1)
+                    CustomInput.release_key(CustomInput.key_map[key1], key1)
                 else:
                     # pydirectinput.keyDown(key2)
                     CustomInput.press_key(CustomInput.key_map[key2], key2)
                     time.sleep((end_time)/percent_moved)
                     # pydirectinput.keyUp(key2)
-                    self.release_key(self.key_map[key2], key2)
+                    CustomInput.release_key(CustomInput.key_map[key2], key2)
             elif percent_moved < 0.9:
                 # Need to continue
                 travel_time_reqd = (1-percent_moved)*(end_time)
@@ -388,7 +388,7 @@ class RHBotArrayServer():
                     time.sleep(travel_time_reqd-move_time)
                 for key in ["up", "down", "left", "right"]:
                     # pydirectinput.keyUp(key)
-                    self.release_key(self.key_map[key], key)
+                    CustomInput.release_key(CustomInput.key_map[key], key)
 
     def regroup(self):
         # first resolve the x direction
@@ -404,7 +404,7 @@ class RHBotArrayServer():
                 if not consec_xpress > 6:
                     time.sleep(0.01)
                     # pydirectinput.keyUp("x")
-                    self.release_key(self.key_map["x"])
+                    CustomInput.release_key(CustomInput.key_map["x"])
                     time.sleep(0.225)
                 else:
                     time.sleep(0.4)
@@ -428,7 +428,7 @@ class RHBotArrayServer():
             xprompt_output_image, threshold=0.61, epsilon=0.5)
         # then return answer to whether currently in dungeon
         if len(xprompt_rectangles) == 1:
-            self.press_key(self.key_map["x"])
+            CustomInput.press_key(CustomInput.key_map["x"])
             # pydirectinput.keyDown("x")
             # keyup performed in main loop
             # return True for autoloot
@@ -578,12 +578,6 @@ class RHBotArrayServer():
             elif button == "quit":
                 print("Shutting down server")
                 os._exit(1)
-            elif button == "revive":
-                pydirectinput.keyDown("x")
-                self.press_key(self.key_map["x"])
-                time.sleep(0.05)
-                pydirectinput.keyUp("x")
-                self.release_key(self.key_map["x"])
             elif button == "mainplayer":
                 self.curr_player = direction
                 print("Admin player name is "+direction)
@@ -593,19 +587,19 @@ class RHBotArrayServer():
                         if self.inputmode:
                             pydirectinput.keyDown("x")
                         else:
-                            self.press_key(self.key_map["x"])
+                            CustomInput.press_key(CustomInput.key_map["x"])
                     else:
                         if self.inputmode:
                             pydirectinput.keyUp("x")
                         else:
-                            self.release_key(self.key_map["x"])
+                            CustomInput.release_key(CustomInput.key_map["x"])
                 elif direction == "down":
                     self.loot_if_available()
                 else:
                     if self.inputmode:
                         pydirectinput.keyUp("x")
                     else:
-                        self.release_key(self.key_map["x"])
+                        CustomInput.release_key(CustomInput.key_map["x"])
             elif button == "regroup":
                 self.regroup(direction)
             elif button == "autoloot":
@@ -642,12 +636,13 @@ class RHBotArrayServer():
                         if self.inputmode:
                             pydirectinput.keyDown(key)
                         else:
-                            self.press_key(self.key_map[key], key)
+                            CustomInput.press_key(
+                                CustomInput.key_map[key], key)
                 else:
                     if self.inputmode:
                         pydirectinput.keyDown(key)
                     else:
-                        self.press_key(self.key_map[key], key)
+                        CustomInput.press_key(CustomInput.key_map[key], key)
             elif direction == "up":
                 key = self.convert_pynput_to_pag(
                     button.replace("'", ""))
@@ -656,12 +651,13 @@ class RHBotArrayServer():
                         if self.inputmode:
                             pydirectinput.keyUp(key)
                         else:
-                            self.release_key(self.key_map[key], key)
+                            CustomInput.release_key(
+                                CustomInput.key_map[key], key)
                 else:
                     if self.inputmode:
                         pydirectinput.keyUp(key)
                     else:
-                        self.release_key(self.key_map[key], key)
+                        CustomInput.release_key(CustomInput.key_map[key], key)
 
     def filter_blackwhite_invert(self, filter, existing_image):
         hsv = cv2.cvtColor(existing_image, cv2.COLOR_BGR2HSV)
