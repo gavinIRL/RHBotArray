@@ -81,15 +81,6 @@ class RHBotArrayServer():
 
         with open("gamename.txt") as f:
             self.gamename = f.readline()
-        # initialise the window centre for the mouse resetter
-        self.centre_x = 900
-        self.centre_y = 500
-        if not self.print_only:
-            self.game_wincap = WindowCapture(self.gamename)
-            self.centre_x = int(0.5 * self.game_wincap.w +
-                                self.game_wincap.window_rect[0])
-            self.centre_y = int(0.5 * self.game_wincap.h +
-                                self.game_wincap.window_rect[1])
 
         self.HEADER_LENGTH = 10
         self.IP = self.grab_current_lan_ip()
@@ -143,17 +134,6 @@ class RHBotArrayServer():
         # This is for follow mode
         self.followmode = False
 
-    def try_toggle_map(self):
-        # pydirectinput.keyDown("m")
-        CustomInput.press_key(CustomInput.key_map["m"])
-        time.sleep(0.05)
-        # pydirectinput.keyUp("m")
-        CustomInput.release_key(CustomInput.key_map["m"])
-        time.sleep(0.08)
-
-    def move_mouse_centre(self):
-        ctypes.windll.user32.SetCursorPos(self.centre_x, self.centre_y)
-
     def grab_current_lan_ip(self):
         output = subprocess.run(
             "ipconfig", capture_output=True).stdout.decode()
@@ -161,31 +141,6 @@ class RHBotArrayServer():
         output, _ = output.split("Subnet Mask", maxsplit=1)
         current_lan_ip = "169" + output.strip()
         return current_lan_ip
-
-    def convert_pynput_to_pag(self, button):
-        PYNPUT_SPECIAL_CASE_MAP = {
-            'alt_l': 'altleft',
-            'alt_r': 'altright',
-            'alt_gr': 'altright',
-            'caps_lock': 'capslock',
-            'ctrl_l': 'ctrlleft',
-            'ctrl_r': 'ctrlright',
-            'page_down': 'pagedown',
-            'page_up': 'pageup',
-            'shift_l': 'shiftleft',
-            'shift_r': 'shiftright',
-            'num_lock': 'numlock',
-            'print_screen': 'printscreen',
-            'scroll_lock': 'scrolllock',
-        }
-
-        # example: 'Key.F9' should return 'F9', 'w' should return as 'w'
-        cleaned_key = button.replace('Key.', '')
-
-        if cleaned_key in PYNPUT_SPECIAL_CASE_MAP:
-            return PYNPUT_SPECIAL_CASE_MAP[cleaned_key]
-
-        return cleaned_key
 
     def convert_ratio_to_click(self, ratx, raty):
         # This will grab the current rectangle coords of game window
@@ -207,9 +162,8 @@ class RHBotArrayServer():
                 consec_xpress += 1
                 if not consec_xpress > 6:
                     time.sleep(0.01)
-                    # pydirectinput.keyUp("x")
                     CustomInput.release_key(CustomInput.key_map["x"])
-                    time.sleep(0.225)
+                    time.sleep(0.425)
                 else:
                     time.sleep(0.4)
             else:
@@ -222,21 +176,10 @@ class RHBotArrayServer():
         t.start()
 
     def loot_if_available(self):
-        # get an updated image of the game at specified area
-        xprompt_screenshot = self.xprompt_wincap.get_screenshot()
-        # pre-process the image to help with detection
-        xprompt_output_image = self.xprompt_vision.apply_hsv_filter(
-            xprompt_screenshot, self.xprompt_filter)
-        # do object detection, this time grab rectangles
-        xprompt_rectangles = self.xprompt_vision.find(
-            xprompt_output_image, threshold=0.61, epsilon=0.5)
-        # then return answer to whether currently in dungeon
-        if len(xprompt_rectangles) == 1:
+        if BotUtils.detect_xprompt(self.gamename):
             CustomInput.press_key(CustomInput.key_map["x"])
-            # pydirectinput.keyDown("x")
-            # keyup performed in main loop
-            # return True for autoloot
             return True
+        return False
 
     def batch_handle(self, lines: str):
         data = lines.split("\n")
@@ -254,11 +197,11 @@ class RHBotArrayServer():
                 # do the action
                 if line[1] == "keyDown":
                     # print("Would press {} down now".format(line[0]))
-                    k = self.convert_pynput_to_pag(line[0].strip("'"))
+                    k = BotUtils.convert_pynput_to_pag(line[0].strip("'"))
                     pydirectinput.keyDown(k)
                 elif line[1] == "keyUp":
                     # print("Would press {} down now".format(line[0]))
-                    k = self.convert_pynput_to_pag(line[0].strip("'"))
+                    k = BotUtils.convert_pynput_to_pag(line[0].strip("'"))
                     pydirectinput.keyUp(k)
                 elif line[1] == "click":
                     xrat, yrat = line[3].split(",")
@@ -340,7 +283,7 @@ class RHBotArrayServer():
             print(decrypted.decode())
         else:
             if (time.time() - self.last_mouse_move) >= 10:
-                self.move_mouse_centre()
+                BotUtils.move_mouse_centre(self.gamename)
                 self.last_mouse_move = time.time()
             button, direction = str(
                 decrypted.decode("utf-8")).split(",", 1)
@@ -418,7 +361,7 @@ class RHBotArrayServer():
                 else:
                     self.allowx = False
             elif direction == "down":
-                key = self.convert_pynput_to_pag(
+                key = BotUtils.convert_pynput_to_pag(
                     button.replace("'", ""))
                 if self.move_only:
                     if button in self.move_only_exclude_keys:
@@ -433,7 +376,7 @@ class RHBotArrayServer():
                     else:
                         CustomInput.press_key(CustomInput.key_map[key], key)
             elif direction == "up":
-                key = self.convert_pynput_to_pag(
+                key = BotUtils.convert_pynput_to_pag(
                     button.replace("'", ""))
                 if self.move_only:
                     if button in self.move_only_exclude_keys:
@@ -488,9 +431,6 @@ class RHBotArrayServer():
                 CustomInput.press_key(CustomInput.key_map[key])
                 CustomInput.release_key(CustomInput.key_map[key])
                 self.regroup(coords)
-        # Finally close the map
-        # if self.detect_bigmap_open():
-        #     self.try_toggle_map()
         self.player_pos = [0, 0]
         self.regroup_try_count = 0
 
