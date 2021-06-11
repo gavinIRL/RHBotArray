@@ -1,15 +1,12 @@
 import socket
 import select
 import threading
-from v12.rhba_utils import BotUtils, Events, QuestHandle, SellRepair
+from rhba_utils import BotUtils, Events, QuestHandle, SellRepair, WindowCapture
 import pydirectinput
 import time
-import subprocess
 import os
-from windowcapture import WindowCapture
 import ctypes
 from cryptography.fernet import Fernet
-import numpy as np
 from fuzzywuzzy import process
 from custom_input import CustomInput
 
@@ -27,7 +24,7 @@ class RHBotArrayServer():
             self.gamename = f.readline()
 
         self.HEADER_LENGTH = 10
-        self.IP = self.grab_current_lan_ip()
+        self.IP = BotUtils.grab_current_lan_ip()
         self.PORT = 1351
 
         self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -69,27 +66,6 @@ class RHBotArrayServer():
 
         # This is for follow mode
         self.followmode = False
-
-    def grab_current_lan_ip(self):
-        output = subprocess.run(
-            "ipconfig", capture_output=True).stdout.decode()
-        _, output = output.split("IPv4 Address. . . . . . . . . . . : 169")
-        output, _ = output.split("Subnet Mask", maxsplit=1)
-        current_lan_ip = "169" + output.strip()
-        return current_lan_ip
-
-    def convert_ratio_to_click(self, ratx, raty):
-        # This will grab the current rectangle coords of game window
-        # and then turn the ratio of positions versus the game window
-        # into true x,y coords
-        self.game_wincap.update_window_position(border=False)
-        # Turn the ratios into relative
-        relx = int(ratx * self.game_wincap.w)
-        rely = int(raty * self.game_wincap.h)
-        # Turn the relative into true
-        truex = int((relx + self.game_wincap.window_rect[0]))
-        truey = int((rely + self.game_wincap.window_rect[1]))
-        return truex, truey
 
     def auto_loot(self):
         consec_xpress = 0
@@ -142,7 +118,7 @@ class RHBotArrayServer():
                 elif line[1] == "click":
                     xrat, yrat = line[3].split(",")
                     # print("Would click at {},{} now".format(x, y))
-                    x, y = self.convert_ratio_to_click(
+                    x, y = BotUtils.convert_ratio_to_click(
                         float(xrat), float(yrat))
                     x = int(x)
                     y = int(y)
@@ -226,7 +202,7 @@ class RHBotArrayServer():
             if button == "Button.left":
                 xrat, yrat = direction.split("|")
                 # Need to convert from ratio to click
-                x, y = self.convert_ratio_to_click(
+                x, y = BotUtils.convert_ratio_to_click(
                     float(xrat), float(yrat))
                 # and then click at that location
                 x = int(x)
@@ -239,7 +215,7 @@ class RHBotArrayServer():
                     0x0004, 0, 0, 0, 0)
             elif button == "Button.right":
                 xrat, yrat = direction.split("|")
-                x, y = self.convert_ratio_to_click(
+                x, y = BotUtils.convert_ratio_to_click(
                     float(xrat), float(yrat))
                 x = int(x)
                 y = int(y)
