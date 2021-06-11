@@ -116,22 +116,6 @@ class RHBotArrayServer():
             self.gamename, xprompt_custom_rect)
         self.xprompt_vision = Vision("xprompt67filtv2.jpg")
 
-        # These are related to the v1 regroup command
-        if not self.print_only:
-            # These are related to auto playername detect
-            plyrname_rect = [165, 45, 320, 65]
-            self.plyrname_wincap = WindowCapture(self.gamename, plyrname_rect)
-            self.plyrname_filt = HsvFilter(0, 0, 103, 89, 104, 255, 0, 0, 0, 0)
-            self.plyrmname_vision = Vision('xprompt67filtv2.jpg')
-            self.main_player = self.detect_name()
-        with open("currplayer.txt") as f:
-            self.curr_player = f.readline()
-        self.regroup_wincap = WindowCapture(
-            self.gamename, [210, 60, 1455, 650])
-        self.regroup_vision = Vision('xprompt67filtv2.jpg')
-        self.regroup_filter = HsvFilter(
-            94, 188, 255, 137, 255, 255, 0, 0, 0, 0)
-
         # These are related to the autoloot function
         self.autoloot_enabled = False
 
@@ -148,11 +132,7 @@ class RHBotArrayServer():
         self.map_rect = None
         self.level_name = None
         self.speed = 20
-        self.rects = {}
-        self.speeds = {}
-        self.num_names = []
-        self.load_level_rects()
-        self.key_map = self.load_key_dict()
+        self.rects, self.speeds = BotUtils.grab_level_rects_and_speeds()
         self.player_pos = None
         self.regroup_try_count = 0
 
@@ -171,71 +151,8 @@ class RHBotArrayServer():
         CustomInput.release_key(CustomInput.key_map["m"])
         time.sleep(0.08)
 
-    def string_to_rect(self, string: str):
-        return [int(i) for i in string.split(',')]
-
-    def load_level_rects(self):
-        # Load the translation from name to num
-        with open("lvl_name_num.txt") as f:
-            self.num_names = f.readlines()
-        for i, entry in enumerate(self.num_names):
-            self.num_names[i] = entry.split("-")
-        # Load the num to rect catalogue
-        with open("catalogue.txt") as f:
-            nums_rects = f.readlines()
-        for i, entry in enumerate(nums_rects):
-            nums_rects[i] = entry.split("-")
-        # Finally load the level speeds
-        with open("lvl_speed.txt") as f:
-            num_speeds = f.readlines()
-        for i, entry in enumerate(num_speeds):
-            num_speeds[i] = entry.split("|")
-        # Then add each rect to the rects dict against name
-        # Also add each speed to the speed dict against name
-        for number, name in self.num_names:
-            for num, area, rect in nums_rects:
-                if area == "FM" and num == number:
-                    self.rects[name.rstrip().replace(" ", "")] = rect.rstrip()
-                    if "1" in name:
-                        self.rects[name.rstrip().replace(
-                            " ", "").replace("1", "L")] = rect.rstrip()
-                    if "ri" in name:
-                        self.rects[name.rstrip().replace(
-                            " ", "").replace("ri", "n").replace("1", "L")] = rect.rstrip()
-                    break
-            for num, speed in num_speeds:
-                if num == number:
-                    self.speeds[name.rstrip().replace(
-                        " ", "")] = float(speed.rstrip())
-                    if "1" in name:
-                        self.speeds[name.rstrip().replace(
-                            " ", "").replace("1", "L")] = float(speed.rstrip())
-                    if "ri" in name:
-                        self.speeds[name.rstrip().replace(
-                            " ", "").replace("ri", "n").replace("1", "L")] = float(speed.rstrip())
-                    break
-
     def move_mouse_centre(self):
         ctypes.windll.user32.SetCursorPos(self.centre_x, self.centre_y)
-
-    def detect_name(self):
-        # get an updated image of the game
-        image = self.plyrname_wincap.get_screenshot()
-        # pre-process the image
-        image = self.plyrmname_vision.apply_hsv_filter(
-            image, self.plyrname_filt)
-        rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-        results = pytesseract.image_to_data(
-            rgb, output_type=pytesseract.Output.DICT, lang='eng')
-        str_list = filter(None, results["text"])
-        with open("mainplayer.txt") as f:
-            longest = f.readline()
-        # try:
-        #     longest = max(str_list, key=len)
-        # except:
-        #     with open("mainplayer.txt") as f:
-        #         longest = f.readline()
-        return longest
 
     def grab_current_lan_ip(self):
         output = subprocess.run(
@@ -282,118 +199,6 @@ class RHBotArrayServer():
         truex = int((relx + self.game_wincap.window_rect[0]))
         truey = int((rely + self.game_wincap.window_rect[1]))
         return truex, truey
-
-    def get_relative_dists(self):
-        print(self.main_player)
-        print(self.curr_player)
-        # format is currplayer x, y, mainplayer x, y
-        positions = [0, 0, 0, 0]
-        # get an updated image of the game
-        image = self.regroup_wincap.get_screenshot()
-        # pre-process the image
-        image = self.regroup_vision.apply_hsv_filter(
-            image, self.regroup_filter)
-        rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-        results = pytesseract.image_to_data(
-            rgb, output_type=pytesseract.Output.DICT, lang='eng')
-
-        no_find_curr = True
-        no_find_main = True
-        for i in range(0, len(results["text"])):
-            if self.main_player in results["text"][i]:
-                no_find_main = False
-                positions[2] = results["left"][i] + (results["width"][i]/2)
-                positions[3] = results["top"][i] + (results["height"][i]/2)
-            elif self.curr_player in results["text"][i]:
-                no_find_curr = False
-                positions[0] = results["left"][i] + (results["width"][i]/2)
-                positions[1] = results["top"][i] + (results["height"][i]/2)
-        xrel = positions[2] - positions[0]
-        yrel = positions[1] - positions[3]
-        if no_find_curr or no_find_main:
-            return False
-        else:
-            return[xrel, yrel]
-
-    def move_towards(self, dir, dists):
-        if dir == "x":
-            dist = dists[0]
-            if dist > 0:
-                key = "left"
-            else:
-                key = "right"
-        elif dir == "y":
-            dist = dists[1]
-            if dist > 0:
-                key = "down"
-            else:
-                key = "up"
-        if abs(dist) > 5:
-            # pydirectinput.keyDown(key)
-            CustomInput.press_key(CustomInput.key_map[key], key)
-
-    def resolve_direction(self, dir):
-        if dir == "x":
-            key1 = "left"
-            key2 = "right"
-            index = 0
-        elif dir == "y":
-            key1 = "down"
-            key2 = "up"
-            index = 1
-        else:
-            return False
-        # grab the first relative distance values
-        first_rel_dists = self.get_relative_dists()
-        # if was able to detect both
-        if first_rel_dists:
-            # then start resolving the x direction
-            start_time = time.time()
-            self.move_towards(dir, first_rel_dists)
-            move_time = time.time() - start_time
-            if move_time < 0.05:
-                time.sleep(0.05-move_time)
-            for key in ["up", "down", "left", "right"]:
-                # pydirectinput.keyUp(key)
-                CustomInput.release_key(CustomInput.key_map[key], key)
-            end_time = time.time() - start_time
-
-            last_rel_dists = self.get_relative_dists()
-            if not last_rel_dists:
-                return False
-            dist_moved = abs(last_rel_dists[index] - first_rel_dists[index])
-            percent_moved = dist_moved / abs(first_rel_dists[index])
-            if percent_moved > 1.1:
-                # Need to reverse direction
-                if first_rel_dists[index] > 0:
-                    # pydirectinput.keyDown(key1)
-                    CustomInput.press_key(CustomInput.key_map[key1], key1)
-                    time.sleep((end_time)/percent_moved)
-                    # pydirectinput.keyUp(key1)
-                    CustomInput.release_key(CustomInput.key_map[key1], key1)
-                else:
-                    # pydirectinput.keyDown(key2)
-                    CustomInput.press_key(CustomInput.key_map[key2], key2)
-                    time.sleep((end_time)/percent_moved)
-                    # pydirectinput.keyUp(key2)
-                    CustomInput.release_key(CustomInput.key_map[key2], key2)
-            elif percent_moved < 0.9:
-                # Need to continue
-                travel_time_reqd = (1-percent_moved)*(end_time)
-                start_time = time.time()
-                self.move_towards(dir, last_rel_dists)
-                move_time = time.time() - start_time
-                if move_time < travel_time_reqd:
-                    time.sleep(travel_time_reqd-move_time)
-                for key in ["up", "down", "left", "right"]:
-                    # pydirectinput.keyUp(key)
-                    CustomInput.release_key(CustomInput.key_map[key], key)
-
-    def regroup(self):
-        # first resolve the x direction
-        self.resolve_direction("x")
-        # and now resolve the y direction
-        self.resolve_direction("y")
 
     def auto_loot(self):
         consec_xpress = 0
@@ -451,12 +256,10 @@ class RHBotArrayServer():
                     # print("Would press {} down now".format(line[0]))
                     k = self.convert_pynput_to_pag(line[0].strip("'"))
                     pydirectinput.keyDown(k)
-                    # self.press_key(self.key_map[k], k)
                 elif line[1] == "keyUp":
                     # print("Would press {} down now".format(line[0]))
                     k = self.convert_pynput_to_pag(line[0].strip("'"))
                     pydirectinput.keyUp(k)
-                    # self.press_key(self.key_map[k], k)
                 elif line[1] == "click":
                     xrat, yrat = line[3].split(",")
                     # print("Would click at {},{} now".format(x, y))
@@ -570,9 +373,6 @@ class RHBotArrayServer():
             elif button == "quit":
                 print("Shutting down server")
                 os._exit(1)
-            elif button == "mainplayer":
-                self.curr_player = direction
-                print("Admin player name is "+direction)
             elif button == "'x'":
                 if self.allowx:
                     if direction == "down":
@@ -612,9 +412,6 @@ class RHBotArrayServer():
                 BotUtils.close_map_and_menu(self.gamename)
             elif button == "sellrepair":
                 os.popen('python sell_repair.py')
-            elif button == "mainplayer":
-                self.main_player = direction
-                print("Mainplayer={}".format(direction))
             elif button == "xallow":
                 if direction == "1":
                     self.allowx = True
@@ -655,13 +452,14 @@ class RHBotArrayServer():
         self.level_name = BotUtils.detect_level_name(self.gamename)
         # Then grab the right rect for the level
         try:
-            self.map_rect = self.string_to_rect(self.rects[self.level_name])
+            self.map_rect = BotUtils.string_to_rect(
+                self.rects[self.level_name])
             self.speed = self.speeds[self.level_name]
         except:
             try:
                 best_match = process.extractOne(
                     self.level_name, self.rects, score_cutoff=0.8)
-                self.map_rect = self.string_to_rect(
+                self.map_rect = BotUtils.string_to_rect(
                     self.rects[best_match])
                 self.speed = self.speeds[best_match]
             except:
