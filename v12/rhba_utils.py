@@ -715,6 +715,14 @@ class BotUtils:
         # This converts the rect from catalogue into int list
         return [int(i) for i in string.split(',')]
 
+    def move_mouse_centre(self, gamename):
+        wincap = WindowCapture(gamename)
+        centre_x = int(0.5 * wincap.w +
+                       wincap.window_rect[0])
+        centre_y = int(0.5 * wincap.h +
+                       wincap.window_rect[1])
+        ctypes.windll.user32.SetCursorPos(centre_x, centre_y)
+
     def detect_bigmap_open(gamename=False):
         if not gamename:
             with open("gamename.txt") as f:
