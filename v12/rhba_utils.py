@@ -856,7 +856,10 @@ class BotUtils:
         raty = rely/(wincap.h)
         return ratx, raty
 
-    def convert_ratio_to_click(gamename, ratx, raty):
+    def convert_ratio_to_click(ratx, raty, gamename=False):
+        if not gamename:
+            with open("gamename.txt") as f:
+                gamename = f.readline()
         wincap = WindowCapture(gamename)
         relx = int(ratx * wincap.w)
         rely = int(raty * wincap.h)
