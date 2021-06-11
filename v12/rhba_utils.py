@@ -741,7 +741,7 @@ class BotUtils:
                     break
         return rects, speeds
 
-    def string_to_rect(self, string: str):
+    def string_to_rect(string: str):
         # This converts the rect from catalogue into int list
         return [int(i) for i in string.split(',')]
 
