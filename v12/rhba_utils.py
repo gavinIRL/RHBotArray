@@ -102,6 +102,7 @@ class WindowCapture:
             else:
                 self.cropped_x = 0
                 self.cropped_y = 0
+                self.w += 3
         else:
             self.w = self.custom_rect[2] - self.custom_rect[0]
             self.h = self.custom_rect[3] - self.custom_rect[1]
@@ -850,10 +851,15 @@ class BotUtils:
 
     def convert_click_to_ratio(gamename, truex, truey):
         wincap = WindowCapture(gamename)
-        relx = (truex - wincap.window_rect[0])
-        rely = (truey - wincap.window_rect[1])
-        ratx = relx/(wincap.w)
-        raty = rely/(wincap.h)
+        wincap.update_window_position(border=False)
+        scaling = BotUtils.get_monitor_scaling()
+        # print(scaling)
+        relx = (truex - (wincap.window_rect[0] * scaling))
+        rely = (truey - (wincap.window_rect[1] * scaling))
+        # print("relx, rely, w, h: {},{},{},{}".format(
+        #     relx, rely, wincap.w, wincap.h))
+        ratx = relx/(wincap.w * scaling)
+        raty = rely/(wincap.h * scaling)
         return ratx, raty
 
     def convert_ratio_to_click(ratx, raty, gamename=False):
