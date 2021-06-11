@@ -835,12 +835,24 @@ class BotUtils:
         truey = int(rely + wincap.window_rect[1])
         return truex, truey
 
-    def find_other_player(wincap=False):
-        if not wincap:
-            with open("gamename.txt") as f:
-                gamename = f.readline()
-            wincap = WindowCapture(gamename, [1090, 331, 1092, 353])
-        image = wincap.get_screenshot()
+    def find_other_player(gamename, all=False):
+        othr_plyr_vision = Vision("otherplayerinvert.jpg")
+        othr_plyr_wincap = WindowCapture(gamename, [1100, 50, 1260, 210])
+        image = othr_plyr_wincap.get_screenshot()
+        filter = HsvFilter(24, 194, 205, 31, 255, 255, 0, 0, 0, 0)
+        image = cv2.blur(image, (4, 4))
+        image = BotUtils.filter_blackwhite_invert(filter, image)
+        rectangles = othr_plyr_vision.find(
+            image, threshold=0.61, epsilon=0.5)
+        points = othr_plyr_vision.get_click_points(rectangles)
+        if len(points) >= 1:
+            if not all:
+                relx = points[0][0] - 0
+                rely = 0 - points[0][1]
+                return relx, rely
+            else:
+                return points
+        return False
 
 
 class Looting:
