@@ -525,6 +525,28 @@ class BotUtils:
         inverted = cv2.cvtColor(inverted, cv2.COLOR_GRAY2BGR)
         return inverted
 
+    def convert_pynput_to_pag(button):
+        PYNPUT_SPECIAL_CASE_MAP = {
+            'alt_l': 'altleft',
+            'alt_r': 'altright',
+            'alt_gr': 'altright',
+            'caps_lock': 'capslock',
+            'ctrl_l': 'ctrlleft',
+            'ctrl_r': 'ctrlright',
+            'page_down': 'pagedown',
+            'page_up': 'pageup',
+            'shift_l': 'shiftleft',
+            'shift_r': 'shiftright',
+            'num_lock': 'numlock',
+            'print_screen': 'printscreen',
+            'scroll_lock': 'scrolllock',
+        }
+        # example: 'Key.F9' should return 'F9', 'w' should return as 'w'
+        cleaned_key = button.replace('Key.', '')
+        if cleaned_key in PYNPUT_SPECIAL_CASE_MAP:
+            return PYNPUT_SPECIAL_CASE_MAP[cleaned_key]
+        return cleaned_key
+
     def detect_player_name(gamename):
         plyrname_rect = [165, 45, 320, 65]
         plyrname_wincap = WindowCapture(gamename, plyrname_rect)
