@@ -650,7 +650,7 @@ class BotUtils:
         else:
             return False
 
-    def grab_player_pos(gamename, map_rect=None):
+    def grab_player_pos(gamename, map_rect=None, rect_rel=False):
         if not map_rect:
             wincap = WindowCapture(gamename, [561, 282, 1111, 666])
         else:
@@ -666,6 +666,10 @@ class BotUtils:
         if not map_rect:
             x += 561
             y += 282
+            return x, y
+        elif rect_rel:
+            x += map_rect[0]
+            y += map_rect[1]
             return x, y
         else:
             x += wincap.window_rect[0]
@@ -924,7 +928,9 @@ class BotUtils:
                 return points
         return False
 
-    def stop_movement():
+    def stop_movement(follower=False):
+        if follower:
+            follower.pressed_keys = []
         for key in ["up", "down", "left", "right"]:
             CustomInput.release_key(CustomInput.key_map[key], key)
 
@@ -1979,6 +1985,78 @@ class QuestHandle():
             return False
         else:
             return True
+
+
+class Follower():
+    def __init__(self) -> None:
+        self.pressed_keys = []
+        self.relx = 0
+        self.rely = 0
+
+    def navigate_towards(self, x, y):
+        self.relx = x
+        self.rely = y
+        if self.relx > 1:
+            # Check if opposite key held down
+            if "left" in self.pressed_keys:
+                self.pressed_keys.remove("left")
+                CustomInput.release_key(CustomInput.key_map["left"], "left")
+            # Check that not already being held down
+            if "right" not in self.pressed_keys:
+                self.pressed_keys.append("right")
+                # Hold the key down
+                CustomInput.press_key(CustomInput.key_map["right"], "right")
+
+        elif self.relx < -1:
+            # Check if opposite key held down
+            if "right" in self.pressed_keys:
+                self.pressed_keys.remove("right")
+                CustomInput.release_key(CustomInput.key_map["right"], "right")
+            # Check that not already being held down
+            if "left" not in self.pressed_keys:
+                self.pressed_keys.append("left")
+                # Hold the key down
+                CustomInput.press_key(CustomInput.key_map["left"], "left")
+
+        else:
+            # Handling for case where = 0, need to remove both keys
+            if "right" in self.pressed_keys:
+                self.pressed_keys.remove("right")
+                CustomInput.release_key(CustomInput.key_map["right"], "right")
+            if "left" in self.pressed_keys:
+                self.pressed_keys.remove("left")
+                CustomInput.release_key(CustomInput.key_map["left"], "left")
+
+        # Handling for y-dir next
+        if self.rely > 1:
+            # Check if opposite key held down
+            if "down" in self.pressed_keys:
+                self.pressed_keys.remove("down")
+                CustomInput.release_key(CustomInput.key_map["down"], "down")
+            # Check that not already being held down
+            if "up" not in self.pressed_keys:
+                self.pressed_keys.append("up")
+                # Hold the key down
+                CustomInput.press_key(CustomInput.key_map["up"], "up")
+
+        elif self.rely < -1:
+            # Check if opposite key held down
+            if "up" in self.pressed_keys:
+                self.pressed_keys.remove("up")
+                CustomInput.release_key(CustomInput.key_map["up"], "up")
+            # Check that not already being held down
+            if "down" not in self.pressed_keys:
+                self.pressed_keys.append("down")
+                # Hold the key down
+                CustomInput.press_key(CustomInput.key_map["down"], "down")
+        else:
+            # Handling for case where = 0, need to remove both keys
+            if "up" in self.pressed_keys:
+                self.pressed_keys.remove("up")
+                CustomInput.release_key(CustomInput.key_map["up"], "up")
+            if "down" in self.pressed_keys:
+                self.pressed_keys.remove("down")
+                CustomInput.release_key(CustomInput.key_map["down"], "down")
 
 
 if __name__ == "__main__":
