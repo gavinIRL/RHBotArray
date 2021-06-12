@@ -119,8 +119,8 @@ class RHBotArrayServer():
                 elif line[1] == "click":
                     xrat, yrat = line[3].split(",")
                     # print("Would click at {},{} now".format(x, y))
-                    x, y = BotUtils.convert_ratio_to_click(
-                        float(xrat), float(yrat))
+                    x, y = BotUtils.convert_window_to_true(self.gamename,
+                                                           float(xrat), float(yrat))
                     x = int(x)
                     y = int(y)
                     # pydirectinput.click(x, y, duration=0.025)
@@ -203,8 +203,8 @@ class RHBotArrayServer():
             if button == "Button.left":
                 xrat, yrat = direction.split("|")
                 # Need to convert from ratio to click
-                x, y = BotUtils.convert_ratio_to_click(
-                    float(xrat), float(yrat))
+                x, y = BotUtils.convert_window_to_true(self.gamename,
+                                                       float(xrat), float(yrat))
                 # and then click at that location
                 x = int(x)
                 y = int(y)
@@ -216,8 +216,8 @@ class RHBotArrayServer():
                     0x0004, 0, 0, 0, 0)
             elif button == "Button.right":
                 xrat, yrat = direction.split("|")
-                x, y = BotUtils.convert_ratio_to_click(
-                    float(xrat), float(yrat))
+                x, y = BotUtils.convert_window_to_true(self.gamename,
+                                                       float(xrat), float(yrat))
                 x = int(x)
                 y = int(y)
                 ctypes.windll.user32.SetCursorPos(x, y)
