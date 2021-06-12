@@ -905,7 +905,7 @@ class BotUtils:
                 return points
         return False
 
-    def find_enemy(self, gamename, all=False):
+    def find_enemy(gamename, all=False):
         othr_plyr_vision = Vision("otherplayerinvert.jpg")
         othr_plyr_wincap = WindowCapture(gamename, [1100, 50, 1260, 210])
         image = othr_plyr_wincap.get_screenshot()
