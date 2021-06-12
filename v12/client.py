@@ -138,7 +138,7 @@ class ClientKeypressListener():
                     # Need to get the ratio compared to window top left
                     # This will allow common usage on other size monitors
                     # print("x={}, y={}".format(x, y))
-                    xratio, yratio = BotUtils.convert_click_to_ratio(
+                    xratio, yratio = BotUtils.convert_true_to_window(
                         self.gamename, x, y)
                     # print("xrat={}, yrat={}".format(xratio, yratio))
                     if self.batch_recording_ongoing:
