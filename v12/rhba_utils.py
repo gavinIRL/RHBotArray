@@ -924,6 +924,10 @@ class BotUtils:
                 return points
         return False
 
+    def stop_movement():
+        for key in ["up", "down", "left", "right"]:
+            CustomInput.release_key(CustomInput.key_map[key], key)
+
 
 class Looting:
     def loot_current_room(gamename, player_name, search_points=False):
