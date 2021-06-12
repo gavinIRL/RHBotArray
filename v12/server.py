@@ -1,7 +1,7 @@
 import socket
 import select
 import threading
-from rhba_utils import BotUtils, Events, QuestHandle, SellRepair, WindowCapture
+from rhba_utils import BotUtils, Events, QuestHandle, SellRepair, WindowCapture, Follower
 import pydirectinput
 import time
 import os
@@ -67,6 +67,7 @@ class RHBotArrayServer():
 
         # This is for follow mode
         self.followmode = False
+        self.follower = Follower()
 
     def auto_loot(self):
         consec_xpress = 0
@@ -373,14 +374,19 @@ class RHBotArrayServer():
             if Events.detect_in_dungeon(dung_cap):
                 loc = BotUtils.find_other_player(self.gamename)
                 if loc:
-                    BotUtils.navigate_towards(loc)
-                    detect_count += 1
+                    playerx, playery = BotUtils.grab_player_pos(
+                        self.gamename, [1100, 50, 1260, 210], True)
+                    if playerx:
+                        relx = loc[0] - playerx
+                        rely = playery - loc[1]
+                        self.follower.navigate_towards(relx, rely)
+                        detect_count += 1
                 elif detect_count > 0:
                     detect_count -= 1
                 else:
-                    BotUtils.stop_movement()
+                    BotUtils.stop_movement(self.follower)
             time.sleep(0.005)
-        BotUtils.stop_movement()
+        BotUtils.stop_movement(self.follower)
 
     def create_support_thread(self):
         t = threading.Thread(target=self.support_MS)
