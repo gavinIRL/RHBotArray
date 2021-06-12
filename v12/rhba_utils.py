@@ -661,6 +661,8 @@ class BotUtils:
         vision = Vision('plyr.jpg')
         rectangles = vision.find(
             save_image, threshold=0.31, epsilon=0.5)
+        if len(rectangles) < 1:
+            return False, False
         points = vision.get_click_points(rectangles)
         x, y = points[0]
         if not map_rect:
