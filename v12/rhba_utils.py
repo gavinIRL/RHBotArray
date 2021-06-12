@@ -874,9 +874,10 @@ class BotUtils:
         return truex, truey
 
     def convert_true_to_window(gamename, truex, truey):
+        scaling = BotUtils.get_monitor_scaling()
         wincap = WindowCapture(gamename)
-        relx = (truex - wincap.window_rect[0])
-        rely = (truey - wincap.window_rect[1])
+        relx = (truex/scaling) - wincap.window_rect[0]
+        rely = (truey/scaling) - wincap.window_rect[1]
         return relx, rely
 
     def convert_window_to_true(gamename, relx, rely):
