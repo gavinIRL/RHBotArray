@@ -391,7 +391,7 @@ class RHBotArrayServer():
         while self.followmode and self.support:
             if Events.detect_in_dungeon(dung_cap):
                 if BotUtils.find_enemy(self.gamename):
-                    for key in ["h", "a", "f", "s"]:
+                    for key in ["s", "a", "f", "h"]:
                         CustomInput.press_key(CustomInput.key_map[key])
                         CustomInput.release_key(CustomInput.key_map[key])
             time.sleep(0.005)
