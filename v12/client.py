@@ -305,7 +305,7 @@ class ClientKeypressListener():
                 self.speed = 30
         # Then open the map
         if not BotUtils.detect_bigmap_open(self.gamename):
-            BotUtils.try_toggle_map()
+            BotUtils.try_toggle_map_clicking()
         return BotUtils.grab_player_pos(self.gamename, map_rect)
 
     def on_release(self, key):
