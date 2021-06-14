@@ -1,6 +1,6 @@
 import time
 import os
-from rhba_utils import BotUtils, Events
+from rhba_utils import BotUtils, Events, SellRepair
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 
@@ -50,7 +50,8 @@ def start_endlevel_script():
     while not Events.detect_store():
         time.sleep(0.2)
     # And then perform the sell and repair actions
-
+    sr = SellRepair()
+    sr.ident_sell_repair()
     # And then go to next level if needs be
     repeat_level()
 
