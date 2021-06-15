@@ -8,7 +8,7 @@
 11-WantedFlintIrongstag
 12-WantedThickMcRunfast
 12-WantedSplintChesthair
-12-WantedDirkHardpec
+12-WantedDirkHardpec-MCC
 13-WantedFistRothbone
 13-WantedBobJohnson-Gems
 13-WantedBoltBigflank
@@ -18,6 +18,6 @@
 15-WantedCastRustrod
 16-WantedLardBigpudge
 16-WantedFattyMcFatso
-17-WantedSlabHunk
+17-WantedSlabHunk-MCC
 18-WantedSmashHardsplash
 18-WantedHissBanejaw
