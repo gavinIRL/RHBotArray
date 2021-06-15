@@ -2,7 +2,7 @@
 06-Wanted
 07-WantedBuffDrinklotz
 07-TrunkSlamchest-GSP
-08-WantedFistMcThornbody
+08-WantedFistMcThornbody-Gems
 09-Wanted
 10-WantedRipSteakface
 11-WantedFlintIrongstag
@@ -19,5 +19,5 @@
 16-WantedLardBigpudge
 16-WantedFattyMcFatso
 17-WantedSlabHunk-MCC
-18-WantedSmashHardsplash
+18-WantedSmashHardsplash-Gems
 18-WantedHissBanejaw
