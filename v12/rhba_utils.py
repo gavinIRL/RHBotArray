@@ -616,7 +616,10 @@ class BotUtils:
 
         return img
 
-    def detect_sect_clear(gamename):
+    def detect_sect_clear(gamename=False):
+        if not gamename:
+            with open("gamename.txt") as f:
+                gamename = f.readline()
         wincap = WindowCapture(gamename, custom_rect=[
             464+156, 640, 464+261, 641])
         image = wincap.get_screenshot()
@@ -627,7 +630,10 @@ class BotUtils:
                 return True
         return False
 
-    def detect_boss_healthbar(gamename):
+    def detect_boss_healthbar(gamename=False):
+        if not gamename:
+            with open("gamename.txt") as f:
+                gamename = f.readline()
         wincap = WindowCapture(gamename, custom_rect=[
                                415+97, 105+533, 415+98, 105+534])
         image = wincap.get_screenshot()
@@ -639,7 +645,10 @@ class BotUtils:
                 return True
         return False
 
-    def detect_xprompt(gamename):
+    def detect_xprompt(gamename=False):
+        if not gamename:
+            with open("gamename.txt") as f:
+                gamename = f.readline()
         wincap = WindowCapture(gamename, custom_rect=[
             1137, 694, 1163, 695])
         image = wincap.get_screenshot()
@@ -650,7 +659,10 @@ class BotUtils:
         else:
             return False
 
-    def grab_player_pos(gamename, map_rect=None, rect_rel=False):
+    def grab_player_pos(gamename=False, map_rect=None, rect_rel=False):
+        if not gamename:
+            with open("gamename.txt") as f:
+                gamename = f.readline()
         if not map_rect:
             wincap = WindowCapture(gamename, [561, 282, 1111, 666])
         else:
@@ -797,7 +809,10 @@ class BotUtils:
             return_list.append((relx, rely))
         return return_list
 
-    def close_map_and_menu(gamename):
+    def close_map_and_menu(gamename=False):
+        if not gamename:
+            with open("gamename.txt") as f:
+                gamename = f.readline()
         game_wincap = WindowCapture(gamename)
         if BotUtils.detect_menu_open(gamename):
             BotUtils.close_esc_menu(game_wincap)
@@ -810,7 +825,10 @@ class BotUtils:
         pydirectinput.keyUp("m")
         time.sleep(0.08)
 
-    def try_toggle_map_clicking(gamename):
+    def try_toggle_map_clicking(gamename=False):
+        if not gamename:
+            with open("gamename.txt") as f:
+                gamename = f.readline()
         game_wincap = WindowCapture(gamename)
         pydirectinput.click(
             int(1262+game_wincap.window_rect[0]), int(64+game_wincap.window_rect[1]))
