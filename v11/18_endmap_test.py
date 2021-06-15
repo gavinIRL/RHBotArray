@@ -2,11 +2,11 @@ import time
 import os
 from v12.rhba_utils import WindowCapture
 import pydirectinput
-from rhba_utils import BotUtils, Events, SellRepair
+from rhba_utils import BotUtils, Events, SellRepair, RHClick
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 
-def start_endlevel_script():
+def start_endlevel_script(gamename):
     # Need to first wait until dungeon check returns false
     while not Events.detect_in_dungeon():
         time.sleep(0.006)
@@ -35,9 +35,9 @@ def start_endlevel_script():
     # Then do the appropriate handling if event is detected
     print("Got to pre-event handling")
     if event:
-        do_otherworld_handling()
+        do_otherworld_handling(gamename)
     # Once event is complete move to correct place in room
-    move_to_loot_point()
+    move_to_loot_point(gamename)
     # And then commence looting
     print("Got to post-move to loot point")
     while Events.detect_in_dungeon():
@@ -74,7 +74,7 @@ def do_otherworld_handling(gamename):
     time.sleep(1)
 
 
-def move_to_loot_point():
+def move_to_loot_point(gamename):
     pass
 
 
@@ -82,9 +82,17 @@ def loot_everything():
     pass
 
 
-def skip_to_reward():
-    pass
+def skip_to_reward(gamename):
+    wincap = WindowCapture(gamename)
+    pydirectinput.click(wincap.window_rect[0]+656, wincap.window_rect[1]+276)
 
 
 def repeat_level():
+    # Don't do anything for now
+    # RHClick.click_explore_again()
     pass
+
+
+if __name__ == "__main__":
+    with open("gamename.txt") as f:
+        gamename = f.readline()
