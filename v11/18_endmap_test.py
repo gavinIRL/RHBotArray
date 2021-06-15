@@ -2,7 +2,7 @@ import time
 import os
 from v12.rhba_utils import WindowCapture
 import pydirectinput
-from rhba_utils import BotUtils, Events, SellRepair, RHClick
+from rhba_utils import BotUtils, Events, SellRepair, RHClick, Looting
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 
@@ -41,7 +41,7 @@ def start_endlevel_script(gamename):
     # And then commence looting
     print("Got to post-move to loot point")
     while Events.detect_in_dungeon():
-        if not loot_everything():
+        if not loot_everything(gamename):
             # Click centre of screen to skip
             skip_to_reward()
             break
@@ -78,8 +78,9 @@ def move_to_loot_point(gamename):
     pass
 
 
-def loot_everything():
-    pass
+def loot_everything(gamename):
+    player_name = BotUtils.detect_player_name(gamename)
+    return Looting.grab_all_visible_loot(gamename, player_name)
 
 
 def skip_to_reward(gamename):
