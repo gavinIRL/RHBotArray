@@ -1,5 +1,7 @@
 import time
 import os
+from v12.rhba_utils import WindowCapture
+import pydirectinput
 from rhba_utils import BotUtils, Events, SellRepair
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
@@ -10,8 +12,8 @@ def start_endlevel_script():
         time.sleep(0.006)
     # Then until sect cleared shows up
     while not BotUtils.detect_sect_clear():
-        # press escape to hide boss death animation
-        pass
+        pydirectinput.press('esc')
+        time.sleep(0.01)
     # Then wait for end-level event to show up
     start_time = time.time()
     event = False
@@ -21,7 +23,7 @@ def start_endlevel_script():
             break
         if not Events.detect_in_dungeon():
             # Press escape
-
+            pydirectinput.press('esc')
             # Wait 2 seconds
             time.sleep(2)
             # Then if ok is detected turn flag on
@@ -56,8 +58,11 @@ def start_endlevel_script():
     repeat_level()
 
 
-def do_otherworld_handling():
-    pass
+def do_otherworld_handling(gamename):
+    wincap = WindowCapture(gamename)
+    # For now just press no to it
+    pydirectinput.click(wincap.window_rect[0]+775, wincap.window_rect[1]+488)
+    time.sleep(1)
 
 
 def move_to_loot_point():
