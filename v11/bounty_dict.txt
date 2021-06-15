@@ -1,7 +1,7 @@
 05-Wanted
-06-Wanted
-07-WantedBuffDrinklotz
-07-TrunkSlamchest-GSP
+06-WantedPunchSideiron-Gems
+07-WantedBuffDrinklotz-MCC
+07-WantedTrunkSlamchest-GSP
 08-WantedFistMcThornbody-Gems
 09-Wanted
 10-WantedRipSteakface
@@ -14,11 +14,12 @@
 13-WantedBoltBigflank
 13-WantedBrickHardmeat-MCC
 14-WantedHoofMuchbeef
-14-GristleFlanksteak-Gems
+14-WantedGristleFlanksteak-Gems
 15-WantedGutBaithook
 15-WantedCastRustrod
 16-WantedLardBigpudge
 16-WantedFattyMcFatso
 17-WantedSlabHunk-MCC
+17-WantedPunchRockgroin-GSP
 18-WantedSmashHardsplash-Gems
 18-WantedHissBanejaw
