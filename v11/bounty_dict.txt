@@ -14,11 +14,12 @@
 13-WantedBobJohnson-Gems
 13-WantedBoltBigflank
 13-WantedBrickHardmeat-MCC
+14-BlastCrunchclaw-GSP
 14-WantedHoofMuchbeef
 14-WantedGristleFlanksteak-Gems
 15-WantedGutBaithook
 15-WantedCastRustrod-Gems
-16-WantedLardBigpudge
+16-WantedLardBigpudge-GSP
 16-WantedFattyMcFatso
 17-WantedSlabHunk-MCC
 17-WantedPunchRockgroin-GSP
