@@ -22,7 +22,7 @@ def start_endlevel_script(gamename):
     event = False
     while True:
         time.sleep(0.006)
-        if time.time() > start_time + 1.5:
+        if time.time() > start_time + 3.5:
             break
         if not Events.detect_in_dungeon():
             # Press escape
@@ -52,7 +52,7 @@ def start_endlevel_script(gamename):
         time.sleep(0.2)
     print("Got to pre-choose reward")
     # Then wait until the cards become selectable
-    time.sleep(2)
+    time.sleep(4)
     # Then choose a random card
     Events.choose_random_reward(gamename)
     # Then wait until store is detected
@@ -79,7 +79,7 @@ def move_to_loot_point(gamename):
     # Placeholder for now
     CustomInput.press_key(CustomInput.key_map["right"], "right")
     # CustomInput.press_key(CustomInput.key_map["up"], "up")
-    time.sleep(1.5)
+    time.sleep(0.5)
     CustomInput.release_key(CustomInput.key_map["right"], "right")
     # CustomInput.release_key(CustomInput.key_map["up"], "up")
 
@@ -100,22 +100,6 @@ def repeat_level():
     pass
 
 
-def detect_store(gamename=False):
-    if not gamename:
-        with open("gamename.txt") as f:
-            gamename = f.readline()
-    wincap = WindowCapture(gamename, [1084, 265, 1099, 267])
-    image = wincap.get_screenshot()
-    cv2.imwrite("testytest.jpg", image)
-    a, b, c = [int(i) for i in image[0][0]]
-    d, e, f = [int(i) for i in image[-1][0]]
-    if a + d > 500:
-        if b + e > 500:
-            if c + f > 500:
-                return True
-    return False
-
-
 if __name__ == "__main__":
     time.sleep(2)
     print("Starting")
@@ -125,5 +109,4 @@ if __name__ == "__main__":
     #     time.sleep(0.2)
     # print("Didn't detect in dungeon")
     # print("Detected in dungeon: {}".format(Events.detect_in_dungeon()))
-    # start_endlevel_script(gamename)
-    print(detect_store(gamename))
+    start_endlevel_script(gamename)
