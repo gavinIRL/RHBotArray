@@ -6,7 +6,7 @@
 08-WantedStumpChunkman-MCC
 09-Wanted
 10-WantedRipSteakface-MCC
-11-WantedFlintIrongstag
+11-WantedFlintIronstag
 12-WantedThickMcRunfast-GSP
 12-WantedSplintChesthair
 12-WantedDirkHardpec-MCC
@@ -26,3 +26,4 @@
 17-WantedPunchRockgroin-GSP
 18-WantedSmashHardsplash-Gems
 18-WantedHissBanejaw
+18-WantedBrineDeadlift-MCC
