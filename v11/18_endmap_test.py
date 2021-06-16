@@ -30,7 +30,7 @@ def start_endlevel_script(gamename):
             # Wait 2 seconds
             time.sleep(1)
             # Then if ok is detected turn flag on
-            if Events.detect_endlevel_bonus_area():
+            if Events.detect_endlevel_bonus_area(gamename):
                 event = True
             break
     # Then do the appropriate handling if event is detected
@@ -85,7 +85,9 @@ def move_to_loot_point(gamename):
 
 
 def loot_everything(gamename):
-    player_name = BotUtils.detect_player_name(gamename)
+    player_name = False
+    while not player_name:
+        player_name = BotUtils.detect_player_name(gamename)
     return Looting.grab_all_visible_loot(gamename, player_name)
 
 
