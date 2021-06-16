@@ -1,15 +1,14 @@
 import time
 import os
-from v12.rhba_utils import WindowCapture
 import pydirectinput
 from custom_input import CustomInput
-from rhba_utils import BotUtils, Events, SellRepair, RHClick, Looting
+from rhba_utils import BotUtils, Events, SellRepair, RHClick, Looting, WindowCapture
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 
 def start_endlevel_script(gamename):
     # Need to first wait until dungeon check returns false
-    while not Events.detect_in_dungeon():
+    while Events.detect_in_dungeon():
         time.sleep(0.006)
     print("Got to pre-sectclear detect")
     # Then until sect cleared shows up
@@ -44,7 +43,7 @@ def start_endlevel_script(gamename):
     while Events.detect_in_dungeon():
         if not loot_everything(gamename):
             # Click centre of screen to skip
-            skip_to_reward()
+            skip_to_reward(gamename)
             break
     print("Got to pre-card check")
     # Then wait until card select appears
@@ -78,11 +77,10 @@ def do_otherworld_handling(gamename):
 def move_to_loot_point(gamename):
     # Placeholder for now
     CustomInput.press_key(CustomInput.key_map["right"], "right")
-    CustomInput.press_key(CustomInput.key_map["up"], "up")
+    # CustomInput.press_key(CustomInput.key_map["up"], "up")
     time.sleep(1.5)
     CustomInput.release_key(CustomInput.key_map["right"], "right")
-    CustomInput.release_key(CustomInput.key_map["up"], "up")
-    pass
+    # CustomInput.release_key(CustomInput.key_map["up"], "up")
 
 
 def loot_everything(gamename):
@@ -102,5 +100,12 @@ def repeat_level():
 
 
 if __name__ == "__main__":
+    time.sleep(2)
+    print("Starting")
     with open("gamename.txt") as f:
         gamename = f.readline()
+    # while Events.detect_in_dungeon():
+    #     time.sleep(0.2)
+    # print("Didn't detect in dungeon")
+    # print("Detected in dungeon: {}".format(Events.detect_in_dungeon()))
+    start_endlevel_script(gamename)
