@@ -21,13 +21,13 @@ def start_endlevel_script(gamename):
     event = False
     while True:
         time.sleep(0.006)
-        if time.time() > start_time + 5:
+        if time.time() > start_time + 1.5:
             break
         if not Events.detect_in_dungeon():
             # Press escape
             pydirectinput.press('esc')
             # Wait 2 seconds
-            time.sleep(2)
+            time.sleep(1)
             # Then if ok is detected turn flag on
             if Events.detect_endlevel_bonus_area():
                 event = True
