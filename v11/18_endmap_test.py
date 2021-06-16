@@ -2,6 +2,7 @@ import time
 import os
 from v12.rhba_utils import WindowCapture
 import pydirectinput
+from custom_input import CustomInput
 from rhba_utils import BotUtils, Events, SellRepair, RHClick, Looting
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
@@ -75,6 +76,12 @@ def do_otherworld_handling(gamename):
 
 
 def move_to_loot_point(gamename):
+    # Placeholder for now
+    CustomInput.press_key(CustomInput.key_map["right"], "right")
+    CustomInput.press_key(CustomInput.key_map["up"], "up")
+    time.sleep(1.5)
+    CustomInput.release_key(CustomInput.key_map["right"], "right")
+    CustomInput.release_key(CustomInput.key_map["up"], "up")
     pass
 
 
