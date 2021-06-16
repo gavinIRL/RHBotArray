@@ -1345,6 +1345,20 @@ class Events:
                     return True
         return False
 
+    def detect_store(gamename=False):
+        if not gamename:
+            with open("gamename.txt") as f:
+                gamename = f.readline()
+        wincap = WindowCapture(gamename, [1084, 265, 1099, 267])
+        image = wincap.get_screenshot()
+        a, b, c = [int(i) for i in image[0][0]]
+        d, e, f = [int(i) for i in image[-1][0]]
+        if a + d > 500:
+            if b + e > 500:
+                if c + f > 500:
+                    return True
+        return False
+
 
 class RHClick:
     def click_yes(gamename):
