@@ -1349,7 +1349,7 @@ class Events:
         if not gamename:
             with open("gamename.txt") as f:
                 gamename = f.readline()
-        wincap = WindowCapture(gamename, [763, 490, 818, 492])
+        wincap = WindowCapture(gamename, [1084, 265, 1099, 267])
         image = wincap.get_screenshot()
         a, b, c = [int(i) for i in image[0][0]]
         d, e, f = [int(i) for i in image[-1][0]]
