@@ -1,5 +1,6 @@
 import time
 import os
+import cv2
 import pydirectinput
 from custom_input import CustomInput
 from rhba_utils import BotUtils, Events, SellRepair, RHClick, Looting, WindowCapture
@@ -47,16 +48,16 @@ def start_endlevel_script(gamename):
             break
     print("Got to pre-card check")
     # Then wait until card select appears
-    while not Events.detect_reward_choice_open():
+    while not Events.detect_reward_choice_open(gamename):
         time.sleep(0.2)
     print("Got to pre-choose reward")
     # Then wait until the cards become selectable
     time.sleep(2)
     # Then choose a random card
-    Events.choose_random_reward()
+    Events.choose_random_reward(gamename)
     # Then wait until store is detected
     print("Got to pre-shop check")
-    while not Events.detect_store():
+    while not Events.detect_store(gamename):
         time.sleep(0.2)
     print("Got to pre-sellrepair")
     # And then perform the sell and repair actions
@@ -99,6 +100,22 @@ def repeat_level():
     pass
 
 
+def detect_store(gamename=False):
+    if not gamename:
+        with open("gamename.txt") as f:
+            gamename = f.readline()
+    wincap = WindowCapture(gamename, [1084, 265, 1099, 267])
+    image = wincap.get_screenshot()
+    cv2.imwrite("testytest.jpg", image)
+    a, b, c = [int(i) for i in image[0][0]]
+    d, e, f = [int(i) for i in image[-1][0]]
+    if a + d > 500:
+        if b + e > 500:
+            if c + f > 500:
+                return True
+    return False
+
+
 if __name__ == "__main__":
     time.sleep(2)
     print("Starting")
@@ -108,4 +125,5 @@ if __name__ == "__main__":
     #     time.sleep(0.2)
     # print("Didn't detect in dungeon")
     # print("Detected in dungeon: {}".format(Events.detect_in_dungeon()))
-    start_endlevel_script(gamename)
+    # start_endlevel_script(gamename)
+    print(detect_store(gamename))
