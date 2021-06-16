@@ -5,7 +5,7 @@
 08-WantedFistMcThornbody-Gems
 08-WantedStumpChunkman-MCC
 09-Wanted
-10-WantedRipSteakface
+10-WantedRipSteakface-MCC
 11-WantedFlintIrongstag
 12-WantedThickMcRunfast-GSP
 12-WantedSplintChesthair
@@ -17,6 +17,7 @@
 14-BlastCrunchclaw-GSP
 14-WantedHoofMuchbeef
 14-WantedGristleFlanksteak-Gems
+14-WantedSlabHardcheese-MCC
 15-WantedGutBaithook
 15-WantedCastRustrod-Gems
 16-WantedLardBigpudge-GSP
