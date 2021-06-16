@@ -569,6 +569,7 @@ class BotUtils:
         results = pytesseract.image_to_data(
             rgb, output_type=pytesseract.Output.DICT, lang='eng')
         biggest = 0
+        name = False
         for entry in results["text"]:
             if len(entry) > biggest:
                 name = entry
