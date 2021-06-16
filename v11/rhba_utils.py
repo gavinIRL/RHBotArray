@@ -6,14 +6,18 @@ import ctypes
 import random
 import win32ui
 import win32gui
+import warnings
 import win32con
-import numpy as np
+import threading
+import subprocess
 import pytesseract
+import numpy as np
 import pydirectinput
 from fuzzywuzzy import process
 from custom_input import CustomInput
 from win32api import GetSystemMetrics
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
+warnings.simplefilter("ignore", DeprecationWarning)
 
 
 class HsvFilter:
@@ -98,6 +102,7 @@ class WindowCapture:
             else:
                 self.cropped_x = 0
                 self.cropped_y = 0
+                self.w += 3
         else:
             self.w = self.custom_rect[2] - self.custom_rect[0]
             self.h = self.custom_rect[3] - self.custom_rect[1]
@@ -113,11 +118,28 @@ class WindowCapture:
 
 
 class BotUtils:
-    def try_toggle_map():
-        pydirectinput.keyDown("m")
-        time.sleep(0.05)
-        pydirectinput.keyUp("m")
-        time.sleep(0.08)
+    def grab_online_servers():
+        output = subprocess.run("arp -a", capture_output=True).stdout.decode()
+        list_ips = []
+        with open("servers.txt", "r") as f:
+            lines = f.readlines()
+            for ip in lines:
+                if ip.strip() in output:
+                    list_ips.append(ip.strip())
+        return list_ips
+
+    def grab_current_lan_ip():
+        output = subprocess.run(
+            "ipconfig", capture_output=True).stdout.decode()
+        _, output = output.split("IPv4 Address. . . . . . . . . . . : 169")
+        output, _ = output.split("Subnet Mask", maxsplit=1)
+        current_lan_ip = "169" + output.strip()
+        return current_lan_ip
+
+    def start_server_threads(list_servers):
+        for server in list_servers:
+            t = threading.Thread(target=server.main_loop)
+            t.start()
 
     def grab_closest(rel_list: list):
         closest_index = False
@@ -512,6 +534,47 @@ class BotUtils:
         inverted = cv2.cvtColor(inverted, cv2.COLOR_GRAY2BGR)
         return inverted
 
+    def convert_pynput_to_pag(button):
+        PYNPUT_SPECIAL_CASE_MAP = {
+            'alt_l': 'altleft',
+            'alt_r': 'altright',
+            'alt_gr': 'altright',
+            'caps_lock': 'capslock',
+            'ctrl_l': 'ctrlleft',
+            'ctrl_r': 'ctrlright',
+            'page_down': 'pagedown',
+            'page_up': 'pageup',
+            'shift_l': 'shiftleft',
+            'shift_r': 'shiftright',
+            'num_lock': 'numlock',
+            'print_screen': 'printscreen',
+            'scroll_lock': 'scrolllock',
+        }
+        # example: 'Key.F9' should return 'F9', 'w' should return as 'w'
+        cleaned_key = button.replace('Key.', '')
+        if cleaned_key in PYNPUT_SPECIAL_CASE_MAP:
+            return PYNPUT_SPECIAL_CASE_MAP[cleaned_key]
+        return cleaned_key
+
+    def detect_player_name(gamename):
+        plyrname_rect = [165, 45, 320, 65]
+        plyrname_wincap = WindowCapture(gamename, plyrname_rect)
+        plyrname_filt = HsvFilter(0, 0, 103, 89, 104, 255, 0, 0, 0, 0)
+        # get an updated image of the game
+        image = plyrname_wincap.get_screenshot()
+        # pre-process the image
+        image = BotUtils.apply_hsv_filter(
+            image, plyrname_filt)
+        rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        results = pytesseract.image_to_data(
+            rgb, output_type=pytesseract.Output.DICT, lang='eng')
+        biggest = 0
+        for entry in results["text"]:
+            if len(entry) > biggest:
+                name = entry
+                biggest = len(entry)
+        return name
+
     def detect_level_name(gamename):
         wincap = WindowCapture(gamename, [1121, 31, 1248, 44])
         existing_image = wincap.get_screenshot()
@@ -553,17 +616,10 @@ class BotUtils:
 
         return img
 
-    def detect_bigmap_open(gamename):
-        wincap = WindowCapture(gamename, custom_rect=[819, 263, 855, 264])
-        image = wincap.get_screenshot()
-        a, b, c = [int(i) for i in image[0][0]]
-        d, e, f = [int(i) for i in image[0][-2]]
-        if a+b+c < 30:
-            if d+e+f > 700:
-                return True
-        return False
-
-    def detect_sect_clear(gamename):
+    def detect_sect_clear(gamename=False):
+        if not gamename:
+            with open("gamename.txt") as f:
+                gamename = f.readline()
         wincap = WindowCapture(gamename, custom_rect=[
             464+156, 640, 464+261, 641])
         image = wincap.get_screenshot()
@@ -574,7 +630,10 @@ class BotUtils:
                 return True
         return False
 
-    def detect_boss_healthbar(gamename):
+    def detect_boss_healthbar(gamename=False):
+        if not gamename:
+            with open("gamename.txt") as f:
+                gamename = f.readline()
         wincap = WindowCapture(gamename, custom_rect=[
                                415+97, 105+533, 415+98, 105+534])
         image = wincap.get_screenshot()
@@ -586,7 +645,10 @@ class BotUtils:
                 return True
         return False
 
-    def detect_xprompt(gamename):
+    def detect_xprompt(gamename=False):
+        if not gamename:
+            with open("gamename.txt") as f:
+                gamename = f.readline()
         wincap = WindowCapture(gamename, custom_rect=[
             1137, 694, 1163, 695])
         image = wincap.get_screenshot()
@@ -597,7 +659,10 @@ class BotUtils:
         else:
             return False
 
-    def grab_player_pos(gamename, map_rect=None):
+    def grab_player_pos(gamename=False, map_rect=None, rect_rel=False):
+        if not gamename:
+            with open("gamename.txt") as f:
+                gamename = f.readline()
         if not map_rect:
             wincap = WindowCapture(gamename, [561, 282, 1111, 666])
         else:
@@ -608,11 +673,17 @@ class BotUtils:
         vision = Vision('plyr.jpg')
         rectangles = vision.find(
             save_image, threshold=0.31, epsilon=0.5)
+        if len(rectangles) < 1:
+            return False, False
         points = vision.get_click_points(rectangles)
         x, y = points[0]
         if not map_rect:
             x += 561
             y += 282
+            return x, y
+        elif rect_rel:
+            x += map_rect[0]
+            y += map_rect[1]
             return x, y
         else:
             x += wincap.window_rect[0]
@@ -645,7 +716,82 @@ class BotUtils:
                     break
         return rects
 
-    def detect_menu_open(gamename):
+    def grab_level_rects_and_speeds():
+        rects = {}
+        speeds = {}
+        # Load the translation from name to num
+        with open("lvl_name_num.txt") as f:
+            num_names = f.readlines()
+        for i, entry in enumerate(num_names):
+            num_names[i] = entry.split("-")
+        # Load the num to rect catalogue
+        with open("catalogue.txt") as f:
+            nums_rects = f.readlines()
+        for i, entry in enumerate(nums_rects):
+            nums_rects[i] = entry.split("-")
+        # Finally load the level speeds
+        with open("lvl_speed.txt") as f:
+            num_speeds = f.readlines()
+        for i, entry in enumerate(num_speeds):
+            num_speeds[i] = entry.split("|")
+        # Then add each rect to the rects dict against name
+        # Also add each speed to the speed dict against name
+        for number, name in num_names:
+            for num, area, rect in nums_rects:
+                if area == "FM" and num == number:
+                    rects[name.rstrip().replace(" ", "")] = rect.rstrip()
+                    if "1" in name:
+                        rects[name.rstrip().replace(
+                            " ", "").replace("1", "L")] = rect.rstrip()
+                    if "ri" in name:
+                        rects[name.rstrip().replace(
+                            " ", "").replace("ri", "n").replace("1", "L")] = rect.rstrip()
+                    break
+            for num, speed in num_speeds:
+                if num == number:
+                    speeds[name.rstrip().replace(
+                        " ", "")] = float(speed.rstrip())
+                    if "1" in name:
+                        speeds[name.rstrip().replace(
+                            " ", "").replace("1", "L")] = float(speed.rstrip())
+                    if "ri" in name:
+                        speeds[name.rstrip().replace(
+                            " ", "").replace("ri", "n").replace("1", "L")] = float(speed.rstrip())
+                    break
+        return rects, speeds
+
+    def string_to_rect(string: str):
+        # This converts the rect from catalogue into int list
+        return [int(i) for i in string.split(',')]
+
+    def move_mouse_centre(gamename=False):
+        if not gamename:
+            with open("gamename.txt") as f:
+                gamename = f.readline()
+        wincap = WindowCapture(gamename)
+        centre_x = int(0.5 * wincap.w +
+                       wincap.window_rect[0])
+        centre_y = int(0.5 * wincap.h +
+                       wincap.window_rect[1])
+        ctypes.windll.user32.SetCursorPos(centre_x, centre_y)
+
+    def detect_bigmap_open(gamename=False):
+        if not gamename:
+            with open("gamename.txt") as f:
+                gamename = f.readline()
+        wincap = WindowCapture(gamename, custom_rect=[819, 263, 855, 264])
+        image = wincap.get_screenshot()
+        a, b, c = [int(i) for i in image[0][0]]
+        d, e, f = [int(i) for i in image[0][-2]]
+        if a+b+c < 30:
+            if d+e+f > 700:
+                return True
+        return False
+
+    def detect_menu_open(gamename=False):
+        if not gamename:
+            with open("gamename.txt") as f:
+                gamename = f.readline()
         wincap = WindowCapture(gamename, custom_rect=[595, 278, 621, 281])
         image = wincap.get_screenshot()
         a, b, c = [int(i) for i in image[0][0]]
@@ -663,24 +809,45 @@ class BotUtils:
             return_list.append((relx, rely))
         return return_list
 
-    def close_map_and_menu(gamename):
-        scaling = BotUtils.get_monitor_scaling()
-        wincap = WindowCapture(gamename)
+    def close_map_and_menu(gamename=False):
+        if not gamename:
+            with open("gamename.txt") as f:
+                gamename = f.readline()
+        game_wincap = WindowCapture(gamename)
         if BotUtils.detect_menu_open(gamename):
-            BotUtils.close_esc_menu(scaling, wincap)
+            BotUtils.close_esc_menu(game_wincap)
         if BotUtils.detect_bigmap_open(gamename):
-            BotUtils.close_map(gamename, scaling)
+            BotUtils.close_map(game_wincap)
 
-    def close_map(gamename, scaling=False):
-        if not scaling:
-            scaling = BotUtils.get_monitor_scaling()
+    def try_toggle_map():
+        pydirectinput.keyDown("m")
+        time.sleep(0.05)
+        pydirectinput.keyUp("m")
+        time.sleep(0.08)
+
+    def try_toggle_map_clicking(gamename=False):
+        if not gamename:
+            with open("gamename.txt") as f:
+                gamename = f.readline()
         game_wincap = WindowCapture(gamename)
         pydirectinput.click(
-            int(scaling*859+game_wincap.window_rect[0]), int(scaling*260+game_wincap.window_rect[1]))
+            int(1262+game_wincap.window_rect[0]), int(64+game_wincap.window_rect[1]))
 
-    def close_esc_menu(scaling, game_wincap):
+    def close_map(game_wincap=False):
+        if not game_wincap:
+            with open("gamename.txt") as f:
+                gamename = f.readline()
+            game_wincap = WindowCapture(gamename)
         pydirectinput.click(
-            int(scaling*749+game_wincap.window_rect[0]), int(scaling*280+game_wincap.window_rect[1]))
+            int(859+game_wincap.window_rect[0]), int(260+game_wincap.window_rect[1]))
+
+    def close_esc_menu(game_wincap=False):
+        if not game_wincap:
+            with open("gamename.txt") as f:
+                gamename = f.readline()
+            game_wincap = WindowCapture(gamename)
+        pydirectinput.click(
+            int(749+game_wincap.window_rect[0]), int(280+game_wincap.window_rect[1]))
 
     def get_monitor_scaling():
         scaleFactor = ctypes.windll.shcore.GetScaleFactorForDevice(0) / 100
@@ -708,22 +875,21 @@ class BotUtils:
 
     def convert_click_to_ratio(gamename, truex, truey):
         wincap = WindowCapture(gamename)
+        wincap.update_window_position(border=False)
         scaling = BotUtils.get_monitor_scaling()
-        relx = (truex - wincap.window_rect[0]) * scaling
-        rely = (truey - wincap.window_rect[1]) * scaling
-        ratx = relx/(wincap.w*scaling)
-        raty = rely/(wincap.h*scaling)
+        # print(scaling)
+        relx = (truex - (wincap.window_rect[0] * scaling))
+        rely = (truey - (wincap.window_rect[1] * scaling))
+        # print("relx, rely, w, h: {},{},{},{}".format(
+        #     relx, rely, wincap.w, wincap.h))
+        ratx = relx/(wincap.w * scaling)
+        raty = rely/(wincap.h * scaling)
         return ratx, raty
 
-    def convert_click_to_ratio_noscale(gamename, truex, truey):
-        wincap = WindowCapture(gamename)
-        relx = (truex - wincap.window_rect[0])
-        rely = (truey - wincap.window_rect[1])
-        ratx = relx/(wincap.w)
-        raty = rely/(wincap.h)
-        return ratx, raty
-
-    def convert_ratio_to_click(gamename, ratx, raty):
+    def convert_ratio_to_click(ratx, raty, gamename=False):
+        if not gamename:
+            with open("gamename.txt") as f:
+                gamename = f.readline()
         wincap = WindowCapture(gamename)
         relx = int(ratx * wincap.w)
         rely = int(raty * wincap.h)
@@ -732,9 +898,10 @@ class BotUtils:
         return truex, truey
 
     def convert_true_to_window(gamename, truex, truey):
+        scaling = BotUtils.get_monitor_scaling()
         wincap = WindowCapture(gamename)
-        relx = (truex - wincap.window_rect[0])
-        rely = (truey - wincap.window_rect[1])
+        relx = (truex/scaling) - wincap.window_rect[0]
+        rely = (truey/scaling) - wincap.window_rect[1]
         return relx, rely
 
     def convert_window_to_true(gamename, relx, rely):
@@ -742,6 +909,72 @@ class BotUtils:
         truex = int(relx + wincap.window_rect[0])
         truey = int(rely + wincap.window_rect[1])
         return truex, truey
+
+    def find_other_player(gamename, all=False):
+        othr_plyr_vision = Vision("otherplayerinvert.jpg")
+        othr_plyr_wincap = WindowCapture(gamename, [1100, 50, 1260, 210])
+        image = othr_plyr_wincap.get_screenshot()
+        filter = HsvFilter(24, 194, 205, 31, 255, 255, 0, 0, 0, 0)
+        image = cv2.blur(image, (4, 4))
+        image = BotUtils.filter_blackwhite_invert(filter, image)
+        rectangles = othr_plyr_vision.find(
+            image, threshold=0.61, epsilon=0.5)
+        points = othr_plyr_vision.get_click_points(rectangles)
+        if len(points) >= 1:
+            if not all:
+                relx = points[0][0] - 0
+                rely = 0 - points[0][1]
+                return relx, rely
+            else:
+                return points
+        return False
+
+    def find_enemy(gamename, all=False):
+        othr_plyr_vision = Vision("otherplayerinvert.jpg")
+        othr_plyr_wincap = WindowCapture(gamename, [1100, 50, 1260, 210])
+        image = othr_plyr_wincap.get_screenshot()
+        filter = HsvFilter(0, 198, 141, 8, 255, 255, 0, 0, 0, 0)
+        image = cv2.blur(image, (4, 4))
+        image = BotUtils.filter_blackwhite_invert(filter, image)
+        rectangles = othr_plyr_vision.find(
+            image, threshold=0.41, epsilon=0.5)
+        points = othr_plyr_vision.get_click_points(rectangles)
+        if len(points) >= 1:
+            if not all:
+                relx = points[0][0] - 0
+                rely = 0 - points[0][1]
+                return relx, rely
+            else:
+                return points
+        return False
+
+    def find_midlevel_event(gamename=False, playerx=False, playery=False):
+        if not gamename:
+            with open("gamename.txt") as f:
+                gamename = f.readline()
+        if not playerx:
+            playerx, playery = BotUtils.grab_player_pos(
+                gamename, [1100, 50, 1260, 210], True)
+        filter = HsvFilter(76, 247, 170, 100, 255, 255, 0, 0, 0, 0)
+        vision = Vision("otherplayerinvert.jpg")
+        wincap = WindowCapture(gamename, [1100, 50, 1260, 210])
+        image = wincap.get_screenshot()
+        image = cv2.blur(image, (4, 4))
+        image = BotUtils.filter_blackwhite_invert(filter, image)
+        rectangles = vision.find(
+            image, threshold=0.61, epsilon=0.5)
+        points = vision.get_click_points(rectangles)
+        if len(points) >= 1:
+            relx = points[0][0] - playerx
+            rely = playery - points[0][1]
+            return relx, rely
+        return False, False
+
+    def stop_movement(follower=False):
+        if follower:
+            follower.pressed_keys = []
+        for key in ["up", "down", "left", "right"]:
+            CustomInput.release_key(CustomInput.key_map[key], key)
 
 
 class Looting:
@@ -1043,8 +1276,11 @@ class Events:
                     return True
         return False
 
-    def detect_in_dungeon(gamename):
-        wincap = WindowCapture(gamename, [1090, 331, 1092, 353])
+    def detect_in_dungeon(wincap=False):
+        if not wincap:
+            with open("gamename.txt") as f:
+                gamename = f.readline()
+            wincap = WindowCapture(gamename, [1090, 331, 1092, 353])
         image = wincap.get_screenshot()
         a, b, c = [int(i) for i in image[0][0]]
         d, e, f = [int(i) for i in image[-1][0]]
@@ -1605,6 +1841,266 @@ class SellRepair():
             0x0004, 0, 0, 0, 0)
 
 
+class QuestHandle():
+    def __init__(self) -> None:
+        with open("gamename.txt") as f:
+            gamename = f.readline()
+        self.game_wincap = WindowCapture(gamename)
+        self.white_text_filter = HsvFilter(
+            0, 0, 102, 45, 65, 255, 0, 0, 0, 0)
+        self.yellow_text_filter = HsvFilter(
+            16, 71, 234, 33, 202, 255, 0, 0, 0, 0)
+        self.blue_text_filter = HsvFilter(
+            83, 126, 85, 102, 255, 255, 0, 0, 0, 0)
+        self.all_text_filter = HsvFilter(
+            0, 0, 61, 78, 255, 255, 0, 255, 0, 0)
+        self.vision = Vision('xprompt67filtv2.jpg')
+        self.accept_rect = [725, 525, 925, 595]
+        self.accept_wincap = WindowCapture(gamename, self.accept_rect)
+        self.skip_rect = [730, 740, 890, 780]
+        self.skip_wincap = WindowCapture(gamename, self.skip_rect)
+        self.next_rect = [880, 740, 1040, 780]
+        self.next_wincap = WindowCapture(gamename, self.next_rect)
+        self.quest_rect = [310, 160, 1055, 650]
+        self.quest_wincap = WindowCapture(gamename, self.quest_rect)
+        self.questlist_rect = [740, 240, 1050, 580]
+        self.questlist_wincap = WindowCapture(gamename, self.questlist_rect)
+        self.complete_wincap = WindowCapture(gamename, self.next_rect)
+        self.xprompt_rect = [1130, 670, 1250, 720]
+        self.xprompt_wincap = WindowCapture(gamename, self.xprompt_rect)
+
+    def start_quest_handle(self):
+        start_time = time.time()
+        while time.time() < start_time + 2:
+            if self.check_for_accept():
+                break
+
+    def convert_and_click(self, x, y, rect):
+        self.game_wincap.update_window_position(border=False)
+        truex = int(x + self.game_wincap.window_rect[0] + rect[0])
+        truey = int(y + self.game_wincap.window_rect[1] + rect[1])
+        ctypes.windll.user32.SetCursorPos(truex, truey)
+        ctypes.windll.user32.mouse_event(
+            0x0002, 0, 0, 0, 0)
+        ctypes.windll.user32.mouse_event(
+            0x0004, 0, 0, 0, 0)
+
+    def check_for_accept(self):
+        image = self.accept_wincap.get_screenshot()
+        image = self.vision.apply_hsv_filter(
+            image, self.white_text_filter)
+        rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        results = pytesseract.image_to_data(
+            rgb, output_type=pytesseract.Output.DICT, lang='eng')
+        detection = False
+        for i in range(0, len(results["text"])):
+            if "Accept" in results["text"][i]:
+                x = results["left"][i] + (results["width"][i]/2)
+                y = results["top"][i] + (results["height"][i]/2)
+                self.convert_and_click(x, y, self.accept_rect)
+                detection = True
+                break
+        if not detection:
+            return self.check_for_skip()
+        else:
+            return True
+
+    def check_for_skip(self):
+        image = self.skip_wincap.get_screenshot()
+        image = self.vision.apply_hsv_filter(
+            image, self.white_text_filter)
+        rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        results = pytesseract.image_to_data(
+            rgb, output_type=pytesseract.Output.DICT, lang='eng')
+        detection = False
+        for i in range(0, len(results["text"])):
+            if "Skip" in results["text"][i]:
+                x = results["left"][i] + (results["width"][i]/2)
+                y = results["top"][i] + (results["height"][i]/2)
+                self.convert_and_click(x, y, self.skip_rect)
+                detection = True
+                break
+        if not detection:
+            return self.check_for_next()
+        else:
+            return True
+
+    def check_for_next(self):
+        image = self.next_wincap.get_screenshot()
+        image = self.vision.apply_hsv_filter(
+            image, self.white_text_filter)
+        rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        results = pytesseract.image_to_data(
+            rgb, output_type=pytesseract.Output.DICT, lang='eng')
+        detection = False
+        for i in range(0, len(results["text"])):
+            if "Next" in results["text"][i]:
+                x = results["left"][i] + (results["width"][i]/2)
+                y = results["top"][i] + (results["height"][i]/2)
+                self.convert_and_click(x, y, self.next_rect)
+                detection = True
+                break
+        if not detection:
+            return self.check_for_quest()
+        else:
+            return True
+
+    def check_for_quest(self):
+        image = self.quest_wincap.get_screenshot()
+        image = self.vision.apply_hsv_filter(
+            image, self.white_text_filter)
+        rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        tess_config = '--psm 6 --oem 3 -c tessedit_char_whitelist=Quest'
+        results = pytesseract.image_to_data(
+            rgb, output_type=pytesseract.Output.DICT, lang='eng', config=tess_config)
+        detection = False
+        for i in range(0, len(results["text"])):
+            if "Quest" in results["text"][i]:
+                x = results["left"][i] + (results["width"][i]/2)
+                y = results["top"][i] + (results["height"][i]/2)
+                self.convert_and_click(x, y, self.quest_rect)
+                detection = True
+                break
+        if not detection:
+            return self.check_for_questlist()
+        else:
+            return True
+
+    def check_for_questlist(self):
+        image = self.questlist_wincap.get_screenshot()
+        image = self.vision.apply_hsv_filter(
+            image, self.all_text_filter)
+        rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        results = pytesseract.image_to_data(
+            rgb, output_type=pytesseract.Output.DICT, lang='eng')
+        detection = False
+        for i in range(0, len(results["text"])):
+            if "LV" in results["text"][i]:
+                # at this point need to grab the centre of the rect
+                x = results["left"][i] + (results["width"][i]/2)
+                y = results["top"][i] + (results["height"][i]/2)
+                # and then click at this position
+                self.convert_and_click(x, y, self.questlist_rect)
+                detection = True
+                break
+        if not detection:
+            return self.check_for_complete()
+        else:
+            return True
+
+    def check_for_complete(self):
+        image = self.complete_wincap.get_screenshot()
+        image = self.vision.apply_hsv_filter(
+            image, self.white_text_filter)
+        rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        results = pytesseract.image_to_data(
+            rgb, output_type=pytesseract.Output.DICT, lang='eng')
+        detection = False
+        for i in range(0, len(results["text"])):
+            if "Com" in results["text"][i]:
+                x = results["left"][i] + (results["width"][i]/2)
+                y = results["top"][i] + (results["height"][i]/2)
+                self.convert_and_click(x, y, self.next_rect)
+                detection = True
+                break
+        if not detection:
+            return self.check_for_xprompt()
+        else:
+            return True
+
+    def check_for_xprompt(self):
+        image = self.xprompt_wincap.get_screenshot()
+        image = self.vision.apply_hsv_filter(
+            image, self.blue_text_filter)
+        rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        results = pytesseract.image_to_data(
+            rgb, output_type=pytesseract.Output.DICT, lang='eng')
+        detection = False
+        for i in range(0, len(results["text"])):
+            if "Press" in results["text"][i]:
+                pydirectinput.keyDown("x")
+                time.sleep(0.1)
+                pydirectinput.keyUp("x")
+                detection = True
+                break
+        if not detection:
+            return False
+        else:
+            return True
+
+
+class Follower():
+    def __init__(self) -> None:
+        self.pressed_keys = []
+        self.relx = 0
+        self.rely = 0
+
+    def navigate_towards(self, x, y):
+        self.relx = x
+        self.rely = y
+        if self.relx > 1:
+            # Check if opposite key held down
+            if "left" in self.pressed_keys:
+                self.pressed_keys.remove("left")
+                CustomInput.release_key(CustomInput.key_map["left"], "left")
+            # Check that not already being held down
+            if "right" not in self.pressed_keys:
+                self.pressed_keys.append("right")
+                # Hold the key down
+                CustomInput.press_key(CustomInput.key_map["right"], "right")
+
+        elif self.relx < -1:
+            # Check if opposite key held down
+            if "right" in self.pressed_keys:
+                self.pressed_keys.remove("right")
+                CustomInput.release_key(CustomInput.key_map["right"], "right")
+            # Check that not already being held down
+            if "left" not in self.pressed_keys:
+                self.pressed_keys.append("left")
+                # Hold the key down
+                CustomInput.press_key(CustomInput.key_map["left"], "left")
+
+        else:
+            # Handling for case where = 0, need to remove both keys
+            if "right" in self.pressed_keys:
+                self.pressed_keys.remove("right")
+                CustomInput.release_key(CustomInput.key_map["right"], "right")
+            if "left" in self.pressed_keys:
+                self.pressed_keys.remove("left")
+                CustomInput.release_key(CustomInput.key_map["left"], "left")
+
+        # Handling for y-dir next
+        if self.rely > 1:
+            # Check if opposite key held down
+            if "down" in self.pressed_keys:
+                self.pressed_keys.remove("down")
+                CustomInput.release_key(CustomInput.key_map["down"], "down")
+            # Check that not already being held down
+            if "up" not in self.pressed_keys:
+                self.pressed_keys.append("up")
+                # Hold the key down
+                CustomInput.press_key(CustomInput.key_map["up"], "up")
+
+        elif self.rely < -1:
+            # Check if opposite key held down
+            if "up" in self.pressed_keys:
+                self.pressed_keys.remove("up")
+                CustomInput.release_key(CustomInput.key_map["up"], "up")
+            # Check that not already being held down
+            if "down" not in self.pressed_keys:
+                self.pressed_keys.append("down")
+                # Hold the key down
+                CustomInput.press_key(CustomInput.key_map["down"], "down")
+        else:
+            # Handling for case where = 0, need to remove both keys
+            if "up" in self.pressed_keys:
+                self.pressed_keys.remove("up")
+                CustomInput.release_key(CustomInput.key_map["up"], "up")
+            if "down" in self.pressed_keys:
+                self.pressed_keys.remove("down")
+                CustomInput.release_key(CustomInput.key_map["down"], "down")
+
+
 if __name__ == "__main__":
     time.sleep(2)
     with open("gamename.txt") as f:
@@ -1612,4 +2108,4 @@ if __name__ == "__main__":
     # start = time.time()
     # BotUtils.detect_xprompt(gamename)
     # print("Time taken: {}s".format(time.time()-start))
-    BotUtils.move_diagonal(gamename, 10, 12, speed=20, rel=True)
+    BotUtils.close_map_and_menu(gamename)
