@@ -6,6 +6,7 @@
 08-WantedStumpChunkman-MCC
 09-Wanted
 10-WantedRipSteakface-MCC
+10-WantedBlastThickneck-GSP
 11-WantedFlintIronstag
 12-WantedThickMcRunfast-GSP
 12-WantedSplintChesthair
