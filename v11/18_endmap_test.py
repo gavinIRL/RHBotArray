@@ -102,6 +102,20 @@ def repeat_level():
     pass
 
 
+def kill_boss(gamename):
+    # Need to first wait until the dung check returns false
+
+    # Then press escape
+
+    # Then move to the correct distance from the boss
+
+    # And then perform the preset initial moves
+
+    # And continue until boss is dead
+    while BotUtils.detect_boss_healthbar(gamename):
+        pass
+
+
 if __name__ == "__main__":
     time.sleep(2)
     print("Starting")
@@ -111,4 +125,5 @@ if __name__ == "__main__":
     #     time.sleep(0.2)
     # print("Didn't detect in dungeon")
     # print("Detected in dungeon: {}".format(Events.detect_in_dungeon()))
+    kill_boss(gamename)
     start_endlevel_script(gamename)
