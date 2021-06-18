@@ -74,6 +74,7 @@ def do_otherworld_handling(gamename):
     # # For now just press no to it
     # pydirectinput.click(wincap.window_rect[0]+775, wincap.window_rect[1]+488)
     # time.sleep(1)
+    print("Exiting as otherworld detected!")
     os._exit(1)
 
 
@@ -111,9 +112,10 @@ def move_to_boss():
     time.sleep(0.1)
     CustomInput.press_key(CustomInput.key_map["right"], "right")
     CustomInput.press_key(CustomInput.key_map["up"], "up")
-    time.sleep(3.4)
+    time.sleep(2.7)
     CustomInput.release_key(CustomInput.key_map["right"], "right")
     CustomInput.release_key(CustomInput.key_map["up"], "up")
+    dodge_attacks("right")
 
 
 def dodge_attacks(key):
@@ -150,17 +152,22 @@ def point_angle(angle):
 
 
 def continue_boss_attacks():
-    for key in ["up", "down", "left", "right"]:
+    for key in ["a", "g", "d", "s"]:
         CustomInput.press_key(CustomInput.key_map[key], key)
+        # time.sleep(0.04)
         CustomInput.release_key(CustomInput.key_map[key], key)
+        # time.sleep(0.04)
 
 
 def perform_boss_moves():
+    print("Got to the perform boss move func")
     # Perform first two skill moves
     CustomInput.press_key(CustomInput.key_map["s"])
+    time.sleep(0.03)
     CustomInput.release_key(CustomInput.key_map["s"])
     time.sleep(0.4)
     CustomInput.press_key(CustomInput.key_map["f"])
+    time.sleep(0.03)
     CustomInput.release_key(CustomInput.key_map["f"])
     time.sleep(0.4)
     # Then dodge any attacks
@@ -168,8 +175,9 @@ def perform_boss_moves():
     dodge_attacks(last_dodge)
     point_angle(315)
     continue_boss_attacks()
+    print("Got past the first dodge point continue")
     # Then continue attack and dodge until boss defeated
-    while not Events.detect_in_dungeon():
+    while Events.detect_in_dungeon():
         if last_dodge == "right":
             last_dodge = "left"
             dodge_attacks(last_dodge)
