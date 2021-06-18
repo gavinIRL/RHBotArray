@@ -24,14 +24,16 @@ class KeyCodeChecker():
 
     def on_press(self, key):
         if key not in self.unreleased_keys:
-            print("key:{}, time:{}".format(key, time.time()-self.start_time))
+            print("Pressed key:{}, time:{}".format(
+                key, time.time()-self.start_time))
+            self.unreleased_keys.append(key)
         if key == keyboard.Key.f11:
             os._exit(1)
-        self.unreleased_keys.append(key)
 
     def on_release(self, key):
         self.unreleased_keys.remove(key)
-        print("key:{}, time:{}".format(key, time.time()-self.start_time))
+        print("Released key:{}, time:{}".format(
+            key, time.time()-self.start_time))
 
 
 if __name__ == "__main__":
