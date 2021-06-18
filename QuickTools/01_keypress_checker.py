@@ -23,12 +23,12 @@ class KeyCodeChecker():
             self.listener.start()
 
     def on_press(self, key):
-        if key not in self.unreleased_keys:
+        if key == keyboard.Key.f11:
+            os._exit(1)
+        elif key not in self.unreleased_keys:
             print("Pressed key:{}, time:{}".format(
                 key, time.time()-self.start_time))
             self.unreleased_keys.append(key)
-        if key == keyboard.Key.f11:
-            os._exit(1)
 
     def on_release(self, key):
         self.unreleased_keys.remove(key)
