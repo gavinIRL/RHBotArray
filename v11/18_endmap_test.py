@@ -102,11 +102,20 @@ def repeat_level():
     pass
 
 
+def move_to_boss():
+    CustomInput.press_key(CustomInput.key_map["right"], "right")
+    CustomInput.press_key(CustomInput.key_map["up"], "up")
+    time.sleep(0.5)
+    CustomInput.release_key(CustomInput.key_map["right"], "right")
+    CustomInput.release_key(CustomInput.key_map["up"], "up")
+
+
 def kill_boss(gamename):
     # Need to first wait until the dung check returns false
-
+    while Events.detect_in_dungeon():
+        time.sleep(0.006)
     # Then press escape
-
+    pydirectinput.press('esc')
     # Then move to the correct distance from the boss
 
     # And then perform the preset initial moves
@@ -125,5 +134,5 @@ if __name__ == "__main__":
     #     time.sleep(0.2)
     # print("Didn't detect in dungeon")
     # print("Detected in dungeon: {}".format(Events.detect_in_dungeon()))
-    kill_boss(gamename)
+    # kill_boss(gamename)
     start_endlevel_script(gamename)
