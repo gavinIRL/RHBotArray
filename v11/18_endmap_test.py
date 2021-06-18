@@ -146,6 +146,12 @@ def point_angle(angle):
     release_dir_keys()
 
 
+def continue_boss_attacks():
+    for key in ["up", "down", "left", "right"]:
+        CustomInput.press_key(CustomInput.key_map[key], key)
+        CustomInput.release_key(CustomInput.key_map[key], key)
+
+
 def perform_boss_moves():
     # Perform first two skill moves
     CustomInput.press_key(CustomInput.key_map["s"])
@@ -155,10 +161,22 @@ def perform_boss_moves():
     CustomInput.release_key(CustomInput.key_map["f"])
     time.sleep(0.4)
     # Then dodge any attacks
-    dodge_attacks("right")
+    last_dodge = "right"
+    dodge_attacks(last_dodge)
+    point_angle(315)
+    continue_boss_attacks()
     # Then continue attack and dodge until boss defeated
     while not Events.detect_in_dungeon():
-        pass
+        if last_dodge == "right":
+            last_dodge = "left"
+            dodge_attacks(last_dodge)
+            point_angle(45)
+            continue_boss_attacks()
+        else:
+            last_dodge = "right"
+            dodge_attacks(last_dodge)
+            point_angle(315)
+            continue_boss_attacks()
 
 
 def kill_boss(gamename):
@@ -170,10 +188,7 @@ def kill_boss(gamename):
     # Then move to the correct distance from the boss
     move_to_boss()
     # And then perform the preset initial moves
-
-    # And continue until boss is dead
-    while BotUtils.detect_boss_healthbar(gamename):
-        pass
+    perform_boss_moves()
 
 
 if __name__ == "__main__":
@@ -185,5 +200,5 @@ if __name__ == "__main__":
     #     time.sleep(0.2)
     # print("Didn't detect in dungeon")
     # print("Detected in dungeon: {}".format(Events.detect_in_dungeon()))
-    # kill_boss(gamename)
+    kill_boss(gamename)
     start_endlevel_script(gamename)
