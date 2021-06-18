@@ -69,10 +69,11 @@ def start_endlevel_script(gamename):
 
 
 def do_otherworld_handling(gamename):
-    wincap = WindowCapture(gamename)
-    # For now just press no to it
-    pydirectinput.click(wincap.window_rect[0]+775, wincap.window_rect[1]+488)
-    time.sleep(1)
+    # wincap = WindowCapture(gamename)
+    # # For now just press no to it
+    # pydirectinput.click(wincap.window_rect[0]+775, wincap.window_rect[1]+488)
+    # time.sleep(1)
+    os._exit(1)
 
 
 def move_to_loot_point(gamename):
@@ -104,10 +105,46 @@ def repeat_level():
 
 def move_to_boss():
     CustomInput.press_key(CustomInput.key_map["right"], "right")
+    time.sleep(0.3)
     CustomInput.press_key(CustomInput.key_map["up"], "up")
-    time.sleep(0.5)
+    time.sleep(3.4)
     CustomInput.release_key(CustomInput.key_map["right"], "right")
     CustomInput.release_key(CustomInput.key_map["up"], "up")
+
+
+def dodge_attacks(key):
+    CustomInput.press_key(CustomInput.key_map[key], key)
+    CustomInput.release_key(CustomInput.key_map[key], key)
+    time.sleep(0.07)
+    CustomInput.press_key(CustomInput.key_map[key], key)
+    CustomInput.release_key(CustomInput.key_map[key], key)
+    time.sleep(0.8)
+
+
+def point_angle(angle):
+    if angle >= 300 or angle < 60:
+        CustomInput.press_key(CustomInput.key_map["up"], "up")
+    if angle >= 210 and angle < 330:
+        CustomInput.press_key(CustomInput.key_map["left"], "left")
+    if angle >= 120 and angle < 240:
+        CustomInput.press_key(CustomInput.key_map["down"], "down")
+    if angle >= 30 and angle < 150:
+        CustomInput.press_key(CustomInput.key_map["right"], "right")
+
+
+def perform_boss_moves():
+    # Perform first two skill moves
+    CustomInput.press_key(CustomInput.key_map["s"])
+    CustomInput.release_key(CustomInput.key_map["s"])
+    time.sleep(0.4)
+    CustomInput.press_key(CustomInput.key_map["f"])
+    CustomInput.release_key(CustomInput.key_map["f"])
+    time.sleep(0.4)
+    # Then dodge any attacks
+    dodge_attacks("right")
+    # Then continue attack and dodge until boss defeated
+    while not Events.detect_in_dungeon():
+        pass
 
 
 def kill_boss(gamename):
@@ -117,7 +154,7 @@ def kill_boss(gamename):
     # Then press escape
     pydirectinput.press('esc')
     # Then move to the correct distance from the boss
-
+    move_to_boss()
     # And then perform the preset initial moves
 
     # And continue until boss is dead
