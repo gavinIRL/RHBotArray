@@ -1,6 +1,7 @@
 import time
 import os
 import cv2
+import ctypes
 import pydirectinput
 from custom_input import CustomInput
 from rhba_utils import BotUtils, Events, SellRepair, RHClick, Looting, WindowCapture
@@ -121,6 +122,18 @@ def dodge_attacks(key):
     time.sleep(0.8)
 
 
+def release_dir_keys():
+    KEYS = {
+        'LEFT': 37,
+        'UP': 38,
+        'RIGHT': 39,
+        'DOWN': 40
+    }
+    for key in ["up", "down", "left", "right"]:
+        if ctypes.windll.user32.GetKeyState(KEYS[key]) > 2:
+            CustomInput.release_key(CustomInput.key_map[key], key)
+
+
 def point_angle(angle):
     if angle >= 300 or angle < 60:
         CustomInput.press_key(CustomInput.key_map["up"], "up")
@@ -130,6 +143,7 @@ def point_angle(angle):
         CustomInput.press_key(CustomInput.key_map["down"], "down")
     if angle >= 30 and angle < 150:
         CustomInput.press_key(CustomInput.key_map["right"], "right")
+    release_dir_keys()
 
 
 def perform_boss_moves():
