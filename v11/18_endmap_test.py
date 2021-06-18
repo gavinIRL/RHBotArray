@@ -107,6 +107,9 @@ def repeat_level():
 def move_to_boss():
     CustomInput.press_key(CustomInput.key_map["right"], "right")
     time.sleep(0.3)
+    CustomInput.release_key(CustomInput.key_map["right"], "right")
+    time.sleep(0.1)
+    CustomInput.press_key(CustomInput.key_map["right"], "right")
     CustomInput.press_key(CustomInput.key_map["up"], "up")
     time.sleep(3.4)
     CustomInput.release_key(CustomInput.key_map["right"], "right")
@@ -124,10 +127,10 @@ def dodge_attacks(key):
 
 def release_dir_keys():
     KEYS = {
-        'LEFT': 37,
-        'UP': 38,
-        'RIGHT': 39,
-        'DOWN': 40
+        'left': 37,
+        'up': 38,
+        'right': 39,
+        'down': 40
     }
     for key in ["up", "down", "left", "right"]:
         if ctypes.windll.user32.GetKeyState(KEYS[key]) > 2:
