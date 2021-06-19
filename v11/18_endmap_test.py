@@ -79,9 +79,10 @@ def start_endlevel_script(gamename):
 
 
 def do_otherworld_handling(gamename):
+    time.sleep(0.4)
     RHClick.click_otherworld_ok(gamename)
-    time.sleep(0.5)
-    while not Events.detect_in_dungeon():
+    time.sleep(2)
+    while not check_if_the_crack(gamename):
         time.sleep(0.006)
     # Then clear the area
     perform_otherworld_combat(gamename)
@@ -89,6 +90,12 @@ def do_otherworld_handling(gamename):
     navigate_otherworld_loot(gamename)
     # And then finally leave the otherworld
     leave_otherworld(gamename)
+
+
+def check_if_the_crack(gamename):
+    if "ack" in BotUtils.detect_level_name(gamename):
+        return True
+    return False
 
 
 def perform_otherworld_combat(gamename):
