@@ -1042,18 +1042,21 @@ class Looting:
         else:
             loot_list, image, xoff, yoff = data
         confirmed = False
-        for _, coords in enumerate(loot_list):
-            x, y = coords
-            x -= xoff
-            y -= yoff
-            rgb = image[y-22:y+22, x-75:x+75]
-            filter = HsvFilter(0, 0, 131, 151, 255, 255, 0, 0, 0, 0)
-            rgb = BotUtils.apply_hsv_filter(rgb, filter)
-            tess_config = '--psm 7 --oem 3 -c tessedit_char_whitelist=ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
-            result = pytesseract.image_to_string(
-                rgb, lang='eng', config=tess_config)[:-2]
-            if len(result) > 3:
-                return True
+        try:
+            for _, coords in enumerate(loot_list):
+                x, y = coords
+                x -= xoff
+                y -= yoff
+                rgb = image[y-22:y+22, x-75:x+75]
+                filter = HsvFilter(0, 0, 131, 151, 255, 255, 0, 0, 0, 0)
+                rgb = BotUtils.apply_hsv_filter(rgb, filter)
+                tess_config = '--psm 7 --oem 3 -c tessedit_char_whitelist=ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
+                result = pytesseract.image_to_string(
+                    rgb, lang='eng', config=tess_config)[:-2]
+                if len(result) > 3:
+                    return True
+        except:
+            return False
         if not confirmed:
             return False
 
