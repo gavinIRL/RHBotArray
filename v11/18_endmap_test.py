@@ -106,23 +106,26 @@ def repeat_level():
 
 
 def move_to_boss():
+    time.sleep(0.5)
     CustomInput.press_key(CustomInput.key_map["right"], "right")
     time.sleep(0.3)
     CustomInput.release_key(CustomInput.key_map["right"], "right")
     time.sleep(0.1)
     CustomInput.press_key(CustomInput.key_map["right"], "right")
     CustomInput.press_key(CustomInput.key_map["up"], "up")
-    time.sleep(2.7)
+    time.sleep(3.4)
     CustomInput.release_key(CustomInput.key_map["right"], "right")
     CustomInput.release_key(CustomInput.key_map["up"], "up")
-    dodge_attacks("right")
+    # dodge_attacks("right")
 
 
 def dodge_attacks(key):
     CustomInput.press_key(CustomInput.key_map[key], key)
+    time.sleep(0.02)
     CustomInput.release_key(CustomInput.key_map[key], key)
     time.sleep(0.07)
     CustomInput.press_key(CustomInput.key_map[key], key)
+    time.sleep(0.02)
     CustomInput.release_key(CustomInput.key_map[key], key)
     time.sleep(0.8)
 
@@ -148,13 +151,14 @@ def point_angle(angle):
         CustomInput.press_key(CustomInput.key_map["down"], "down")
     if angle >= 30 and angle < 150:
         CustomInput.press_key(CustomInput.key_map["right"], "right")
+    time.sleep(0.01)
     release_dir_keys()
 
 
 def continue_boss_attacks():
-    for key in ["a", "g", "d", "s"]:
+    for key in ["a", "g", "f", "s", "d"]:
         CustomInput.press_key(CustomInput.key_map[key], key)
-        # time.sleep(0.04)
+        time.sleep(0.02)
         CustomInput.release_key(CustomInput.key_map[key], key)
         # time.sleep(0.04)
 
@@ -172,21 +176,21 @@ def perform_boss_moves():
     time.sleep(0.4)
     # Then dodge any attacks
     last_dodge = "right"
-    dodge_attacks(last_dodge)
-    point_angle(315)
+    # dodge_attacks(last_dodge)
+    # point_angle(315)
     continue_boss_attacks()
     print("Got past the first dodge point continue")
     # Then continue attack and dodge until boss defeated
     while Events.detect_in_dungeon():
         if last_dodge == "right":
-            last_dodge = "left"
-            dodge_attacks(last_dodge)
-            point_angle(45)
+            # last_dodge = "left"
+            # dodge_attacks(last_dodge)
+            # point_angle(45)
             continue_boss_attacks()
         else:
-            last_dodge = "right"
-            dodge_attacks(last_dodge)
-            point_angle(315)
+            # last_dodge = "right"
+            # dodge_attacks(last_dodge)
+            # point_angle(315)
             continue_boss_attacks()
 
 
@@ -212,4 +216,4 @@ if __name__ == "__main__":
     # print("Didn't detect in dungeon")
     # print("Detected in dungeon: {}".format(Events.detect_in_dungeon()))
     kill_boss(gamename)
-    start_endlevel_script(gamename)
+    # start_endlevel_script(gamename)
