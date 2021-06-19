@@ -5,7 +5,7 @@ import ctypes
 import logging
 import pydirectinput
 from custom_input import CustomInput
-from rhba_utils import BotUtils, Events, SellRepair, RHClick, Looting, WindowCapture
+from rhba_utils import BotUtils, Events, SellRepair, RHClick, Looting, WindowCapture, Vision, HsvFilter
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 logging.getLogger().setLevel(logging.ERROR)
 
@@ -31,7 +31,9 @@ def start_endlevel_script(gamename):
             # Press escape
             pydirectinput.press('esc')
             # Wait 2 seconds
-            time.sleep(1)
+            time.sleep(0.5)
+            if Events.detect_move_reward_screen(gamename):
+                break
             # Then if ok is detected turn flag on
             if Events.detect_endlevel_bonus_area(gamename):
                 event = True
@@ -111,7 +113,7 @@ def perform_otherworld_combat(gamename):
     time.sleep(0.005)
     CustomInput.release_key(CustomInput.key_map["h"])
     start_time = time.time()
-    while not BotUtils.detect_sect_clear():
+    while detect_enemies_overworld(gamename):
         continue_otherworld_attacks()
         if time.time()-start_time > 20:
             print("need to move closer to detected enemies")
@@ -126,20 +128,48 @@ def continue_otherworld_attacks():
 
 
 def navigate_otherworld_loot(gamename):
-    key = "left"
-    CustomInput.press_key(CustomInput.key_map[key], key)
-    time.sleep(0.8)
-    CustomInput.release_key(CustomInput.key_map[key], key)
-    time.sleep(0.1)
-    key = "up"
-    CustomInput.press_key(CustomInput.key_map[key], key)
-    time.sleep(3)
-    CustomInput.release_key(CustomInput.key_map[key], key)
+    if not BotUtils.detect_bigmap_open(gamename):
+        BotUtils.try_toggle_map()
+    player_pos = BotUtils.grab_player_pos()
+    BotUtils.try_toggle_map()
+    relx = player_pos[0] - 590
+    rely = 468 - player_pos[1]
+    BotUtils.move_diagonal(gamename, relx, rely, 90, 50, True)
+    relx = 590 - 667
+    rely = 407 - 468
+    BotUtils.move_diagonal(gamename, relx, rely, 90, 50, True)
+    while BotUtils.detect_bigmap_open(gamename):
+        BotUtils.try_toggle_map()
+        time.sleep(0.01)
     loot_everything(gamename)
 
 
 def leave_otherworld(gamename):
+    if not BotUtils.detect_bigmap_open(gamename):
+        BotUtils.try_toggle_map()
+    player_pos = BotUtils.grab_player_pos()
+    BotUtils.try_toggle_map()
+    relx = player_pos[0] - 667
+    rely = 455 - player_pos[1]
+    BotUtils.move_diagonal(gamename, relx, rely, 90, 50, True)
     os._exit(1)
+
+
+def detect_enemies_overworld(gamename):
+    if not BotUtils.detect_bigmap_open(gamename):
+        BotUtils.try_toggle_map()
+    wincap = WindowCapture(gamename, [530, 331, 781, 580])
+    othr_plyr_vision = Vision("otherplayerinvert.jpg")
+    image = wincap.get_screenshot()
+    filter = HsvFilter(0, 198, 141, 8, 255, 255, 0, 0, 0, 0)
+    image = cv2.blur(image, (4, 4))
+    image = BotUtils.filter_blackwhite_invert(filter, image)
+    rectangles = othr_plyr_vision.find(
+        image, threshold=0.41, epsilon=0.5)
+    points = othr_plyr_vision.get_click_points(rectangles)
+    if len(points) >= 1:
+        return True
+    return False
 
 
 def move_to_loot_point(gamename):
