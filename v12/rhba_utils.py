@@ -1179,7 +1179,7 @@ class Looting:
     def grab_farloot_locations(gamename=False, rect=False, return_image=False):
         if gamename:
             if not rect:
-                rect1 = [100, 135, 1223, 688]
+                rect1 = [100, 160, 1223, 688]
                 wincap = WindowCapture(gamename, rect1)
             else:
                 wincap = WindowCapture(gamename, rect)
