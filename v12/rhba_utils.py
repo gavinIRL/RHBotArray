@@ -1379,6 +1379,16 @@ class RHClick:
         pydirectinput.click(
             wincap.window_rect[0]+763, wincap.window_rect[1]+433)
 
+    def click_otherworld_ok(gamename):
+        wincap = WindowCapture(gamename)
+        pydirectinput.click(
+            wincap.window_rect[0]+503, wincap.window_rect[1]+487)
+
+    def click_otherworld_no(gamename):
+        wincap = WindowCapture(gamename)
+        pydirectinput.click(
+            wincap.window_rect[0]+778, wincap.window_rect[1]+487)
+
     def click_choose_map(gamename):
         wincap = WindowCapture(gamename)
         pydirectinput.click(

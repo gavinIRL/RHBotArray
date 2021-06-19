@@ -79,7 +79,7 @@ def start_endlevel_script(gamename):
 
 
 def do_otherworld_handling(gamename):
-    RHClick.click_yes(gamename)
+    RHClick.click_otherworld_ok(gamename)
     time.sleep(0.5)
     while not Events.detect_in_dungeon():
         time.sleep(0.006)
