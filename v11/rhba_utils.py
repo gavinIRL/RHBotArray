@@ -1002,6 +1002,8 @@ class Looting:
             pydirectinput.press("x")
             count += 1
             time.sleep(0.09)
+            CustomInput.press_key(CustomInput.key_map["right"], "right")
+            CustomInput.release_key(CustomInput.key_map["right"], "right")
 
     def grab_all_visible_loot(gamename, player_name):
         start_time = time.time()
@@ -1092,7 +1094,7 @@ class Looting:
             order = BotUtils.grab_order_lowest_y(loot_list)
             # Then reorder the lootlist to match
             loot_list = [x for _, x in sorted(zip(order, loot_list))]
-        print(len(loot_list))
+        # print(len(loot_list))
         confirmed = False
         for index, coords in enumerate(loot_list):
             x, y = coords
@@ -1233,6 +1235,7 @@ class Events:
         posx = wincap.window_rect[0] + (460+(180*random.randint(0, 2)))
         posy = wincap.window_rect[1] + (200+(132*random.randint(0, 3)))
         pydirectinput.click(int(posx), int(posy))
+        time.sleep(0.1)
         # Now accept the reward
         pydirectinput.click(
             wincap.window_rect[0]+750, wincap.window_rect[1]+720)
