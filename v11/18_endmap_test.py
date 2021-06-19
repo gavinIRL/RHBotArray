@@ -2,10 +2,12 @@ import time
 import os
 import cv2
 import ctypes
+import logging
 import pydirectinput
 from custom_input import CustomInput
 from rhba_utils import BotUtils, Events, SellRepair, RHClick, Looting, WindowCapture
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
+logging.getLogger().setLevel(logging.ERROR)
 
 
 def start_endlevel_script(gamename):
@@ -61,6 +63,11 @@ def start_endlevel_script(gamename):
     while not Events.detect_store(gamename):
         time.sleep(0.2)
     print("Got to pre-sellrepair")
+    # Then wait to see if chest event appears
+    time.sleep(2)
+    if Events.detect_endlevel_chest(gamename):
+        pydirectinput.press('esc')
+        time.sleep(0.05)
     # And then perform the sell and repair actions
     sr = SellRepair()
     sr.ident_sell_repair()
@@ -164,7 +171,7 @@ def continue_boss_attacks():
 
 
 def perform_boss_moves():
-    print("Got to the perform boss move func")
+    # print("Got to the perform boss move func")
     # Perform first two skill moves
     CustomInput.press_key(CustomInput.key_map["s"])
     time.sleep(0.02)
@@ -174,23 +181,8 @@ def perform_boss_moves():
     time.sleep(0.02)
     CustomInput.release_key(CustomInput.key_map["f"])
     time.sleep(0.4)
-    # CustomInput.press_key(CustomInput.key_map["shift"])
-    # time.sleep(0.02)
-    # CustomInput.release_key(CustomInput.key_map["shift"])
-    # CustomInput.press_key(CustomInput.key_map["z"])
-    # time.sleep(1.5)
-    # CustomInput.press_key(CustomInput.key_map["up"], "up")
-    # CustomInput.press_key(CustomInput.key_map["right"], "right")
-    # time.sleep(0.6)
-    # release_dir_keys()
-    # CustomInput.release_key(CustomInput.key_map["z"])
-    # time.sleep(0.6)
-    # Then dodge any attacks
-    last_dodge = "right"
-    # dodge_attacks(last_dodge)
-    # point_angle(315)
     continue_boss_attacks()
-    print("Got past the first dodge point continue")
+    # print("Got past the first dodge point continue")
     # Then continue attack and dodge until boss defeated
     while Events.detect_in_dungeon():
         continue_boss_attacks()
@@ -218,4 +210,4 @@ if __name__ == "__main__":
     # print("Didn't detect in dungeon")
     # print("Detected in dungeon: {}".format(Events.detect_in_dungeon()))
     kill_boss(gamename)
-    # start_endlevel_script(gamename)
+    start_endlevel_script(gamename)
