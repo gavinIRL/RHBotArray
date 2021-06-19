@@ -198,11 +198,9 @@ def check_loot_preshop(gamename):
 
 def loot_everything(gamename):
     player_name = False
-    start_time = time.time()
-    while not player_name:
-        player_name = BotUtils.detect_player_name(gamename)
-        if time.time() - start_time > 1:
-            return False
+    player_name = BotUtils.detect_player_name(gamename)
+    if not player_name:
+        return Looting.grab_all_visible_loot(gamename)
     return Looting.grab_all_visible_loot(gamename, player_name)
 
 
