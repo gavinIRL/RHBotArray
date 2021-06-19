@@ -14,12 +14,12 @@ def start_endlevel_script(gamename):
     # Need to first wait until dungeon check returns false
     while Events.detect_in_dungeon():
         time.sleep(0.006)
-    print("Got to pre-sectclear detect")
+    # print("Got to pre-sectclear detect")
     # Then until sect cleared shows up
     while not BotUtils.detect_sect_clear():
         pydirectinput.press('esc')
         time.sleep(0.05)
-    print("Got to pre-endlevel event check")
+    # print("Got to pre-endlevel event check")
     # Then wait for end-level event to show up
     start_time = time.time()
     event = False
@@ -37,42 +37,44 @@ def start_endlevel_script(gamename):
                 event = True
             break
     # Then do the appropriate handling if event is detected
-    print("Got to pre-event handling")
+    # print("Got to pre-event handling")
     if event:
         do_otherworld_handling(gamename)
     # Once event is complete move to correct place in room
     move_to_loot_point(gamename)
     # And then commence looting
-    print("Got to post-move to loot point")
+    # print("Got to post-move to loot point")
     while Events.detect_in_dungeon():
         if not loot_everything(gamename):
             # Click centre of screen to skip
             skip_to_reward(gamename)
             break
-    print("Got to pre-card check")
+    # print("Got to pre-card check")
     # Then wait until card select appears
     while not Events.detect_reward_choice_open(gamename):
         time.sleep(0.2)
-    print("Got to pre-choose reward")
+    # print("Got to pre-choose reward")
     # Then wait until the cards become selectable
     time.sleep(4)
     # Then choose a random card
     Events.choose_random_reward(gamename)
     # Then wait until store is detected
-    print("Got to pre-shop check")
+    # print("Got to pre-shop check")
     while not Events.detect_store(gamename):
         time.sleep(0.2)
-    print("Got to pre-sellrepair")
+    # print("Got to pre-sellrepair")
     # Then wait to see if chest event appears
     time.sleep(2)
     if Events.detect_endlevel_chest(gamename):
         pydirectinput.press('esc')
         time.sleep(0.05)
+    # Then check for loot one last time
+    check_loot_preshop(gamename)
     # And then perform the sell and repair actions
     sr = SellRepair()
     sr.ident_sell_repair()
     # And then go to next level if needs be
-    print("Got to pre-restart")
+    # print("Got to pre-restart")
     repeat_level()
 
 
@@ -94,10 +96,28 @@ def move_to_loot_point(gamename):
     # CustomInput.release_key(CustomInput.key_map["up"], "up")
 
 
+def check_loot_preshop(gamename):
+    # Simple placeholder for now
+    CustomInput.press_key(CustomInput.key_map["right"], "right")
+    start_time = time.time()
+    while time.time() - start_time < 1.5:
+        if Looting.check_for_loot(gamename):
+            CustomInput.release_key(CustomInput.key_map["right"], "right")
+            loot_everything(gamename)
+    CustomInput.release_key(CustomInput.key_map["right"], "right")
+    # Then perform one final check
+    time.sleep(0.1)
+    if Looting.check_for_loot(gamename):
+        loot_everything(gamename)
+
+
 def loot_everything(gamename):
     player_name = False
+    start_time = time.time()
     while not player_name:
         player_name = BotUtils.detect_player_name(gamename)
+        if time.time() - start_time > 1:
+            return False
     return Looting.grab_all_visible_loot(gamename, player_name)
 
 
@@ -211,3 +231,4 @@ if __name__ == "__main__":
     # print("Detected in dungeon: {}".format(Events.detect_in_dungeon()))
     kill_boss(gamename)
     start_endlevel_script(gamename)
+    # loot_everything(gamename)
