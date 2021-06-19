@@ -1061,8 +1061,10 @@ class Looting:
         # Then grab loot locations
         loot_list = Looting.grab_farloot_locations(gamename)
         if not loot_list:
+            # print("No loot found")
             return "noloot"
-
+        # else:
+        #     print("Loot found")
         playerx, playery = BotUtils.grab_character_location(
             player_name, gamename)
         # If didn't find player then try once more
@@ -1090,15 +1092,16 @@ class Looting:
             order = BotUtils.grab_order_lowest_y(loot_list)
             # Then reorder the lootlist to match
             loot_list = [x for _, x in sorted(zip(order, loot_list))]
-
+        print(len(loot_list))
         confirmed = False
         for index, coords in enumerate(loot_list):
             x, y = coords
-            wincap = WindowCapture(gamename, [x-75, y-22, x+75, y+22])
+            wincap = WindowCapture(gamename, [x-95, y-50, x+95, y+50])
             rgb = wincap.get_screenshot()
             filter = HsvFilter(0, 0, 131, 151, 255, 255, 0, 0, 0, 0)
             rgb = BotUtils.apply_hsv_filter(rgb, filter)
-            tess_config = '--psm 7 --oem 3 -c tessedit_char_whitelist=ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
+            # cv2.imwrite("testytest.jpg", rgb)
+            tess_config = '--psm 5 --oem 3 -c tessedit_char_whitelist=ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
             result = pytesseract.image_to_string(
                 rgb, lang='eng', config=tess_config)[:-2]
             if len(result) > 3:
@@ -1107,6 +1110,7 @@ class Looting:
                 confirmed = loot_list[index]
                 break
         if not confirmed:
+            # print("Lootname not confirmed or detected")
             return "noloot"
 
         relx = playerx - confirmed[0]
