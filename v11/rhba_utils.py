@@ -160,10 +160,8 @@ class BotUtils:
         return sorted(range(len(dists)), key=dists.__getitem__)
 
     def grab_order_lowest_y(coords):
-        y_only = []
-        for _, y in coords:
-            y_only.append(y)
-        return sorted(range(len(y_only)), key=y_only.__getitem__)
+        sorted_by_second = sorted(coords, key=lambda tup: tup[1], reverse=True)
+        return sorted_by_second
 
     # Angle is left->right travel of room angle, north being 0deg
     def move_diagonal(gamename, x, y, angle=90, speed=20, rel=False):
@@ -1005,7 +1003,7 @@ class Looting:
             CustomInput.press_key(CustomInput.key_map["right"], "right")
             CustomInput.release_key(CustomInput.key_map["right"], "right")
 
-    def grab_all_visible_loot(gamename, player_name):
+    def grab_all_visible_loot(gamename, player_name=False):
         start_time = time.time()
         while True:
             if time.time() - start_time > 20:
@@ -1060,7 +1058,7 @@ class Looting:
         if not confirmed:
             return False
 
-    def try_find_and_grab_loot(gamename, player_name, loot_lowest=True, printout=False):
+    def try_find_and_grab_loot(gamename, player_name=False, loot_lowest=True, printout=False):
         # First need to close anything that might be in the way
         BotUtils.close_map_and_menu(gamename)
         # Then grab loot locations
@@ -1070,15 +1068,18 @@ class Looting:
             return "noloot"
         # else:
         #     print("Loot found")
-        playerx, playery = BotUtils.grab_character_location(
-            player_name, gamename)
-        # If didn't find player then try once more
-        if not playerx:
+        if player_name:
             playerx, playery = BotUtils.grab_character_location(
                 player_name, gamename)
+            # If didn't find player then try once more
             if not playerx:
-                return "noplayer"
-
+                playerx, playery = BotUtils.grab_character_location(
+                    player_name, gamename)
+                if not playerx:
+                    return "noplayer"
+        else:
+            playerx, playery = [641, 387]
+        # print(loot_list)
         # if want to always loot the nearest first despite the cpu hit
         if not loot_lowest:
             # Then convert lootlist to rel_pos list
@@ -1097,36 +1098,60 @@ class Looting:
             order = BotUtils.grab_order_lowest_y(loot_list)
             # Then reorder the lootlist to match
             loot_list = [x for _, x in sorted(zip(order, loot_list))]
-        # print(len(loot_list))
+        # print(loot_list)
         confirmed = False
         for index, coords in enumerate(loot_list):
+            # print("Found a possible match")
             x, y = coords
-            wincap = WindowCapture(gamename, [x-95, y-50, x+95, y+50])
+            wincap = WindowCapture(gamename, [x-70, y, x+70, y+40])
             rgb = wincap.get_screenshot()
             filter = HsvFilter(0, 0, 131, 151, 255, 255, 0, 0, 0, 0)
             rgb = BotUtils.apply_hsv_filter(rgb, filter)
-            # cv2.imwrite("testytest.jpg", rgb)
-            tess_config = '--psm 5 --oem 3 -c tessedit_char_whitelist=ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
+            cv2.imwrite("testytest.jpg", rgb)
+            tess_config = '--psm 8 --oem 3 -c tessedit_char_whitelist=ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
             result = pytesseract.image_to_string(
                 rgb, lang='eng', config=tess_config)[:-2]
-            if len(result) > 3:
+            if len(result.replace(" ", "")) > 3:
                 if printout:
                     print(result)
                 confirmed = loot_list[index]
+                print("First method, {}".format(result.replace(" ", "")))
+                cv2.imwrite("C:\\Games\\first" +
+                            str(random.randint(0, 10000))+".jpg", rgb)
                 break
+            else:
+                wincap = WindowCapture(gamename, [x-75, y-10, x+75, y+50])
+                rgb = wincap.get_screenshot()
+                filter = HsvFilter(0, 0, 131, 151, 255, 255, 0, 0, 0, 0)
+                rgb = BotUtils.apply_hsv_filter(rgb, filter)
+                # cv2.imwrite("testytest.jpg", rgb)
+                tess_config = '--psm 6 --oem 3 -c tessedit_char_whitelist=ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
+                result = pytesseract.image_to_string(
+                    rgb, lang='eng', config=tess_config)[:-2]
+                if len(result.replace(" ", "").replace("\n", "")) > 6:
+                    confirmed = loot_list[index]
+                    print("Second method, {}".format(result.replace(" ", "").replace("\n", "")))
+                    cv2.imwrite("C:\\Games\\second" +
+                                str(random.randint(0, 10000))+".jpg", rgb)
+                    break
+
         if not confirmed:
             # print("Lootname not confirmed or detected")
             return "noloot"
-
+        # print(confirmed)
         relx = playerx - confirmed[0]
-        rely = confirmed[1] - playery - 275
+        rely = confirmed[1] - playery - 150
+        # print("relx:{}, rely:{}".format(-relx, -rely))
         rect = [confirmed[0]-100, confirmed[1] -
                 30, confirmed[0]+100, confirmed[1]+30]
         BotUtils.move_towards(relx, "x")
         loop_time = time.time()
         time_remaining = 0.1
         time.sleep(0.01)
+        zero_speed_frames = 0
+        lastx = 89271
         while time_remaining > 0:
+            # print("Looping during x travel")
             time.sleep(0.003)
             if BotUtils.detect_xprompt(gamename):
                 break
@@ -1136,24 +1161,38 @@ class Looting:
                 time_taken = time.time() - loop_time
                 movementx = confirmed[0] - newx
                 speed = movementx/time_taken
-                if speed != 0:
+                # print(speed)
+                if newx == lastx:
+                    zero_speed_frames += 1
+                    if zero_speed_frames >= 8:
+                        break
+                elif speed != 0:
                     time_remaining = abs(
                         relx/speed) - time_taken
                 rect = [newx-100, newy-30, newx+100, newy+30]
+                lastx = newx
             except:
+                print("Can no longer detect loot")
                 try:
-                    time.sleep(time_remaining)
+                    if time_remaining < 3:
+                        time.sleep(time_remaining)
+                    else:
+                        time.sleep(abs(relx/100))
                     break
                 except:
                     return False
         for key in ["left", "right"]:
             CustomInput.release_key(CustomInput.key_map[key], key)
+        time.sleep(0.1)
+        for key in ["left", "right"]:
+            CustomInput.release_key(CustomInput.key_map[key], key)
         BotUtils.move_towards(rely, "y")
         start_time = time.time()
         if rely < 0:
-            expected_time = abs(rely/7.5)
+            expected_time = abs(rely/300)
         else:
-            expected_time = abs(rely/5.5)
+            expected_time = abs(rely/380)
+        # print("rely:{}px, travel time: {}s".format(rely, expected_time))
         while not BotUtils.detect_xprompt(gamename):
             time.sleep(0.005)
             # After moving in opposite direction
@@ -1171,6 +1210,8 @@ class Looting:
                     CustomInput.release_key(CustomInput.key_map[key], key)
                 BotUtils.move_towards(-1*rely, "y")
                 start_time -= 8.5
+        # print("Expected:{}s, actual:{}s".format(
+        #     expected_time, time.time()-start_time))
         for key in ["up", "down"]:
             CustomInput.release_key(CustomInput.key_map[key], key)
         pydirectinput.press("x")
@@ -1179,7 +1220,7 @@ class Looting:
     def grab_farloot_locations(gamename=False, rect=False, return_image=False):
         if gamename:
             if not rect:
-                rect1 = [100, 135, 1223, 688]
+                rect1 = [100, 160, 1092, 695]
                 wincap = WindowCapture(gamename, rect1)
             else:
                 wincap = WindowCapture(gamename, rect)
@@ -1190,7 +1231,9 @@ class Looting:
         filter = HsvFilter(15, 180, 0, 20, 255, 63, 0, 0, 0, 0)
         output_image = BotUtils.filter_blackwhite_invert(
             filter, original_image, True, 0, 180)
-
+        # cv2.imwrite("testytest2.jpg", output_image)
+        # cv2.imwrite("C:\\Games\\" +
+        #             str(random.randint(0, 10000))+".jpg", output_image)
         output_image = cv2.blur(output_image, (8, 1))
         output_image = cv2.blur(output_image, (8, 1))
         output_image = cv2.blur(output_image, (8, 1))
