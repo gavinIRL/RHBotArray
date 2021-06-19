@@ -100,7 +100,7 @@ def check_if_the_crack(gamename):
 
 def perform_otherworld_combat(gamename):
     CustomInput.press_key(CustomInput.key_map["down"], "down")
-    time.sleep(0.4)
+    time.sleep(2)
     CustomInput.release_key(CustomInput.key_map["down"], "down")
     time.sleep(0.005)
     CustomInput.press_key(CustomInput.key_map["up"], "up")
@@ -113,10 +113,9 @@ def perform_otherworld_combat(gamename):
     start_time = time.time()
     while not BotUtils.detect_sect_clear():
         continue_otherworld_attacks()
-        if time.time()-start_time > 10:
+        if time.time()-start_time > 20:
             print("need to move closer to detected enemies")
-            break
-    os._exit(1)
+            os._exit(1)
 
 
 def continue_otherworld_attacks():
@@ -127,11 +126,20 @@ def continue_otherworld_attacks():
 
 
 def navigate_otherworld_loot(gamename):
-    pass
+    key = "left"
+    CustomInput.press_key(CustomInput.key_map[key], key)
+    time.sleep(0.8)
+    CustomInput.release_key(CustomInput.key_map[key], key)
+    time.sleep(0.1)
+    key = "up"
+    CustomInput.press_key(CustomInput.key_map[key], key)
+    time.sleep(3)
+    CustomInput.release_key(CustomInput.key_map[key], key)
+    loot_everything(gamename)
 
 
 def leave_otherworld(gamename):
-    pass
+    os._exit(1)
 
 
 def move_to_loot_point(gamename):
