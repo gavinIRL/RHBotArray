@@ -488,7 +488,7 @@ class BotUtils:
             y += 235
             return x, y
         except:
-            return False, False
+            return 640, 382
 
     def shift_channel(c, amount):
         if amount > 0:
