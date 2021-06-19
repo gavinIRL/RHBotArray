@@ -174,13 +174,17 @@ def perform_boss_moves():
     time.sleep(0.02)
     CustomInput.release_key(CustomInput.key_map["f"])
     time.sleep(0.4)
-    CustomInput.press_key(CustomInput.key_map["shift"])
-    time.sleep(0.02)
-    CustomInput.release_key(CustomInput.key_map["shift"])
-    CustomInput.press_key(CustomInput.key_map["s"])
-    time.sleep(0.02)
-    CustomInput.release_key(CustomInput.key_map["s"])
-    time.sleep(0.6)
+    # CustomInput.press_key(CustomInput.key_map["shift"])
+    # time.sleep(0.02)
+    # CustomInput.release_key(CustomInput.key_map["shift"])
+    # CustomInput.press_key(CustomInput.key_map["z"])
+    # time.sleep(1.5)
+    # CustomInput.press_key(CustomInput.key_map["up"], "up")
+    # CustomInput.press_key(CustomInput.key_map["right"], "right")
+    # time.sleep(0.6)
+    # release_dir_keys()
+    # CustomInput.release_key(CustomInput.key_map["z"])
+    # time.sleep(0.6)
     # Then dodge any attacks
     last_dodge = "right"
     # dodge_attacks(last_dodge)
@@ -189,16 +193,7 @@ def perform_boss_moves():
     print("Got past the first dodge point continue")
     # Then continue attack and dodge until boss defeated
     while Events.detect_in_dungeon():
-        if last_dodge == "right":
-            # last_dodge = "left"
-            # dodge_attacks(last_dodge)
-            # point_angle(45)
-            continue_boss_attacks()
-        else:
-            # last_dodge = "right"
-            # dodge_attacks(last_dodge)
-            # point_angle(315)
-            continue_boss_attacks()
+        continue_boss_attacks()
 
 
 def kill_boss(gamename):
