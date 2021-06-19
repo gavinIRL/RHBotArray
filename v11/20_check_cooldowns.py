@@ -73,10 +73,20 @@ def check_off_cooldown_tab2(gamename):
 
 
 def grab_skilltab(gamename):
-    pass
+    wincap = WindowCapture(gamename, [361, 755, 591, 788])
+    image = wincap.get_screenshot()
+    # cv2.imwrite("testytest.jpg", image)
+    a, _, _ = [int(i) for i in image[0][0]]
+    if a == 144:
+        return 1
+    elif a == 18:
+        return 2
+    else:
+        return False
 
 
-start = time.time()
-print(check_off_cooldown(gamename))
-total = time.time()-start
-print("Time taken: {}s".format(total))
+grab_skilltab(gamename)
+# start = time.time()
+# print(check_off_cooldown(gamename))
+# total = time.time()-start
+# print("Time taken: {}s".format(total))
