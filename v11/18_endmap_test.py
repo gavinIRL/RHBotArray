@@ -79,12 +79,52 @@ def start_endlevel_script(gamename):
 
 
 def do_otherworld_handling(gamename):
-    # wincap = WindowCapture(gamename)
-    # # For now just press no to it
-    # pydirectinput.click(wincap.window_rect[0]+775, wincap.window_rect[1]+488)
-    # time.sleep(1)
-    print("Exiting as otherworld detected!")
+    RHClick.click_yes(gamename)
+    time.sleep(0.5)
+    while not Events.detect_in_dungeon():
+        time.sleep(0.006)
+    # Then clear the area
+    perform_otherworld_combat(gamename)
+    # Then move to collect the loot
+    navigate_otherworld_loot(gamename)
+    # And then finally leave the otherworld
+    leave_otherworld(gamename)
+
+
+def perform_otherworld_combat(gamename):
+    CustomInput.press_key(CustomInput.key_map["down"], "down")
+    time.sleep(0.4)
+    CustomInput.release_key(CustomInput.key_map["down"], "down")
+    time.sleep(0.005)
+    CustomInput.press_key(CustomInput.key_map["up"], "up")
+    time.sleep(0.005)
+    CustomInput.release_key(CustomInput.key_map["up"], "up")
+    time.sleep(0.01)
+    CustomInput.press_key(CustomInput.key_map["h"])
+    time.sleep(0.005)
+    CustomInput.release_key(CustomInput.key_map["h"])
+    start_time = time.time()
+    while not BotUtils.detect_sect_clear():
+        continue_otherworld_attacks()
+        if time.time()-start_time > 10:
+            print("need to move closer to detected enemies")
+            break
     os._exit(1)
+
+
+def continue_otherworld_attacks():
+    for key in ["a", "g", "f", "h"]:
+        CustomInput.press_key(CustomInput.key_map[key], key)
+        time.sleep(0.02)
+        CustomInput.release_key(CustomInput.key_map[key], key)
+
+
+def navigate_otherworld_loot(gamename):
+    pass
+
+
+def leave_otherworld(gamename):
+    pass
 
 
 def move_to_loot_point(gamename):
