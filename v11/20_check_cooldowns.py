@@ -47,6 +47,35 @@ def check_off_cooldown(gamename):
     return cd_list
 
 
+def check_off_cooldown_tab2(gamename):
+    cd_list = [False, False, False, False, False, False]
+    wincap = WindowCapture(gamename, [395, 745, 591, 788])
+    image = wincap.get_screenshot()
+    a, _, _ = [int(i) for i in image[0][0]]
+    b, _, _ = [int(i) for i in image[0][39]]
+    c, _, _ = [int(i) for i in image[0][78]]
+    # d, _, _ = [int(i) for i in image[0][117]]
+    # e, _, _ = [int(i) for i in image[0][156]]
+    # f, _, _ = [int(i) for i in image[0][195]]
+    if a != 56:
+        cd_list[0] = True
+    if b != 11:
+        cd_list[1] = True
+    if c != 44:
+        cd_list[2] = True
+    # if d != 245:
+    #     cd_list[3] = True
+    # if e != 231:
+    #     cd_list[4] = True
+    # if f != 142:
+    #     cd_list[5] = True
+    return cd_list
+
+
+def grab_skilltab(gamename):
+    pass
+
+
 start = time.time()
 print(check_off_cooldown(gamename))
 total = time.time()-start
