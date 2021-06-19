@@ -167,13 +167,20 @@ def perform_boss_moves():
     print("Got to the perform boss move func")
     # Perform first two skill moves
     CustomInput.press_key(CustomInput.key_map["s"])
-    time.sleep(0.03)
+    time.sleep(0.02)
     CustomInput.release_key(CustomInput.key_map["s"])
     time.sleep(0.4)
     CustomInput.press_key(CustomInput.key_map["f"])
-    time.sleep(0.03)
+    time.sleep(0.02)
     CustomInput.release_key(CustomInput.key_map["f"])
     time.sleep(0.4)
+    CustomInput.press_key(CustomInput.key_map["shift"])
+    time.sleep(0.02)
+    CustomInput.release_key(CustomInput.key_map["shift"])
+    CustomInput.press_key(CustomInput.key_map["s"])
+    time.sleep(0.02)
+    CustomInput.release_key(CustomInput.key_map["s"])
+    time.sleep(0.6)
     # Then dodge any attacks
     last_dodge = "right"
     # dodge_attacks(last_dodge)
