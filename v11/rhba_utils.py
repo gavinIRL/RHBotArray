@@ -1497,12 +1497,12 @@ class Looting:
         else:
             # Grab the indexes in ascending order of distance from
             # bottom of the screen
-            print(loot_list)
+            # print(loot_list)
             loot_list.sort(key=lambda x: x[1], reverse=True)
             # order = BotUtils.grab_order_lowest_y(loot_list)
             # Then reorder the lootlist to match
             # loot_list = [x for _, x in sorted(zip(order, loot_list))]
-            print(loot_list)
+            # print(loot_list)
         true_coords = [loot_list[0][0], loot_list[0][1]]
         # Now calculate relative loot position
         relx = playerx - loot_list[0][0]
