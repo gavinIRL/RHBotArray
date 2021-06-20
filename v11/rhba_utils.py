@@ -1082,6 +1082,20 @@ class Looting:
             final, threshold=0.87, epsilon=0.5)
         if len(rectangles) < 1:
             return False
+        points = []
+        for (x, y, w, h) in rectangles:
+            # Account for the rect
+            if rect:
+                # Account for the rect
+                x += rect[0]
+                y += rect[1]
+            else:
+                x += rect1[0]
+                y += rect1[1]
+            center_x = x + int(w/2)
+            center_y = y + int(h/2)
+            points.append((center_x, center_y))
+        return points
 
     def move_loot_diagonal(relcoords, rect=False, gamename=False, seek=True):
         if not gamename:
@@ -1092,7 +1106,7 @@ class Looting:
         expect_x = abs(relx/300)
         expect_y = abs(rely/380)
 
-    def try_find_and_grab_lootv2(gamename=False, player_name=False, loot_lowest=True):
+    def try_find_and_grab_lootv2(gamename=False, player_name=False, loot_lowest=True, allow_noplyr=True):
         if not gamename:
             with open("gamename.txt") as f:
                 gamename = f.readline()
@@ -1111,7 +1125,10 @@ class Looting:
                 playerx, playery = BotUtils.grab_character_location(
                     player_name, gamename)
                 if not playerx:
-                    return "noplayer"
+                    if not allow_noplyr:
+                        return "noplayer"
+                    else:
+                        playerx, playery = [641, 387]
         # Otherwise assume a standard player position
         else:
             playerx, playery = [641, 387]
