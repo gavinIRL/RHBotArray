@@ -200,8 +200,8 @@ def loot_everything(gamename):
     player_name = False
     player_name = BotUtils.detect_player_name(gamename)
     if not player_name:
-        return Looting.grab_all_visible_loot(gamename)
-    return Looting.grab_all_visible_loot(gamename, player_name)
+        return Looting.grab_all_visible_lootv2(gamename)
+    return Looting.grab_all_visible_lootv2(gamename, player_name)
 
 
 def skip_to_reward(gamename):
@@ -312,6 +312,6 @@ if __name__ == "__main__":
     #     time.sleep(0.2)
     # print("Didn't detect in dungeon")
     # print("Detected in dungeon: {}".format(Events.detect_in_dungeon()))
-    kill_boss(gamename)
-    start_endlevel_script(gamename)
-    # loot_everything(gamename)
+    # kill_boss(gamename)
+    # start_endlevel_script(gamename)
+    loot_everything(gamename)

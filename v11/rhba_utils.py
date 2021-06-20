@@ -1029,6 +1029,32 @@ class Looting:
                     count += 1
                     time.sleep(0.09)
 
+    def grab_all_visible_lootv2(gamename, player_name=False):
+        start_time = time.time()
+        while True:
+            if time.time() - start_time > 20:
+                break
+            outcome = Looting.try_find_and_grab_lootv2(
+                gamename, player_name)
+            if outcome == "noloot":
+                break
+            elif outcome == "noplayer":
+                pydirectinput.press("right")
+                outcome = Looting.try_find_and_grab_lootv2(
+                    gamename, player_name)
+                if outcome == "noplayer":
+                    break
+            elif outcome == "falsepos":
+                break
+            elif outcome == True:
+                count = 0
+                while BotUtils.detect_xprompt(gamename):
+                    if count > 12:
+                        break
+                    pydirectinput.press("x")
+                    count += 1
+                    time.sleep(0.23)
+
     def check_for_loot(gamename):
         # This will be a lightweight check for any positive loot ident
         # Meant to be used when moving and normal looting has ceased
