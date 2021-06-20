@@ -1059,15 +1059,43 @@ class Looting:
             return False
 
     def grab_farloot_locationsv2(gamename=False, rect=False):
-        pass
+        if not gamename:
+            with open("gamename.txt") as f:
+                gamename = f.readline()
+        if not rect:
+            rect1 = [5, 80, 1273, 776]
+            wincap = WindowCapture(gamename, rect1)
+        else:
+            wincap = WindowCapture(gamename, rect)
+        vision = Vision("doublelootline.jpg")
+        screenshot = wincap.get_screenshot()
+        original_image = cv2.blur(screenshot, (80, 1))
+        lootbox_thresh1 = cv2.inRange(original_image, np.array(
+            [0, 19, 30]), np.array([1, 20, 37]))
+        lootbox_thresh2 = cv2.inRange(original_image, np.array(
+            [5, 19, 27]), np.array([9, 23, 31]))
+        combined_mask = lootbox_thresh2 + lootbox_thresh1
+        combined_mask_inv = 255 - combined_mask
+        combined_mask_rgb = cv2.cvtColor(combined_mask_inv, cv2.COLOR_GRAY2BGR)
+        final = cv2.max(original_image, combined_mask_rgb)
+        rectangles = vision.find(
+            final, threshold=0.87, epsilon=0.5)
+        if len(rectangles) < 1:
+            return False
 
-    def move_loot_diagonal(relcoords, rect=False, seek=True, gamename=False):
+    def move_loot_diagonal(relcoords, rect=False, gamename=False, seek=True):
+        if not gamename:
+            with open("gamename.txt") as f:
+                gamename = f.readline()
         relx, rely = relcoords
         # Calculate roughly how long expect to travel
         expect_x = abs(relx/300)
         expect_y = abs(rely/380)
 
-    def try_find_and_grab_lootv2(gamename, player_name=False, loot_lowest=True):
+    def try_find_and_grab_lootv2(gamename=False, player_name=False, loot_lowest=True):
+        if not gamename:
+            with open("gamename.txt") as f:
+                gamename = f.readline()
         # First need to close anything that might be in the way
         BotUtils.close_map_and_menu(gamename)
         # Then grab loot locations
@@ -1111,7 +1139,7 @@ class Looting:
         rect = [loot_list[0][0]-80, loot_list[0][1] -
                 30, loot_list[0][0]+80, loot_list[0][1]+30]
         # Then send to dedicated function for diagonal looting run
-        return Looting.move_loot_diagonal([relx, rely], rect, True, gamename)
+        return Looting.move_loot_diagonal([relx, rely], rect, gamename, True)
 
     def try_find_and_grab_loot(gamename, player_name=False, loot_lowest=True, printout=False):
         # First need to close anything that might be in the way
