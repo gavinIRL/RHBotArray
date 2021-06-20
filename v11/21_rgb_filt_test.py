@@ -1,4 +1,5 @@
 import cv2
+import time
 import os
 import numpy as np
 from rhba_utils import BotUtils, Events, SellRepair, RHClick, Looting, WindowCapture, Vision, HsvFilter
@@ -9,6 +10,7 @@ with open("gamename.txt") as f:
 vision = Vision("lootline.jpg")
 wincap = WindowCapture(gamename)
 
+start = time.time()
 
 screenshot = wincap.get_screenshot()
 
@@ -43,6 +45,9 @@ final = cv2.max(original_image, combined_mask_rgb)
 
 rectangles = vision.find(
     final, threshold=0.81, epsilon=0.5)
+
+print("Time taken: {}s".format(time.time()-start))
+
 output_image = vision.draw_rectangles(screenshot, rectangles)
 
 cv2.imwrite("testycont.jpg", output_image)
