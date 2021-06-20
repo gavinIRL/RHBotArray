@@ -1058,6 +1058,9 @@ class Looting:
         if not confirmed:
             return False
 
+    def try_find_and_grab_lootv2(gamename, player_name=False, loot_lowest=True):
+        BotUtils.close_map_and_menu(gamename)
+
     def try_find_and_grab_loot(gamename, player_name=False, loot_lowest=True, printout=False):
         # First need to close anything that might be in the way
         BotUtils.close_map_and_menu(gamename)
@@ -1130,7 +1133,8 @@ class Looting:
                     rgb, lang='eng', config=tess_config)[:-2]
                 if len(result.replace(" ", "").replace("\n", "")) > 6:
                     confirmed = loot_list[index]
-                    print("Second method, {}".format(result.replace(" ", "").replace("\n", "")))
+                    print("Second method, {}".format(
+                        result.replace(" ", "").replace("\n", "")))
                     cv2.imwrite("C:\\Games\\second" +
                                 str(random.randint(0, 10000))+".jpg", rgb)
                     break
