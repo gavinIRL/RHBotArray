@@ -1248,6 +1248,8 @@ class Looting:
                         total_frames = 0
             # Finally if can't find it then search in both directions for y
             if require_seek:
+                if not seek:
+                    return False
                 # Need to move up and down for 0.5sec each way checking for loot
                 start_time = time.time()
                 keyy = "down"
@@ -1378,6 +1380,8 @@ class Looting:
             BotUtils.stop_movement()
             # Then need to seek out loot if flag set
             if require_seek:
+                if not seek:
+                    return False
                 # Need to move up and down for 0.5sec each way checking for loot
                 start_time = time.time()
                 keyy = "down"
