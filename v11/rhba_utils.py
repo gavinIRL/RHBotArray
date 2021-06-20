@@ -1370,7 +1370,10 @@ class Looting:
                             if movementx == 0:
                                 pass
                             elif total_frames == 2:
-                                avg_x_speed = speedx
+                                if speedx != 0:
+                                    avg_x_speed = speedx
+                                else:
+                                    total_frames -= 1
                             else:
                                 avg_x_speed = (
                                     total_frames*avg_x_speed+speedx)/(total_frames+1)
@@ -1380,7 +1383,10 @@ class Looting:
                             if movementy == 0:
                                 pass
                             elif total_frames == 2:
-                                avg_y_speed = speedy
+                                if speedy != 0:
+                                    avg_y_speed = speedy
+                                else:
+                                    total_frames -= 1
                             else:
                                 avg_y_speed = (
                                     total_frames*avg_y_speed+speedy)/(total_frames+1)
