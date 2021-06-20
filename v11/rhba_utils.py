@@ -1168,6 +1168,7 @@ class Looting:
         if closer < 0.05:
             # If both tiny then return false
             if further < 0.05:
+                BotUtils.stop_movement()
                 return False
             # Otherwise need to just travel in second direction
             # Effectively just using the old straightline method
@@ -1283,6 +1284,7 @@ class Looting:
             # Finally if can't find it then search in both directions for y
             if require_seek:
                 if not seek:
+                    BotUtils.stop_movement()
                     return False
                 # Need to move up and down for 0.5sec each way checking for loot
                 start_time = time.time()
@@ -1411,6 +1413,7 @@ class Looting:
                 except:
                     time_remaining -= loop_time
                     if time_remaining < 0:
+                        BotUtils.stop_movement()
                         return False
                     if time.time() - last_detect > 0.5:
                         # Release all keys
@@ -1422,6 +1425,7 @@ class Looting:
             # Then need to seek out loot if flag set
             if require_seek:
                 if not seek:
+                    BotUtils.stop_movement()
                     return False
                 # Need to move up and down for 0.5sec each way checking for loot
                 start_time = time.time()
@@ -1449,6 +1453,7 @@ class Looting:
                 BotUtils.stop_movement()
                 pydirectinput.press("x")
                 return True
+            BotUtils.stop_movement()
             return False
 
     def try_find_and_grab_lootv2(gamename=False, player_name=False, loot_lowest=True, allow_noplyr=True):
