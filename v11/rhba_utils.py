@@ -1204,7 +1204,10 @@ class Looting:
                                 require_seek = True
                         elif total_frames == 2:
                             zero_speed_framesx = 0
-                            avg_x_speed = speedx
+                            if speedx != 0:
+                                avg_x_speed = speedx
+                            else:
+                                total_frames -= 1
                         else:
                             zero_speed_framesx = 0
                             avg_x_speed = (
@@ -1254,7 +1257,10 @@ class Looting:
                                 require_seek = True
                         elif total_frames == 2:
                             zero_speed_framesy = 0
-                            avg_y_speed = speedy
+                            if speedy != 0:
+                                avg_x_speed = speedy
+                            else:
+                                total_frames -= 1
                         else:
                             zero_speed_framesy = 0
                             avg_y_speed = (
