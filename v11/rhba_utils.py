@@ -1061,6 +1061,12 @@ class Looting:
     def grab_farloot_locationsv2(gamename=False, rect=False):
         pass
 
+    def move_loot_diagonal(relcoords, rect=False, seek=True, gamename=False):
+        relx, rely = relcoords
+        # Calculate roughly how long expect to travel
+        expect_x = abs(relx/300)
+        expect_y = abs(rely/380)
+
     def try_find_and_grab_lootv2(gamename, player_name=False, loot_lowest=True):
         # First need to close anything that might be in the way
         BotUtils.close_map_and_menu(gamename)
@@ -1098,6 +1104,14 @@ class Looting:
             order = BotUtils.grab_order_lowest_y(loot_list)
             # Then reorder the lootlist to match
             loot_list = [x for _, x in sorted(zip(order, loot_list))]
+        # Now calculate relative loot position
+        relx = playerx - loot_list[0][0]
+        rely = loot_list[0][1] - playery - 150
+        # Grab the small rect for speed tracking
+        rect = [loot_list[0][0]-80, loot_list[0][1] -
+                30, loot_list[0][0]+80, loot_list[0][1]+30]
+        # Then send to dedicated function for diagonal looting run
+        return Looting.move_loot_diagonal([relx, rely], rect, True, gamename)
 
     def try_find_and_grab_loot(gamename, player_name=False, loot_lowest=True, printout=False):
         # First need to close anything that might be in the way
