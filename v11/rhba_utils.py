@@ -1178,7 +1178,7 @@ class Looting:
             if further == timeleftx:
                 CustomInput.press_key(
                     CustomInput.key_map[second_key], second_key)
-                loop_time = time.time()
+                last_loop = time.time()
                 total_frames = 0
                 avg_x_speed = 100
                 time_remaining = further
@@ -1186,7 +1186,8 @@ class Looting:
                 zero_speed_framesx = 0
                 while not BotUtils.detect_xprompt(gamename):
                     time.sleep(0.003)
-                    loop_time = loop_time - time.time()
+                    loop_time = time.time() - last_loop
+                    last_loop = time.time()
                     try:
                         newx, newy = Looting.grab_farloot_locationsv2(gamename, rect)[
                             0]
@@ -1232,7 +1233,7 @@ class Looting:
             else:
                 CustomInput.press_key(
                     CustomInput.key_map[second_key], second_key)
-                loop_time = time.time()
+                last_loop = time.time()
                 total_frames = 0
                 avg_y_speed = 100
                 time_remaining = further
@@ -1240,7 +1241,8 @@ class Looting:
                 zero_speed_framesy = 0
                 while not BotUtils.detect_xprompt(gamename):
                     time.sleep(0.003)
-                    loop_time = loop_time - time.time()
+                    loop_time = time.time() - last_loop
+                    last_loop = time.time()
                     try:
                         newx, newy = Looting.grab_farloot_locationsv2(gamename, rect)[
                             0]
@@ -1323,13 +1325,14 @@ class Looting:
             total_frames = 0
             y_stuck = False
             require_seek = False
-            loop_time = time.time()
+            last_loop = time.time()
             last_detect = time.time()
             while time_remaining > 0:
                 time.sleep(0.002)
                 if BotUtils.detect_xprompt(gamename):
                     break
-                loop_time = loop_time - time.time()
+                loop_time = time.time() - last_loop
+                last_loop = time.time()
                 last_detect = time.time()
                 try:
                     total_frames += 1
@@ -1337,6 +1340,7 @@ class Looting:
                         0]
                     if not xfinished:
                         movementx = lastx - newx
+                        # print("movementx = {}px".format(movementx))
                         speedx = movementx/loop_time
                         totalx = truex - newx
                         percentx = abs(totalx)/abs(relx)
@@ -1410,6 +1414,7 @@ class Looting:
                     rect = [newx-100, newy-30, newx+100, newy+30]
                     lastx = newx
                     lasty = newy
+                    # print(speedx)
 
                 except:
                     time_remaining -= loop_time
