@@ -7,26 +7,28 @@ os.chdir(os.path.dirname(os.path.abspath(__file__)))
 with open("gamename.txt") as f:
     gamename = f.readline()
 
-vision = Vision("lootline.jpg")
-wincap = WindowCapture(gamename)
+vision = Vision("lootside2.jpg")
+wincap = WindowCapture(gamename, [510, 349, 775, 500])
 
 start = time.time()
 
 screenshot = wincap.get_screenshot()
-
-original_image = cv2.blur(screenshot, (80, 1))
+original_image = screenshot
+# original_image = cv2.blur(screenshot, (1, 2))
 # original_image = cv2.blur(original_image, (8, 1))
 # original_image = cv2.blur(original_image, (8, 1))
 
 # cv2.imwrite("testytest.jpg", original_image)
-t = 6  # tolerance
+# t = 6  # tolerance
 
-lootbox_thresh1 = cv2.inRange(original_image, np.array(
-    [26 - t, 37 - t, 47 - t]), np.array([26 + t, 37 + t, 47 + t]))
+# lootbox_thresh1 = cv2.inRange(original_image, np.array(
+#     [26 - t, 37 - t, 47 - t]), np.array([26 + t, 37 + t, 47 + t]))
 
 t = 2
+# lootbox_thresh2 = cv2.inRange(original_image, np.array(
+#     [0, 13, 21]), np.array([8, 19, 30]))
 lootbox_thresh2 = cv2.inRange(original_image, np.array(
-    [7 - t, 21 - t, 29 - t]), np.array([7 + t, 21 + t, 29 + t]))
+    [29, 44, 49]), np.array([62, 67, 78]))
 # green_thresh = cv2.inRange(original_image, np.array(
 #     [104 - t, 214 - t, 99 - t]), np.array([104 + t, 214 + t, 99 + t]))
 # red_1_thresh = cv2.inRange(original_image, np.array(
@@ -44,7 +46,7 @@ final = cv2.max(original_image, combined_mask_rgb)
 
 
 rectangles = vision.find(
-    final, threshold=0.81, epsilon=0.5)
+    original_image, threshold=0.81, epsilon=0.5)
 
 print("Time taken: {}s".format(time.time()-start))
 
