@@ -1058,8 +1058,46 @@ class Looting:
         if not confirmed:
             return False
 
+    def grab_farloot_locationsv2(gamename=False, rect=False):
+        pass
+
     def try_find_and_grab_lootv2(gamename, player_name=False, loot_lowest=True):
+        # First need to close anything that might be in the way
         BotUtils.close_map_and_menu(gamename)
+        # Then grab loot locations
+        loot_list = Looting.grab_farloot_locationsv2(gamename)
+        if not loot_list:
+            return "noloot"
+        # Then look for player
+        if player_name:
+            playerx, playery = BotUtils.grab_character_location(
+                player_name, gamename)
+            # If didn't find player then try once more
+            if not playerx:
+                playerx, playery = BotUtils.grab_character_location(
+                    player_name, gamename)
+                if not playerx:
+                    return "noplayer"
+        # Otherwise assume a standard player position
+        else:
+            playerx, playery = [641, 387]
+        # The decide whether to loot nearest or lowest
+        # Difference between first is faster,
+        # second less likely to miss loot by walking out of FOV
+        if not loot_lowest:
+            # Then convert lootlist to rel_pos list
+            relatives = BotUtils.convert_list_to_rel(
+                loot_list, playerx, playery, 150)
+            # Grab the indexes in ascending order of closesness
+            order = BotUtils.grab_order_closeness(relatives)
+            # Then reorder the lootlist to match
+            loot_list = [x for _, x in sorted(zip(order, loot_list))]
+        else:
+            # Grab the indexes in ascending order of distance from
+            # bottom of the screen
+            order = BotUtils.grab_order_lowest_y(loot_list)
+            # Then reorder the lootlist to match
+            loot_list = [x for _, x in sorted(zip(order, loot_list))]
 
     def try_find_and_grab_loot(gamename, player_name=False, loot_lowest=True, printout=False):
         # First need to close anything that might be in the way
