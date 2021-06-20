@@ -1160,7 +1160,7 @@ class Looting:
                     time.sleep(0.003)
                     loop_time = loop_time - time.time()
                     try:
-                        newx, _ = Looting.grab_farloot_locationsv2(gamename, rect)[
+                        newx, newy = Looting.grab_farloot_locationsv2(gamename, rect)[
                             0]
                         last_detect = time.time()
                         total_frames += 1
@@ -1184,6 +1184,8 @@ class Looting:
                             avg_x_speed = (
                                 total_frames*avg_x_speed+speedx)/(total_frames+1)
                         time_remaining = abs((totalx/percentx)/avg_x_speed)
+                        rect = [newx-100, newy-30, newx+100, newy+30]
+                        lastx = newx
                     except:
                         time_remaining -= loop_time
                         if time_remaining < 0:
@@ -1196,7 +1198,54 @@ class Looting:
                         total_frames = 0
             # Alternatively try handle the y case only
             else:
-                pass
+                CustomInput.press_key(
+                    CustomInput.key_map[second_key], second_key)
+                loop_time = time.time()
+                total_frames = 0
+                avg_y_speed = 100
+                time_remaining = further
+                last_detect = time.time()
+                zero_speed_framesy = 0
+                while not BotUtils.detect_xprompt(gamename):
+                    time.sleep(0.003)
+                    loop_time = loop_time - time.time()
+                    try:
+                        newx, newy = Looting.grab_farloot_locationsv2(gamename, rect)[
+                            0]
+                        last_detect = time.time()
+                        total_frames += 1
+                        movementy = lasty - newy
+                        speedy = movementy/loop_time
+                        totaly = truey - newy
+                        percenty = abs(totaly)/abs(rely)
+                        if percenty > 1:
+                            BotUtils.stop_movement()
+                            require_seek = True
+                        if movementy == 0:
+                            zero_speed_framesy += 1
+                            if zero_speed_framesy > 8:
+                                BotUtils.stop_movement()
+                                require_seek = True
+                        elif total_frames == 2:
+                            zero_speed_framesy = 0
+                            avg_y_speed = speedy
+                        else:
+                            zero_speed_framesy = 0
+                            avg_y_speed = (
+                                total_frames*avg_y_speed+speedy)/(total_frames+1)
+                        time_remaining = abs((totaly/percenty)/avg_y_speed)
+                        rect = [newx-100, newy-30, newx+100, newy+30]
+                        lasty = newy
+                    except:
+                        time_remaining -= loop_time
+                        if time_remaining < 0:
+                            BotUtils.stop_movement()
+                            require_seek = True
+                        if time.time() - last_detect > 0.5:
+                            # Release all keys
+                            BotUtils.stop_movement()
+                            return False
+                        total_frames = 0
             # Finally if can't find it then search in both directions for y
             if require_seek:
                 # Need to move up and down for 0.5sec each way checking for loot
