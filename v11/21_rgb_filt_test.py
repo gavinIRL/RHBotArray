@@ -8,7 +8,7 @@ with open("gamename.txt") as f:
 wincap = WindowCapture(gamename)
 original_image = wincap.get_screenshot()
 
-original_image = cv2.blur(original_image, (8, 1))
+original_image = cv2.blur(original_image, (80, 1))
 # original_image = cv2.blur(original_image, (8, 1))
 # original_image = cv2.blur(original_image, (8, 1))
 
