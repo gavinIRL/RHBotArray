@@ -1104,7 +1104,69 @@ class Looting:
         relx, rely = relcoords
         # Calculate roughly how long expect to travel
         expect_x = abs(relx/300)
-        expect_y = abs(rely/380)
+        expect_y = abs(rely/450)
+        # Then figure out which directions need to travel and how long
+        mult = 0.707
+        if relx > 0:
+            keyx = "left"
+            #CustomInput.press_key(CustomInput.key_map["left"], "left")
+            timeleftx = float("{:.4f}".format(abs(expect_x*mult)))
+        elif relx < 0:
+            keyx = "right"
+            #CustomInput.press_key(CustomInput.key_map["right"], "right")
+            timeleftx = float("{:.4f}".format(abs(expect_x*mult)))
+        else:
+            timeleftx = 0
+            mult = 1
+        if rely > 0:
+            keyy = "down"
+            #CustomInput.press_key(CustomInput.key_map["down"], "down")
+            timelefty = float("{:.4f}".format(abs(expect_y*mult)))
+        elif rely < 0:
+            keyy = "up"
+            #CustomInput.press_key(CustomInput.key_map["up"], "up")
+            timelefty = float("{:.4f}".format(abs(expect_y*mult)))
+        else:
+            timelefty = 0
+            if relx != 0:
+                timeleftx = float("{:.4f}".format(abs(expect_x)))
+            else:
+                return False
+        # Then figure out roughly which direction will finish first
+        closer = min([timeleftx, timelefty])
+        further = max([timeleftx, timelefty])
+        # first_key = [keyx, keyy][[timeleftx, timelefty].index(closer)]
+        second_key = [keyx, keyy][[timeleftx, timelefty].index(further)]
+        if closer < 0.05:
+            # If both tiny then return false
+            if further < 0.05:
+                return False
+            # Otherwise need to just travel in second direction
+            # Effectively just using the old straightline method
+            CustomInput.press_key(CustomInput.key_map[second_key], second_key)
+        else:
+            # Need to start moving in the right direction
+            CustomInput.press_key(CustomInput.key_map[keyx], keyx)
+            CustomInput.press_key(CustomInput.key_map[keyy], keyy)
+            time_remaining = 0.2
+            loop_time = time.time()
+            while time_remaining > 0:
+                time.sleep(0.002)
+                if BotUtils.detect_xprompt(gamename):
+                    break
+                try:
+                    newx, newy = Looting.grab_farloot_locations(gamename, rect)[
+                        0]
+                    time_taken = time.time() - loop_time
+                except:
+                    try:
+                        if time_remaining < 3:
+                            time.sleep(time_remaining)
+                        else:
+                            time.sleep(abs(relx/100))
+                        break
+                    except:
+                        return False
 
     def try_find_and_grab_lootv2(gamename=False, player_name=False, loot_lowest=True, allow_noplyr=True):
         if not gamename:
