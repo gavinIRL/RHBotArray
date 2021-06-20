@@ -44,7 +44,7 @@ final = cv2.max(original_image, combined_mask_rgb)
 
 
 rectangles = vision.find(
-    final, threshold=0.81, epsilon=0.5)
+    final, threshold=0.97, epsilon=0.5)
 
 print("Time taken: {}s".format(time.time()-start))
 
