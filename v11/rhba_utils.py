@@ -1097,10 +1097,12 @@ class Looting:
             points.append((center_x, center_y))
         return points
 
-    def move_loot_diagonal(relcoords, rect=False, gamename=False, seek=True):
+    def move_loot_diagonal(true_coords, relcoords, rect=False, gamename=False, seek=True):
         if not gamename:
             with open("gamename.txt") as f:
                 gamename = f.readline()
+        truex, truey = true_coords
+        lastx, lasty = true_coords
         relx, rely = relcoords
         # Calculate roughly how long expect to travel
         expect_x = abs(relx/300)
@@ -1143,30 +1145,216 @@ class Looting:
                 return False
             # Otherwise need to just travel in second direction
             # Effectively just using the old straightline method
-            CustomInput.press_key(CustomInput.key_map[second_key], second_key)
+            # Do this to make it clear which direction being sorted
+            require_seek = False
+            if further == timeleftx:
+                CustomInput.press_key(
+                    CustomInput.key_map[second_key], second_key)
+                loop_time = time.time()
+                total_frames = 0
+                avg_x_speed = 100
+                time_remaining = further
+                last_detect = time.time()
+                zero_speed_framesx = 0
+                while not BotUtils.detect_xprompt(gamename):
+                    time.sleep(0.003)
+                    loop_time = loop_time - time.time()
+                    try:
+                        newx, _ = Looting.grab_farloot_locationsv2(gamename, rect)[
+                            0]
+                        last_detect = time.time()
+                        total_frames += 1
+                        movementx = lastx - newx
+                        speedx = movementx/loop_time
+                        totalx = truex - newx
+                        percentx = abs(totalx)/abs(relx)
+                        if percentx > 1:
+                            BotUtils.stop_movement()
+                            require_seek = True
+                        if movementx == 0:
+                            zero_speed_framesx += 1
+                            if zero_speed_framesx > 8:
+                                BotUtils.stop_movement()
+                                require_seek = True
+                        elif total_frames == 2:
+                            zero_speed_framesx = 0
+                            avg_x_speed = speedx
+                        else:
+                            zero_speed_framesx = 0
+                            avg_x_speed = (
+                                total_frames*avg_x_speed+speedx)/(total_frames+1)
+                        time_remaining = abs((totalx/percentx)/avg_x_speed)
+                    except:
+                        time_remaining -= loop_time
+                        if time_remaining < 0:
+                            BotUtils.stop_movement()
+                            require_seek = True
+                        if time.time() - last_detect > 0.5:
+                            # Release all keys
+                            BotUtils.stop_movement()
+                            return False
+                        total_frames = 0
+            # Alternatively try handle the y case only
+            else:
+                pass
+            # Finally if can't find it then search in both directions for y
+            if require_seek:
+                # Need to move up and down for 0.5sec each way checking for loot
+                start_time = time.time()
+                keyy = "down"
+                CustomInput.press_key(CustomInput.key_map[keyy], keyy)
+                while not BotUtils.detect_xprompt(gamename):
+                    time.sleep(0.003)
+                    if time.time() - start_time > 0.4:
+                        break
+                CustomInput.release_key(CustomInput.key_map[keyy], keyy)
+                if not BotUtils.detect_xprompt(gamename):
+                    # Then move in opposite direction
+                    start_time = time.time()
+                    keyy = "up"
+                    CustomInput.press_key(CustomInput.key_map[keyy], keyy)
+                    while not BotUtils.detect_xprompt(gamename):
+                        time.sleep(0.003)
+                        if time.time() - start_time > 0.8:
+                            break
+                    CustomInput.release_key(CustomInput.key_map[keyy], keyy)
+                    # Then need to check no keys are still pressed again
+                BotUtils.stop_movement()
+            if BotUtils.detect_xprompt(gamename):
+                pydirectinput.press("x")
+                return True
         else:
             # Need to start moving in the right direction
             CustomInput.press_key(CustomInput.key_map[keyx], keyx)
             CustomInput.press_key(CustomInput.key_map[keyy], keyy)
-            time_remaining = 0.2
+            time_remaining = 0.3
+            avg_x_speed, avg_y_speed = [200, 200]
+            zero_speed_framesx = 0
+            zero_speed_framesy = 0
+            xfinished = False
+            total_frames = 0
+            y_stuck = False
+            require_seek = False
             loop_time = time.time()
+            last_detect = time.time()
             while time_remaining > 0:
                 time.sleep(0.002)
                 if BotUtils.detect_xprompt(gamename):
                     break
+                loop_time = loop_time - time.time()
+                last_detect = time.time()
                 try:
-                    newx, newy = Looting.grab_farloot_locations(gamename, rect)[
+                    total_frames += 1
+                    newx, newy = Looting.grab_farloot_locationsv2(gamename, rect)[
                         0]
-                    time_taken = time.time() - loop_time
-                except:
-                    try:
-                        if time_remaining < 3:
-                            time.sleep(time_remaining)
+                    if not xfinished:
+                        movementx = lastx - newx
+                        speedx = movementx/loop_time
+                        totalx = truex - newx
+                        percentx = abs(totalx)/abs(relx)
+                        if movementx == 0:
+                            zero_speed_framesx += 1
+                            # If too many zero speed frames, clearly stuck
+                            if zero_speed_framesx >= 8:
+                                CustomInput.release_key(
+                                    CustomInput.key_map[keyx], keyx)
+                                xfinished = True
                         else:
-                            time.sleep(abs(relx/100))
+                            zero_speed_framesx = 0
+                        if percentx > 1:
+                            xfinished = True
+                            CustomInput.release_key(
+                                CustomInput.key_map[keyx], keyx)
+                    movementy = lasty - newy
+                    if movementy == 0:
+                        zero_speed_framesy += 1
+                        # If too many zero speed frames, clearly stuck
+                        if zero_speed_framesy >= 8:
+                            CustomInput.release_key(
+                                CustomInput.key_map[keyy], keyy)
+                            y_stuck = True
+                            require_seek = True
+                    speedy = movementy/loop_time
+                    totaly = truey - newy
+                    percenty = abs(totaly)/abs(rely)
+                    if y_stuck:
+                        pass
+                    elif percenty > 1 and xfinished:
+                        require_seek = True
+                        CustomInput.release_key(
+                            CustomInput.key_map[keyy], keyy)
                         break
-                    except:
+                    elif percenty > 1:
+                        CustomInput.release_key(
+                            CustomInput.key_map[keyy], keyy)
+                    # And then update the ETA's based on speed
+                    if not xfinished:
+                        if total_frames > 1 and total_frames < 10:
+                            if movementx == 0:
+                                pass
+                            elif total_frames == 2:
+                                avg_x_speed = speedx
+                            else:
+                                avg_x_speed = (
+                                    total_frames*avg_x_speed+speedx)/(total_frames+1)
+                        x_remaining = abs((totalx/percentx)/avg_x_speed)
+                    if not percenty > 1 or y_stuck:
+                        if total_frames > 1 and total_frames < 10:
+                            if movementy == 0:
+                                pass
+                            elif total_frames == 2:
+                                avg_y_speed = speedy
+                            else:
+                                avg_y_speed = (
+                                    total_frames*avg_y_speed+speedy)/(total_frames+1)
+                        y_remaining = abs((totaly/percenty)/avg_y_speed)
+                    else:
+                        y_remaining = 0
+                    time_remaining = max([x_remaining, y_remaining])
+                    # And finally choose the next rectangle
+                    rect = [newx-100, newy-30, newx+100, newy+30]
+                    lastx = newx
+                    lasty = newy
+
+                except:
+                    time_remaining -= loop_time
+                    if time_remaining < 0:
                         return False
+                    if time.time() - last_detect > 0.5:
+                        # Release all keys
+                        BotUtils.stop_movement()
+                        return False
+                    total_frames = 0
+            # Then need to check no keys left pressed
+            BotUtils.stop_movement()
+            # Then need to seek out loot if flag set
+            if require_seek:
+                # Need to move up and down for 0.5sec each way checking for loot
+                start_time = time.time()
+                keyy = "down"
+                CustomInput.press_key(CustomInput.key_map[keyy], keyy)
+                while not BotUtils.detect_xprompt(gamename):
+                    time.sleep(0.003)
+                    if time.time() - start_time > 0.4:
+                        break
+                CustomInput.release_key(CustomInput.key_map[keyy], keyy)
+                # Then move in opposite direction
+                if not BotUtils.detect_xprompt(gamename):
+                    # Then move in opposite direction
+                    start_time = time.time()
+                    keyy = "up"
+                    CustomInput.press_key(CustomInput.key_map[keyy], keyy)
+                    while not BotUtils.detect_xprompt(gamename):
+                        time.sleep(0.003)
+                        if time.time() - start_time > 0.8:
+                            break
+                    CustomInput.release_key(CustomInput.key_map[keyy], keyy)
+                    # Then need to check no keys are still pressed again
+                BotUtils.stop_movement()
+            if BotUtils.detect_xprompt(gamename):
+                pydirectinput.press("x")
+                return True
+            return False
 
     def try_find_and_grab_lootv2(gamename=False, player_name=False, loot_lowest=True, allow_noplyr=True):
         if not gamename:
@@ -1211,14 +1399,15 @@ class Looting:
             order = BotUtils.grab_order_lowest_y(loot_list)
             # Then reorder the lootlist to match
             loot_list = [x for _, x in sorted(zip(order, loot_list))]
+        true_coords = [loot_list[0][0], loot_list[0][1]]
         # Now calculate relative loot position
         relx = playerx - loot_list[0][0]
         rely = loot_list[0][1] - playery - 150
         # Grab the small rect for speed tracking
-        rect = [loot_list[0][0]-80, loot_list[0][1] -
-                30, loot_list[0][0]+80, loot_list[0][1]+30]
+        rect = [loot_list[0][0]-90, loot_list[0][1] -
+                30, loot_list[0][0]+90, loot_list[0][1]+30]
         # Then send to dedicated function for diagonal looting run
-        return Looting.move_loot_diagonal([relx, rely], rect, gamename, True)
+        return Looting.move_loot_diagonal(true_coords, [relx, rely], rect, gamename, True)
 
     def try_find_and_grab_loot(gamename, player_name=False, loot_lowest=True, printout=False):
         # First need to close anything that might be in the way
