@@ -5,10 +5,14 @@ from rhba_utils import BotUtils, Events, SellRepair, RHClick, Looting, WindowCap
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 with open("gamename.txt") as f:
     gamename = f.readline()
-wincap = WindowCapture(gamename)
-original_image = wincap.get_screenshot()
 
-original_image = cv2.blur(original_image, (80, 1))
+vision = Vision("lootline.jpg")
+wincap = WindowCapture(gamename)
+
+
+screenshot = wincap.get_screenshot()
+
+original_image = cv2.blur(screenshot, (80, 1))
 # original_image = cv2.blur(original_image, (8, 1))
 # original_image = cv2.blur(original_image, (8, 1))
 
@@ -36,4 +40,10 @@ combined_mask_rgb = cv2.cvtColor(combined_mask_inv, cv2.COLOR_GRAY2BGR)
 
 final = cv2.max(original_image, combined_mask_rgb)
 
+
+rectangles = vision.find(
+    final, threshold=0.81, epsilon=0.5)
+output_image = vision.draw_rectangles(screenshot, rectangles)
+
+cv2.imwrite("testycont.jpg", output_image)
 cv2.imwrite("testypoints.jpg", final)
