@@ -1212,7 +1212,8 @@ class Looting:
                             zero_speed_framesx = 0
                             avg_x_speed = (
                                 total_frames*avg_x_speed+speedx)/(total_frames+1)
-                        time_remaining = abs((totalx/percentx)/avg_x_speed)
+                        time_remaining = abs(
+                            (relx - relx*percentx)/avg_x_speed)
                         rect = [newx-100, newy-30, newx+100, newy+30]
                         lastx = newx
                     except:
@@ -1265,7 +1266,8 @@ class Looting:
                             zero_speed_framesy = 0
                             avg_y_speed = (
                                 total_frames*avg_y_speed+speedy)/(total_frames+1)
-                        time_remaining = abs((totaly/percenty)/avg_y_speed)
+                        time_remaining = abs(
+                            (rely - rely*percenty)/avg_y_speed)
                         rect = [newx-100, newy-30, newx+100, newy+30]
                         lasty = newy
                     except:
@@ -1383,7 +1385,7 @@ class Looting:
                             else:
                                 avg_x_speed = (
                                     total_frames*avg_x_speed+speedx)/(total_frames+1)
-                        x_remaining = abs((totalx/percentx)/avg_x_speed)
+                        x_remaining = abs((relx - relx * percentx)/avg_x_speed)
                     if not percenty > 1 or y_stuck:
                         if total_frames > 1 and total_frames < 10:
                             if movementy == 0:
@@ -1396,7 +1398,8 @@ class Looting:
                             else:
                                 avg_y_speed = (
                                     total_frames*avg_y_speed+speedy)/(total_frames+1)
-                        y_remaining = abs((totaly/percenty)/avg_y_speed)
+
+                        y_remaining = abs((rely - rely*percenty)/avg_y_speed)
                     else:
                         y_remaining = 0
                     time_remaining = max([x_remaining, y_remaining])
@@ -1443,6 +1446,7 @@ class Looting:
                     # Then need to check no keys are still pressed again
                 BotUtils.stop_movement()
             if BotUtils.detect_xprompt(gamename):
+                BotUtils.stop_movement()
                 pydirectinput.press("x")
                 return True
             return False
