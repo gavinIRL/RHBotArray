@@ -1085,6 +1085,21 @@ class Looting:
         if not confirmed:
             return False
 
+    def check_for_lootv2(gamename):
+        # Improved version of the original check for loot function
+        pass
+
+    def grab_farloot_locationsv3(gamename=False, rect=False):
+        # Slower version of grab farloot locations v2
+        # Checks for signature edges of loot tag
+        # Useful for verification due to 100% accuracy
+        pass
+
+    def check_for_nearby_obscured_loot(gamename):
+        # This checks for loot which wouldn't be detected by the normal function
+        # which is typically going to be loot that is directly behind player name
+        pass
+
     def grab_farloot_locationsv2(gamename=False, rect=False):
         if not gamename:
             with open("gamename.txt") as f:
