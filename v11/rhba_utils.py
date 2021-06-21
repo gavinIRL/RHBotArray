@@ -1093,7 +1093,10 @@ class Looting:
         if Looting.check_for_nearby_obscured_loot(gamename):
             return True
         else:
-            pass
+            result = Looting.grab_farloot_locationsv2(gamename)
+            if not result:
+                return False
+            return True
 
     def grab_farloot_locationsv3(gamename=False, rect=False):
         # Slower version of grab farloot locations v2
