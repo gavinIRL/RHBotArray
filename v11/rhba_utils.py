@@ -1136,7 +1136,14 @@ class Looting:
     def check_for_nearby_obscured_loot(gamename):
         # This checks for loot which wouldn't be detected by the normal function
         # which is typically going to be loot that is directly behind player name
-        pass
+        if not gamename:
+            with open("gamename.txt") as f:
+                gamename = f.readline()
+        result = Looting.grab_farloot_locationsv3(
+            gamename, [510, 349, 775, 500])
+        if not result:
+            return False
+        return True
 
     def grab_farloot_locationsv2(gamename=False, rect=False):
         if not gamename:
