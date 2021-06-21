@@ -1093,7 +1093,45 @@ class Looting:
         # Slower version of grab farloot locations v2
         # Checks for signature edges of loot tag
         # Useful for verification due to 100% accuracy
-        pass
+        if not gamename:
+            with open("gamename.txt") as f:
+                gamename = f.readline()
+        vision = Vision("lootside2.jpg")
+        if not rect:
+            rect = [5, 80, 1273, 776]
+        wincap = WindowCapture(gamename, rect)
+        screenshot = wincap.get_screenshot()
+        original_image = screenshot
+        rectangles = vision.find(
+            original_image, threshold=0.81, epsilon=0.5)
+        if len(rectangles) < 1:
+            # Need to check other side
+            vision = Vision("lootside.jpg")
+            wincap = WindowCapture(gamename, rect)
+            screenshot = wincap.get_screenshot()
+            original_image = screenshot
+            rectangles = vision.find(
+                original_image, threshold=0.81, epsilon=0.5)
+            if len(rectangles) < 1:
+                return False
+            else:
+                points = []
+                for (x, y, w, h) in rectangles:
+                    x += rect[0]
+                    y += rect[1]
+                    center_x = x + int(w/2) + 81
+                    center_y = y + int(h/2)
+                    points.append((center_x, center_y))
+                return points
+        else:
+            points = []
+            for (x, y, w, h) in rectangles:
+                x += rect[0]
+                y += rect[1]
+                center_x = x + int(w/2) - 81
+                center_y = y + int(h/2)
+                points.append((center_x, center_y))
+            return points
 
     def check_for_nearby_obscured_loot(gamename):
         # This checks for loot which wouldn't be detected by the normal function
