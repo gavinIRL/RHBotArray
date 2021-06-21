@@ -1029,7 +1029,10 @@ class Looting:
                     count += 1
                     time.sleep(0.09)
 
-    def grab_all_visible_lootv2(gamename, player_name=False):
+    def grab_all_visible_lootv2(gamename=False, player_name=False):
+        if not gamename:
+            with open("gamename.txt") as f:
+                gamename = f.readline()
         start_time = time.time()
         while True:
             if time.time() - start_time > 20:
