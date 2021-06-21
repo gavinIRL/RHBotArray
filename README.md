@@ -4,14 +4,14 @@
 A family of socket-controlled video game bots derived from https://github.com/gavinIRL/RHBot. See the parent repo for details on the game in question, etc. Each version is more autonomous with more features than the last. Goal is for fully autonomous bots.
 
 ## Current Status
-### 14th June
-The past week has been spent upgrading the client and server to v12 with all of the speed and experimental upgrades from the v10/v11 tests. The planned date of June 13th for a single-level autonomous bot has passed due to a change in priorities. How the plan is to proceed with the autonomnous efforts again and to now aim for 20th June for a fully autonomous single-level bot. Some other issues currently persist which need to be rectified in the near term such as the regroup function not opening the map correctly.
+### 21st June
+The autonomous effort ran into a snag in the past week due to getting stuck attempting to loot and also general moving around. Therefore two new more accurate methods have been developed to reduce the chances of getting stuck. Additionally, looting now occurs by moving in a diagonal manner which greatly reduces the time taken and also reduces probability of getting stuck. There is also a much more robust catch for inaccessible loot, with the attempt timeout dictated by the main loop rather than the looting loop as before. The current aim is fully finishing testing the end-level sequence and then incorporating it into the existing map10 bot, therefore the fully autonomous single-level bot ETA is now 27th June. However there will immediately be an upgrade campaign aimed at updating combat capabilities (especially target selection), catching/handling stuck bots, and also special event handling. Once that has been completed it will be on to enabling running of all other maps and multi-bot integration.
 
 ## Rough plan as of 4th June 2021
 1) DONE -> Clean up and integrate autonomous looting into utils
 2) DONE -> Add tests for detection and handling of events
 3) DONE -> Add tests for endlevel handling
-4) Implement endlevel handling, event handling, and autonomous looting into map10 bot
+4) DONE -> Implement endlevel handling, event handling, and autonomous looting into map10 bot
 5) Test improved autonomous combat capabilities
 6) Add handling for a party of bots
 7) Add all other maps to catalogue
@@ -33,7 +33,7 @@ The past week has been spent upgrading the client and server to v12 with all of 
 * Version 10 - Loot identification, automatic sell and repair, delayed batch playback
 * Version 11 - Fully autonomous bot with combat, looting, navigation, event handling
 * Version 12 - Version 10 client-server upgraded with follower and auto-farloot capabilities
-* Version 13 - Autonomous bounty mission accept and fulfillment
+* Version 13 - Autonomous bounty mission accept and fulfilment
 
 ### Version Status
 * Version 1 - Complete
@@ -52,6 +52,9 @@ The past week has been spent upgrading the client and server to v12 with all of 
 
 ## Previous Status Updates 
 Full list at https://github.com/gavinIRL/RHBotArray/blob/main/STATUS_UPDATES.txt
+### 14th June
+The past week has been spent upgrading the client and server to v12 with all of the speed and experimental upgrades from the v10/v11 tests. The planned date of June 13th for a single-level autonomous bot has passed due to a change in priorities. Now the plan is to proceed with the autonomnous efforts again and to now aim for 20th June for a fully autonomous single-level bot. Some other issues currently persist which need to be rectified in the near term such as the regroup function not opening the map correctly.
+
 ### 7th June
 Almost all end-of-level and event handling has now been completed and tested piecemeal. The current focus is now briefly swapping to incorporating the follower bot from the original RHBot family with all of the updates developed as part of RHBA. The intention is for the follower mode to be turned on and off similar to autolooting. In addition, the autonomous looting option developed for the map10 test will also be incorporated into the servers. The intent is to allow an autonomous client control 3 servers at some point allowing for single point of control autonomous party play. Also, all status updates beyond the most recent 3 updates will now be put into a separate file as the readme was getting to be too long.
 
