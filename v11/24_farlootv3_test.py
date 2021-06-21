@@ -22,13 +22,13 @@ def grab_lootposv3_right():
     for (x, y, w, h) in rectangles:
         x += rect[0]
         y += rect[1]
-        center_x = x + int(w/2)
+        center_x = x + int(w/2) - 81
         center_y = y + int(h/2)
         points.append((center_x, center_y))
     return points
 
 
-def grab_lootposv3_right():
+def grab_lootposv3_left():
     with open("gamename.txt") as f:
         gamename = f.readline()
     vision = Vision("lootside.jpg")
@@ -44,7 +44,7 @@ def grab_lootposv3_right():
     for (x, y, w, h) in rectangles:
         x += rect[0]
         y += rect[1]
-        center_x = x + int(w/2)
+        center_x = x + int(w/2) + 81
         center_y = y + int(h/2)
         points.append((center_x, center_y))
     return points
