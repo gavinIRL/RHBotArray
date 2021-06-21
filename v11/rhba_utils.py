@@ -1085,9 +1085,15 @@ class Looting:
         if not confirmed:
             return False
 
-    def check_for_lootv2(gamename):
+    def check_for_lootv2(gamename=False):
         # Improved version of the original check for loot function
-        pass
+        if not gamename:
+            with open("gamename.txt") as f:
+                gamename = f.readline()
+        if Looting.check_for_nearby_obscured_loot(gamename):
+            return True
+        else:
+            pass
 
     def grab_farloot_locationsv3(gamename=False, rect=False):
         # Slower version of grab farloot locations v2
