@@ -176,7 +176,7 @@ def move_to_loot_point(gamename):
     # Placeholder for now
     CustomInput.press_key(CustomInput.key_map["right"], "right")
     # CustomInput.press_key(CustomInput.key_map["up"], "up")
-    time.sleep(0.5)
+    time.sleep(0.3)
     CustomInput.release_key(CustomInput.key_map["right"], "right")
     # CustomInput.release_key(CustomInput.key_map["up"], "up")
 
@@ -186,13 +186,13 @@ def check_loot_preshop(gamename):
     CustomInput.press_key(CustomInput.key_map["right"], "right")
     start_time = time.time()
     while time.time() - start_time < 1.5:
-        if Looting.check_for_loot(gamename):
+        if Looting.check_for_lootv2(gamename):
             CustomInput.release_key(CustomInput.key_map["right"], "right")
             loot_everything(gamename)
     CustomInput.release_key(CustomInput.key_map["right"], "right")
     # Then perform one final check
     time.sleep(0.1)
-    if Looting.check_for_loot(gamename):
+    if Looting.check_for_lootv2(gamename):
         loot_everything(gamename)
 
 
@@ -200,7 +200,7 @@ def loot_everything(gamename):
     player_name = False
     player_name = BotUtils.detect_player_name(gamename)
     if not player_name:
-        print("Didn't detect name")
+        # print("Didn't detect name")
         return Looting.grab_all_visible_lootv2(gamename)
     else:
         return Looting.grab_all_visible_lootv2(gamename, player_name)
