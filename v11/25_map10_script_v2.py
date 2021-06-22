@@ -61,13 +61,20 @@ class Map10_MS30():
         time.sleep(0.6)
         start_time = time.time()
         while not BotUtils.detect_sect_clear(self.gamename):
-            if time.time() > start_time + 4:
+            if time.time() > start_time + 2:
                 self.aim_am_enemies()
                 self.continue_clear()
                 if time.time() > start_time + 12:
-                    os._exit()
+                    # prob need to move closer to enemies at this point
+                    points = self.grab_enemy_points()
+                    result = self.move_diagonal_sectclrdet(
+                        points[0], points[1], self.speed*2, self.gamename)
+                    if result:
+                        break
+                    start_time = time.time() + 2
             else:
                 self.continue_clear()
+        time.sleep(0.3)
 
     def perform_room_after_first(self, num):
         room = self.rooms[num-1]
@@ -131,6 +138,7 @@ class Map10_MS30():
     def aim_am_enemies(self):
         points = self.grab_enemy_points()
         if points:
+            print("Enemiy detected at {}".format(points[0]))
             if points[0][0] > 80:
                 CustomInput.press_key(CustomInput.key_map["left"], "left")
             if points[0][0] < 80:
