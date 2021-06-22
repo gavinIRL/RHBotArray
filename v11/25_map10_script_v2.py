@@ -154,6 +154,38 @@ class Map10_MS30():
         points = self.grab_enemy_points()
         return points[0]
 
+    def grab_off_cooldown(self, skill_list=False, gamename=False):
+        if not gamename:
+            with open("gamename.txt") as f:
+                gamename = f.readline()
+        if not skill_list:
+            skill_list = ["a", "s", "d", "f", "g", "h"]
+        available = []
+        wincap = WindowCapture(gamename, [395, 745, 591, 748])
+        image = wincap.get_screenshot()
+        a, _, _ = [int(i) for i in image[0][0]]
+        b, _, _ = [int(i) for i in image[0][39]]
+        c, _, _ = [int(i) for i in image[0][78]]
+        d, _, _ = [int(i) for i in image[0][117]]
+        e, _, _ = [int(i) for i in image[0][156]]
+        f, _, _ = [int(i) for i in image[0][195]]
+        if a != 56 and "a" in skill_list:
+            available.append("a")
+        if b != 11 and "s" in skill_list:
+            available.append("s")
+        if c != 44 and "d" in skill_list:
+            available.append("d")
+        if d != 245 and "f" in skill_list:
+            available.append("f")
+        if e != 231 and "g" in skill_list:
+            available.append("g")
+        if f != 142 and "h" in skill_list:
+            available.append("h")
+        if len(available) > 0:
+            return available
+        else:
+            return False
+
     def grab_enemy_points(self):
         minimap_screenshot = self.enemy_minimap_wincap.get_screenshot()
         # pre-process the image to help with detection
