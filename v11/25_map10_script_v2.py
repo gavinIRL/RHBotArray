@@ -3,6 +3,7 @@ import time
 import os
 import numpy as np
 import cv2
+import math
 import ctypes
 import logging
 from rhba_utils import BotUtils, Events, SellRepair, RHClick, Looting, WindowCapture, Vision, HsvFilter
@@ -51,7 +52,7 @@ class Map10_MS30():
         self.roomclear_skill()
         time.sleep(0.6)
         start_time = time.time()
-        while not self.sect_clear_detected():
+        while not BotUtils.detect_sect_clear(self.gamename):
             if time.time() > start_time + 4:
                 self.aim_am_enemies()
                 self.continue_clear()
@@ -78,7 +79,7 @@ class Map10_MS30():
         self.roomclear_skill()
         time.sleep(0.6)
         start_time = time.time()
-        while not self.sect_clear_detected():
+        while not BotUtils.detect_sect_clear(self.gamename):
             if time.time() > start_time + 4:
                 calc_time = time.time()
                 self.aim_am_enemies()
@@ -88,3 +89,22 @@ class Map10_MS30():
                     os._exit()
             else:
                 self.continue_clear()
+
+    def calculate_travel_time(self, x, y, currx=False, curry=False):
+        if not currx:
+            if not BotUtils.BotUtils.detect_bigmap_open(self.gamename):
+                BotUtils.try_toggle_map_clicking(self.gamename)
+            currx, curry = BotUtils.grab_player_pos(
+                self.gamename, [x-75, y-75, x+75, y+75])
+            BotUtils.close_map_and_menu(self.gamename)
+        xdist = abs(currx - int(x))
+        ydist = abs(int(y) - curry)
+        travel_time = (math.sqrt(xdist ^ 2+ydist ^ 2))/self.speed
+        return travel_time
+
+
+if __name__ == "__main__":
+    time.sleep(2)
+    with open("gamename.txt") as f:
+        gamename = f.readline()
+    BotUtils.try_toggle_map_clicking(gamename)
