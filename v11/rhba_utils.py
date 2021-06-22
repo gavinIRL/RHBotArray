@@ -974,8 +974,16 @@ class BotUtils:
     def stop_movement(follower=False):
         if follower:
             follower.pressed_keys = []
+        KEYS = {
+            'left': 37,
+            'up': 38,
+            'right': 39,
+            'down': 40
+        }
         for key in ["up", "down", "left", "right"]:
-            CustomInput.release_key(CustomInput.key_map[key], key)
+            result = ctypes.windll.user32.GetKeyState(KEYS[key])
+            if result != 0 and result != 1:
+                CustomInput.release_key(CustomInput.key_map[key], key)
 
 
 class Looting:
