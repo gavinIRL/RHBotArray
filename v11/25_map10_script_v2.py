@@ -96,12 +96,13 @@ class Map10_MS30():
                     # prob need to move closer to enemies at this point
                     points = self.grab_enemy_points()
                     result = self.move_diagonal_sectclrdet(
-                        points[0], points[1], self.speed*4, self.gamename)
+                        points[0], points[1], self.speed*2, self.gamename)
                     if result:
                         break
                     start_time = time.time() + 2
             else:
                 self.continue_clear()
+        time.sleep(0.5)
 
     def calculate_travel_time(self, x, y, currx=False, curry=False):
         if not currx:
