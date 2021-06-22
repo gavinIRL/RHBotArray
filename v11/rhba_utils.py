@@ -168,13 +168,13 @@ class BotUtils:
         # If not a direct relative move command
         if not rel:
             if not BotUtils.detect_bigmap_open(gamename):
-                BotUtils.try_toggle_map()
+                BotUtils.try_toggle_map_clicking()
             player_pos = BotUtils.grab_player_pos(gamename)
             start_time = time.time()
             while not player_pos:
                 time.sleep(0.05)
                 if not BotUtils.detect_bigmap_open(gamename):
-                    BotUtils.try_toggle_map()
+                    BotUtils.try_toggle_map_clicking()
                 time.sleep(0.05)
                 player_pos = BotUtils.grab_player_pos(gamename)
                 if time.time() - start_time > 5:
@@ -981,9 +981,9 @@ class BotUtils:
             'down': 40
         }
         for key in ["up", "down", "left", "right"]:
-            result = ctypes.windll.user32.GetKeyState(KEYS[key])
-            if result != 0 and result != 1:
-                CustomInput.release_key(CustomInput.key_map[key], key)
+            # result = ctypes.windll.user32.GetKeyState(KEYS[key])
+            # if result != 0 and result != 1:
+            CustomInput.release_key(CustomInput.key_map[key], key)
 
 
 class Looting:
