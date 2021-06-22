@@ -49,7 +49,8 @@ class Map10_MS30():
     def start(self):
         # Using placeholder individual methods for now
         self.perform_room1()
-        self.perform_room2()
+        for i in range(4):
+            self.perform_room_after_first(i+1)
 
     def perform_room1(self):
         time.sleep(2)
@@ -68,8 +69,8 @@ class Map10_MS30():
             else:
                 self.continue_clear()
 
-    def perform_room2(self):
-        room = self.rooms[0]
+    def perform_room_after_first(self, num):
+        room = self.rooms[num-1]
         BotUtils.move_diagonal(int(room[3]), int(room[4]), self.speed)
         time.sleep(0.4)
         # Now calculate the travel time to figure out
@@ -81,14 +82,14 @@ class Map10_MS30():
         sleep_time = self.last_clear + self.clearskill_cd - time.time() - travel_time
         if sleep_time > 0:
             time.sleep(sleep_time)
-        room = self.rooms[1]
+        room = self.rooms[num]
         BotUtils.move_diagonal(int(room[1]), int(room[2]), self.speed)
         time.sleep(0.6)
         self.roomclear_skill()
         time.sleep(0.6)
         start_time = time.time()
         while not BotUtils.detect_sect_clear(self.gamename):
-            if time.time() > start_time + 4:
+            if time.time() > start_time + 2:
                 self.aim_am_enemies()
                 self.continue_clear()
                 if time.time() > start_time + 12:
