@@ -54,7 +54,7 @@ class Map10_MS30():
     def perform_room1(self):
         time.sleep(2)
         room = self.rooms[0]
-        self.move_to(int(room[1]), int(room[2]))
+        BotUtils.move_diagonal(int(room[1]), int(room[2]), self.speed)
         time.sleep(0.4)
         self.roomclear_skill()
         time.sleep(0.6)
@@ -147,7 +147,7 @@ class Map10_MS30():
     def grab_enemy_points(self):
         minimap_screenshot = self.enemy_minimap_wincap.get_screenshot()
         # pre-process the image to help with detection
-        enemy_output_image = self.enemy_minimap_vision.apply_hsv_filter(
+        enemy_output_image = BotUtils.apply_hsv_filter(
             minimap_screenshot, self.enemy_minimap_filter)
         # do object detection, this time grab points
         enemy_rectangles = self.enemy_minimap_vision.find(
@@ -235,6 +235,5 @@ class Map10_MS30():
 
 if __name__ == "__main__":
     time.sleep(2)
-    with open("gamename.txt") as f:
-        gamename = f.readline()
-    BotUtils.try_toggle_map_clicking(gamename)
+    map = Map10_MS30()
+    map.start()
