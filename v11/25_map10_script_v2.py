@@ -89,12 +89,16 @@ class Map10_MS30():
         start_time = time.time()
         while not BotUtils.detect_sect_clear(self.gamename):
             if time.time() > start_time + 4:
-                calc_time = time.time()
                 self.aim_am_enemies()
-                print("Total aim time = {}".format(time.time()-calc_time))
                 self.continue_clear()
                 if time.time() > start_time + 12:
-                    os._exit()
+                    # prob need to move closer to enemies at this point
+                    points = self.grab_enemy_points()
+                    result = self.move_diagonal_sectclrdet(
+                        points[0], points[1], self.speed*4, self.gamename)
+                    if result:
+                        break
+                    start_time = time.time() + 2
             else:
                 self.continue_clear()
 
@@ -123,6 +127,24 @@ class Map10_MS30():
             CustomInput.release_key(CustomInput.key_map[key], key)
 
     def aim_am_enemies(self):
+        points = self.grab_enemy_points()
+        if points:
+            if points[0][0] > 80:
+                CustomInput.press_key(CustomInput.key_map["left"], "left")
+            if points[0][0] < 80:
+                CustomInput.press_key(CustomInput.key_map["right"], "right")
+            if points[0][1] > 80:
+                CustomInput.press_key(CustomInput.key_map["up"], "up")
+            if points[0][1] < 80:
+                CustomInput.press_key(CustomInput.key_map["down"], "down")
+            # time.sleep(0.001)
+            BotUtils.stop_movement()
+
+    def find_nearest_enemy(self):
+        points = self.grab_enemy_points()
+        return points[0]
+
+    def grab_enemy_points(self):
         minimap_screenshot = self.enemy_minimap_wincap.get_screenshot()
         # pre-process the image to help with detection
         enemy_output_image = self.enemy_minimap_vision.apply_hsv_filter(
@@ -132,19 +154,83 @@ class Map10_MS30():
             enemy_output_image, threshold=0.61, epsilon=0.5)
         # then return answer to whether enemies are detected
         if len(enemy_rectangles) >= 1:
-            points = self.enemy_minimap_vision.get_click_points(
+            return self.enemy_minimap_vision.get_click_points(
                 enemy_rectangles)
-            if points[0][0] > 80:
-                CustomInput.press_key(self.key_dict["left"], "left")
-            if points[0][0] < 80:
-                CustomInput.press_key(self.key_dict["right"], "right")
-            if points[0][1] > 80:
-                CustomInput.press_key(self.key_dict["up"], "up")
-            if points[0][1] < 80:
-                CustomInput.press_key(self.key_dict["down"], "down")
-            # time.sleep(0.001)
-            for key in ["up", "down", "left", "right"]:
-                CustomInput.release_key(self.key_dict[key], key)
+        return False
+
+    def move_diagonal_sectclrdet(self, x, y, speed=40, gamename=False):
+        # Can only be a relative input
+        relx = x
+        rely = y
+        mult = 0.707
+        if relx > 0:
+            keyx = "left"
+            CustomInput.press_key(CustomInput.key_map["left"], "left")
+            timeleftx = float("{:.4f}".format(abs(relx/(speed*mult))))
+        elif relx < 0:
+            keyx = "right"
+            CustomInput.press_key(CustomInput.key_map["right"], "right")
+            timeleftx = float("{:.4f}".format(abs(relx/(speed*mult))))
+        else:
+            keyx = "right"
+            timeleftx = 0
+            mult = 1
+        if rely > 0:
+            keyy = "down"
+            CustomInput.press_key(CustomInput.key_map["down"], "down")
+            timelefty = float("{:.4f}".format(abs(rely/(speed*mult))))
+        elif rely < 0:
+            keyy = "up"
+            CustomInput.press_key(CustomInput.key_map["up"], "up")
+            timelefty = float("{:.4f}".format(abs(rely/(speed*mult))))
+        else:
+            keyy = "up"
+            timelefty = 0
+            if relx != 0:
+                timeleftx = float("{:.4f}".format(abs(relx/speed)))
+        first_sleep = min([timeleftx, timelefty])
+        second_sleep = max([timeleftx, timelefty])
+        first_key = [keyx, keyy][[timeleftx, timelefty].index(first_sleep)]
+        second_key = [keyx, keyy][[timeleftx, timelefty].index(second_sleep)]
+        if first_sleep < 0.009:
+            if second_sleep < 0.009:
+                pass
+            else:
+                start = time.time()
+                while time.time() - start < second_sleep - 0.009:
+                    if BotUtils.detect_sect_clear(gamename):
+                        BotUtils.stop_movement()
+                        return True
+                    time.sleep(0.005)
+                CustomInput.release_key(
+                    CustomInput.key_map[second_key], second_key)
+        elif timelefty == timeleftx:
+            start = time.time()
+            while time.time() - start < first_sleep - 0.009:
+                if BotUtils.detect_sect_clear(gamename):
+                    BotUtils.stop_movement()
+                    return True
+                time.sleep(0.005)
+            CustomInput.release_key(CustomInput.key_map[first_key], first_key)
+            CustomInput.release_key(
+                CustomInput.key_map[second_key], second_key)
+        else:
+            start = time.time()
+            while time.time() - start < first_sleep - 0.009:
+                if BotUtils.detect_sect_clear(gamename):
+                    BotUtils.stop_movement()
+                    return True
+                time.sleep(0.005)
+            CustomInput.release_key(CustomInput.key_map[first_key], first_key)
+            start = time.time()
+            while time.time() - start < (second_sleep-first_sleep-0.009)*mult:
+                if BotUtils.detect_sect_clear(gamename):
+                    BotUtils.stop_movement()
+                    return True
+                time.sleep(0.005)
+            CustomInput.release_key(
+                CustomInput.key_map[second_key], second_key)
+        return False
 
 
 if __name__ == "__main__":
