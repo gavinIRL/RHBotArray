@@ -63,18 +63,19 @@ class Map10_MS30():
 
     def perform_room2(self):
         room = self.rooms[0]
-        self.move_to(int(room[3]), int(room[4]))
+        BotUtils.move_diagonal(int(room[3]), int(room[4]), self.speed)
         time.sleep(0.4)
         # Now calculate the travel time to figure out
         # How long to sleep before moving to room2 spot
         targetx = self.rooms[1][1]
         targety = self.rooms[1][2]
-        travel_time = self.calculate_travel_time(targetx, targety)
+        travel_time = self.calculate_travel_time(
+            targetx, targety, int(room[3]), int(room[4]))
         sleep_time = self.last_clear + self.clearskill_cd - time.time() - travel_time
         if sleep_time > 0:
             time.sleep(sleep_time)
         room = self.rooms[1]
-        self.move_to(int(room[1]), int(room[2]), yfirst=False)
+        BotUtils.move_diagonal(int(room[1]), int(room[2]), self.speed)
         time.sleep(0.6)
         self.roomclear_skill()
         time.sleep(0.6)
@@ -101,6 +102,18 @@ class Map10_MS30():
         ydist = abs(int(y) - curry)
         travel_time = (math.sqrt(xdist ^ 2+ydist ^ 2))/self.speed
         return travel_time
+
+    def roomclear_skill(self):
+        CustomInput.press_key(CustomInput.key_map["h"])
+        time.sleep(0.01)
+        CustomInput.release_key(CustomInput.key_map["h"])
+        self.last_clear = time.time()
+
+    def continue_clear(self):
+        for key in ["a", "g", "f", "s", "d"]:
+            CustomInput.press_key(CustomInput.key_map[key], key)
+            time.sleep(0.015)
+            CustomInput.release_key(CustomInput.key_map[key], key)
 
 
 if __name__ == "__main__":
