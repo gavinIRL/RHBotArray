@@ -91,15 +91,15 @@ for c in list('ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890'):
     KEYS[c] = ord(c)
 
 
-# time.sleep(2)
+time.sleep(2)
 # print(keyboard.is_pressed('right'))
-# print(ctypes.windll.user32.GetKeyState(KEYS["DOWN"]))
-# print(ctypes.windll.user32.GetAsyncKeyState(KEYS["DOWN"]))
-# time.sleep(1)
-start = time.time()
+print(ctypes.windll.user32.GetKeyState(KEYS["DOWN"]))
+print(ctypes.windll.user32.GetAsyncKeyState(KEYS["DOWN"]))
+time.sleep(1)
+# start = time.time()
 # keyboard.is_pressed('right')
-for i in range(100):
-    ctypes.windll.user32.GetKeyState(KEYS["DOWN"])
-    ctypes.windll.user32.GetAsyncKeyState(KEYS["DOWN"])
-total = time.time()-start
-print("Time taken: {}s".format(total))
+# for i in range(100):
+print(ctypes.windll.user32.GetKeyState(KEYS["DOWN"]))
+print(ctypes.windll.user32.GetAsyncKeyState(KEYS["DOWN"]))
+# total = time.time()-start
+# print("Time taken: {}s".format(total))
