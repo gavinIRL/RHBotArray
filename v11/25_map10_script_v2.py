@@ -130,7 +130,12 @@ class Map10_MS30():
         self.last_clear = time.time()
 
     def continue_clear(self):
-        for key in ["a", "g", "f", "s", "d"]:
+        available = self.grab_off_cooldown(
+            ["a", "g", "f", "s", "d"], self.gamename)
+        if not available:
+            # Need to dodge right and left?
+            return False
+        for key in available:
             CustomInput.press_key(CustomInput.key_map[key], key)
             time.sleep(0.015)
             CustomInput.release_key(CustomInput.key_map[key], key)
