@@ -59,7 +59,8 @@ class Map10_MS30():
         time.sleep(0.4)
         self.roomclear_skill()
         time.sleep(0.6)
-        start_time = time.time()
+        aim_cd = time.time()
+        move_cd = time.time()
         while not BotUtils.detect_sect_clear(self.gamename):
             if time.time() - aim_cd > 2:
                 print("Aiming at enemies again")
@@ -70,12 +71,13 @@ class Map10_MS30():
                 print("Moving closer to the enemy")
                 # prob need to move closer to enemies at this point
                 points = self.find_nearest_enemy()
-                result = self.move_diagonal_sectclrdet(
-                    points[0], points[1], self.speed*4, self.gamename)
-                if result:
-                    BotUtils.stop_movement(self.gamename)
-                    break
-                move_cd = time.time()
+                if points:
+                    result = self.move_diagonal_sectclrdet(
+                        points[0], points[1], self.speed*4, self.gamename)
+                    if result:
+                        BotUtils.stop_movement(self.gamename)
+                        break
+                    move_cd = time.time()
             else:
                 self.continue_clear()
                 BotUtils.stop_movement()
@@ -103,7 +105,6 @@ class Map10_MS30():
         time.sleep(0.6)
         self.roomclear_skill()
         time.sleep(0.6)
-        start_time = time.time()
         aim_cd = time.time()
         move_cd = time.time()
         while not BotUtils.detect_sect_clear(self.gamename):
@@ -174,7 +175,10 @@ class Map10_MS30():
             BotUtils.stop_movement()
 
     def find_nearest_enemy(self):
-        points = self.grab_enemy_points()[0]
+        try:
+            points = self.grab_enemy_points()[0]
+        except:
+            return False
         return [points[0] - 80, 80-points[1]]
 
     def grab_off_cooldown(self, skill_list=False, gamename=False):
@@ -192,17 +196,17 @@ class Map10_MS30():
         d, _, _ = [int(i) for i in image[0][117]]
         e, _, _ = [int(i) for i in image[0][156]]
         f, _, _ = [int(i) for i in image[0][195]]
-        if a != 56 and "a" in skill_list:
+        if a == 56 and "a" in skill_list:
             available.append("a")
-        if b != 11 and "s" in skill_list:
+        if b == 11 and "s" in skill_list:
             available.append("s")
-        if c != 44 and "d" in skill_list:
+        if c == 44 and "d" in skill_list:
             available.append("d")
-        if d != 245 and "f" in skill_list:
+        if d == 245 and "f" in skill_list:
             available.append("f")
-        if e != 231 and "g" in skill_list:
+        if e == 231 and "g" in skill_list:
             available.append("g")
-        if f != 142 and "h" in skill_list:
+        if f == 142 and "h" in skill_list:
             available.append("h")
         if len(available) > 0:
             return available
@@ -301,4 +305,5 @@ class Map10_MS30():
 if __name__ == "__main__":
     time.sleep(2)
     map = Map10_MS30()
+    # print(map.grab_off_cooldown())
     map.start()
