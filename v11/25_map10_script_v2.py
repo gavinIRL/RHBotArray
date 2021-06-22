@@ -106,18 +106,17 @@ class Map10_MS30():
                 print("Aiming at enemies again")
                 self.aim_at_enemies()
                 aim_cd = time.time()
-            self.continue_clear()
-            if time.time() > start_time + 10:
-                if time.time() - move_cd > 3:
-                    print("Moving closer to the enemy")
-                    # prob need to move closer to enemies at this point
-                    points = self.find_nearest_enemy()
-                    result = self.move_diagonal_sectclrdet(
-                        points[0], points[1], self.speed*4, self.gamename)
-                    if result:
-                        BotUtils.stop_movement(self.gamename)
-                        break
-                    move_cd = time.time()
+                self.continue_clear()
+            elif time.time() - move_cd > 6:
+                print("Moving closer to the enemy")
+                # prob need to move closer to enemies at this point
+                points = self.find_nearest_enemy()
+                result = self.move_diagonal_sectclrdet(
+                    points[0], points[1], self.speed*4, self.gamename)
+                if result:
+                    BotUtils.stop_movement(self.gamename)
+                    break
+                move_cd = time.time()
             else:
                 self.continue_clear()
                 BotUtils.stop_movement()
@@ -166,7 +165,7 @@ class Map10_MS30():
                 CustomInput.press_key(CustomInput.key_map["up"], "up")
             if points[0][1] < 80:
                 CustomInput.press_key(CustomInput.key_map["down"], "down")
-            # time.sleep(0.001)
+            time.sleep(0.005)
             BotUtils.stop_movement()
 
     def find_nearest_enemy(self):
