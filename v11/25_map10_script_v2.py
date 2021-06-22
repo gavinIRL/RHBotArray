@@ -75,8 +75,8 @@ class Map10_MS30():
         time.sleep(0.4)
         # Now calculate the travel time to figure out
         # How long to sleep before moving to room2 spot
-        targetx = self.rooms[1][1]
-        targety = self.rooms[1][2]
+        targetx = self.rooms[num][1]
+        targety = self.rooms[num][2]
         travel_time = self.calculate_travel_time(
             targetx, targety, int(room[3]), int(room[4]))
         sleep_time = self.last_clear + self.clearskill_cd - time.time() - travel_time
