@@ -134,10 +134,10 @@ def navigate_otherworld_loot(gamename):
     BotUtils.try_toggle_map()
     relx = player_pos[0] - 590
     rely = 468 - player_pos[1]
-    BotUtils.move_diagonal(gamename, relx, rely, 90, 50, True)
+    BotUtils.move_diagonal(relx, rely, 50, True)
     relx = 590 - 667
     rely = 407 - 468
-    BotUtils.move_diagonal(gamename, relx, rely, 90, 50, True)
+    BotUtils.move_diagonal(relx, rely, 50, True)
     while BotUtils.detect_bigmap_open(gamename):
         BotUtils.try_toggle_map()
         time.sleep(0.01)
@@ -151,7 +151,7 @@ def leave_otherworld(gamename):
     BotUtils.try_toggle_map()
     relx = player_pos[0] - 667
     rely = 455 - player_pos[1]
-    BotUtils.move_diagonal(gamename, relx, rely, 90, 50, True)
+    BotUtils.move_diagonal(relx, rely, 50, True)
     os._exit(1)
 
 
