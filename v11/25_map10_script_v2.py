@@ -26,6 +26,13 @@ class Map10_MS30():
         self.clearskill_cd = 8.9
         # This is for keeping track of where player is
         self.current_room = 0
+        # For aiming at enemies
+        self.enemy_minimap_filter = HsvFilter(
+            0, 128, 82, 8, 255, 255, 0, 66, 30, 34)
+        enemy_custom_rect = [1100, 50, 1260, 210]
+        self.enemy_minimap_wincap = WindowCapture(
+            self.gamename, enemy_custom_rect)
+        self.enemy_minimap_vision = Vision('enemy67.jpg')
 
     def load_map_rooms(self):
         # Temporary, will be replace by objects later
@@ -114,6 +121,30 @@ class Map10_MS30():
             CustomInput.press_key(CustomInput.key_map[key], key)
             time.sleep(0.015)
             CustomInput.release_key(CustomInput.key_map[key], key)
+
+    def aim_am_enemies(self):
+        minimap_screenshot = self.enemy_minimap_wincap.get_screenshot()
+        # pre-process the image to help with detection
+        enemy_output_image = self.enemy_minimap_vision.apply_hsv_filter(
+            minimap_screenshot, self.enemy_minimap_filter)
+        # do object detection, this time grab points
+        enemy_rectangles = self.enemy_minimap_vision.find(
+            enemy_output_image, threshold=0.61, epsilon=0.5)
+        # then return answer to whether enemies are detected
+        if len(enemy_rectangles) >= 1:
+            points = self.enemy_minimap_vision.get_click_points(
+                enemy_rectangles)
+            if points[0][0] > 80:
+                CustomInput.press_key(self.key_dict["left"], "left")
+            if points[0][0] < 80:
+                CustomInput.press_key(self.key_dict["right"], "right")
+            if points[0][1] > 80:
+                CustomInput.press_key(self.key_dict["up"], "up")
+            if points[0][1] < 80:
+                CustomInput.press_key(self.key_dict["down"], "down")
+            # time.sleep(0.001)
+            for key in ["up", "down", "left", "right"]:
+                CustomInput.release_key(self.key_dict[key], key)
 
 
 if __name__ == "__main__":
