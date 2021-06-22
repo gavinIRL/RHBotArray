@@ -78,6 +78,7 @@ class Map10_MS30():
 
     def perform_room_after_first(self, num):
         room = self.rooms[num-1]
+        print("{},{}".format(int(room[1]), int(room[2])))
         print("Just about to move to next roomstart, room {}".format(num))
         BotUtils.move_diagonal(int(room[3]), int(room[4]), self.speed)
         print("Finished moving to next roomstart, room {}".format(num))
@@ -112,7 +113,7 @@ class Map10_MS30():
                     # prob need to move closer to enemies at this point
                     points = self.grab_enemy_points()
                     result = self.move_diagonal_sectclrdet(
-                        points[0], points[1], self.speed*4, self.gamename)
+                        points[0][0], points[0][1], self.speed*4, self.gamename)
                     if result:
                         BotUtils.stop_movement(self.gamename)
                         break
