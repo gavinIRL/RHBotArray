@@ -164,7 +164,7 @@ class BotUtils:
         return sorted_by_second
 
     # Angle is left->right travel of room angle, north being 0deg
-    def move_diagonal(gamename, x, y, angle=90, speed=20, rel=False):
+    def move_diagonal(x, y, speed=20, rel=False, gamename=False, angle=90):
         # If not a direct relative move command
         if not rel:
             if not BotUtils.detect_bigmap_open(gamename):
