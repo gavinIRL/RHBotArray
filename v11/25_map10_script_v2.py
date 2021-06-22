@@ -107,13 +107,13 @@ class Map10_MS30():
                 self.aim_at_enemies()
                 aim_cd = time.time()
             self.continue_clear()
-            if time.time() > start_time + 12:
+            if time.time() > start_time + 10:
                 if time.time() - move_cd > 3:
                     print("Moving closer to the enemy")
                     # prob need to move closer to enemies at this point
-                    points = self.grab_enemy_points()
+                    points = self.find_nearest_enemy()
                     result = self.move_diagonal_sectclrdet(
-                        points[0][0], points[0][1], self.speed*4, self.gamename)
+                        points[0], points[1], self.speed*4, self.gamename)
                     if result:
                         BotUtils.stop_movement(self.gamename)
                         break
@@ -170,8 +170,8 @@ class Map10_MS30():
             BotUtils.stop_movement()
 
     def find_nearest_enemy(self):
-        points = self.grab_enemy_points()
-        return points[0]
+        points = self.grab_enemy_points()[0]
+        return [points[0] - 80, 80-points[1]]
 
     def grab_off_cooldown(self, skill_list=False, gamename=False):
         if not gamename:
