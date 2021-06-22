@@ -62,7 +62,7 @@ class Map10_MS30():
         start_time = time.time()
         while not BotUtils.detect_sect_clear(self.gamename):
             if time.time() > start_time + 2:
-                self.aim_am_enemies()
+                self.aim_at_enemies()
                 self.continue_clear()
                 if time.time() > start_time + 12:
                     # prob need to move closer to enemies at this point
@@ -78,7 +78,9 @@ class Map10_MS30():
 
     def perform_room_after_first(self, num):
         room = self.rooms[num-1]
+        print("Just about to move to next roomstart, room {}".format(num))
         BotUtils.move_diagonal(int(room[3]), int(room[4]), self.speed)
+        print("Finished moving to next roomstart, room {}".format(num))
         time.sleep(0.4)
         # Now calculate the travel time to figure out
         # How long to sleep before moving to room2 spot
@@ -90,26 +92,37 @@ class Map10_MS30():
         if sleep_time > 0:
             time.sleep(sleep_time)
         room = self.rooms[num]
+        print("Preparing to move to clear position, room {}".format(num))
         BotUtils.move_diagonal(int(room[1]), int(room[2]), self.speed)
         time.sleep(0.6)
         self.roomclear_skill()
         time.sleep(0.6)
         start_time = time.time()
+        aim_cd = time.time()
+        move_cd = time.time()
         while not BotUtils.detect_sect_clear(self.gamename):
-            if time.time() > start_time + 2:
-                self.aim_am_enemies()
-                self.continue_clear()
-                if time.time() > start_time + 12:
+            if time.time() - aim_cd > 2:
+                print("Aiming at enemies again")
+                self.aim_at_enemies()
+                aim_cd = time.time()
+            self.continue_clear()
+            if time.time() > start_time + 12:
+                if time.time() - move_cd > 3:
+                    print("Moving closer to the enemy")
                     # prob need to move closer to enemies at this point
                     points = self.grab_enemy_points()
                     result = self.move_diagonal_sectclrdet(
-                        points[0], points[1], self.speed*2, self.gamename)
+                        points[0], points[1], self.speed*4, self.gamename)
                     if result:
+                        BotUtils.stop_movement(self.gamename)
                         break
-                    start_time = time.time() + 2
+                    move_cd = time.time()
             else:
                 self.continue_clear()
+                BotUtils.stop_movement()
         time.sleep(0.5)
+        BotUtils.stop_movement()
+        print("Finished combat in room {}".format(num))
 
     def calculate_travel_time(self, x, y, currx=False, curry=False):
         if not currx:
@@ -140,10 +153,10 @@ class Map10_MS30():
             time.sleep(0.015)
             CustomInput.release_key(CustomInput.key_map[key], key)
 
-    def aim_am_enemies(self):
+    def aim_at_enemies(self):
         points = self.grab_enemy_points()
         if points:
-            print("Enemiy detected at {}".format(points[0]))
+            # print("Enemy detected at {}".format(points[0]))
             if points[0][0] > 80:
                 CustomInput.press_key(CustomInput.key_map["left"], "left")
             if points[0][0] < 80:
