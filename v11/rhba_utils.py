@@ -204,6 +204,7 @@ class BotUtils:
             CustomInput.press_key(CustomInput.key_map["right"], "right")
             timeleftx = float("{:.4f}".format(abs(relx/(speed*mult))))
         else:
+            keyx = "right"
             timeleftx = 0
             mult = 1
         if rely > 0:
@@ -215,6 +216,7 @@ class BotUtils:
             CustomInput.press_key(CustomInput.key_map["up"], "up")
             timelefty = float("{:.4f}".format(abs(rely/(speed*mult))))
         else:
+            keyy = "up"
             timelefty = 0
             if relx != 0:
                 timeleftx = float("{:.4f}".format(abs(relx/speed)))
