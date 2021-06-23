@@ -1,4 +1,5 @@
 # This file will automatically run through map 10
+from random import randint
 import time
 import os
 import numpy as np
@@ -29,7 +30,7 @@ class Map10_MS30():
         # For aiming at enemies
         self.enemy_minimap_filter = HsvFilter(
             0, 128, 82, 8, 255, 255, 0, 66, 30, 34)
-        enemy_custom_rect = [1100, 50, 1260, 210]
+        enemy_custom_rect = [1094, 50, 1284, 210]
         self.enemy_minimap_wincap = WindowCapture(
             self.gamename, enemy_custom_rect)
         self.enemy_minimap_vision = Vision('enemy67.jpg')
@@ -81,14 +82,14 @@ class Map10_MS30():
             else:
                 self.continue_clear()
                 BotUtils.stop_movement()
-        time.sleep(0.3)
+        time.sleep(1.4)
 
     def perform_room_after_first(self, num):
         room = self.rooms[num-1]
         print("{},{}".format(int(room[1]), int(room[2])))
-        print("Just about to move to next roomstart, room {}".format(num))
+        # print("Just about to move to next roomstart, room {}".format(num))
         BotUtils.move_diagonal(int(room[3]), int(room[4]), self.speed)
-        print("Finished moving to next roomstart, room {}".format(num))
+        # print("Finished moving to next roomstart, room {}".format(num))
         time.sleep(0.4)
         # Now calculate the travel time to figure out
         # How long to sleep before moving to room2 spot
@@ -100,7 +101,7 @@ class Map10_MS30():
         if sleep_time > 0:
             time.sleep(sleep_time)
         room = self.rooms[num]
-        print("Preparing to move to clear position, room {}".format(num))
+        # print("Preparing to move to clear position, room {}".format(num))
         BotUtils.move_diagonal(int(room[1]), int(room[2]), self.speed)
         time.sleep(0.6)
         self.roomclear_skill()
@@ -117,17 +118,18 @@ class Map10_MS30():
                 print("Moving closer to the enemy")
                 # prob need to move closer to enemies at this point
                 points = self.find_nearest_enemy()
-                result = self.move_diagonal_sectclrdet(
-                    points[0], points[1], self.speed*4, self.gamename)
-                if result:
-                    BotUtils.stop_movement(self.gamename)
-                    break
-                move_cd = time.time()
+                if points:
+                    result = self.move_diagonal_sectclrdet(
+                        points[0], points[1], self.speed*4, self.gamename)
+                    if result:
+                        BotUtils.stop_movement(self.gamename)
+                        break
+                    move_cd = time.time()
             else:
                 self.continue_clear()
-                BotUtils.stop_movement()
-        time.sleep(0.5)
-        BotUtils.stop_movement()
+                # BotUtils.stop_movement()
+        time.sleep(1.4)
+        # BotUtils.stop_movement()
         print("Finished combat in room {}".format(num))
 
     def calculate_travel_time(self, x, y, currx=False, curry=False):
@@ -154,22 +156,24 @@ class Map10_MS30():
         if not available:
             # Need to dodge right and left?
             return False
-        for key in available:
+        else:
+            key = available[0]
             CustomInput.press_key(CustomInput.key_map[key], key)
             time.sleep(0.015)
             CustomInput.release_key(CustomInput.key_map[key], key)
+            time.sleep(0.2)
 
     def aim_at_enemies(self):
         points = self.grab_enemy_points()
         if points:
             # print("Enemy detected at {}".format(points[0]))
-            if points[0][0] > 80:
+            if points[0][0] < 94:
                 CustomInput.press_key(CustomInput.key_map["left"], "left")
-            if points[0][0] < 80:
+            if points[0][0] > 94:
                 CustomInput.press_key(CustomInput.key_map["right"], "right")
-            if points[0][1] > 80:
+            if points[0][1] < 69:
                 CustomInput.press_key(CustomInput.key_map["up"], "up")
-            if points[0][1] < 80:
+            if points[0][1] > 69:
                 CustomInput.press_key(CustomInput.key_map["down"], "down")
             time.sleep(0.005)
             BotUtils.stop_movement()
@@ -179,7 +183,7 @@ class Map10_MS30():
             points = self.grab_enemy_points()[0]
         except:
             return False
-        return [points[0] - 80, 80-points[1]]
+        return [points[0] - 94, 69-points[1]]
 
     def grab_off_cooldown(self, skill_list=False, gamename=False):
         if not gamename:
@@ -223,8 +227,14 @@ class Map10_MS30():
             enemy_output_image, threshold=0.61, epsilon=0.5)
         # then return answer to whether enemies are detected
         if len(enemy_rectangles) >= 1:
-            return self.enemy_minimap_vision.get_click_points(
+            points = self.enemy_minimap_vision.get_click_points(
                 enemy_rectangles)
+            # output_image = self.enemy_minimap_vision.draw_crosshairs(
+            #     minimap_screenshot, [points[0]])
+            # name = str(points[0][0])+"-"+str(points[0][1])
+            # cv2.imwrite("C:\\Games\\"+name +
+            #             ".jpg", output_image)
+            return points
         return False
 
     def move_diagonal_sectclrdet(self, x, y, speed=40, gamename=False):
