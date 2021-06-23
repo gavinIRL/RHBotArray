@@ -167,11 +167,19 @@ class BotUtils:
     def move_diagonal(x, y, speed=20, rel=False, gamename=False, angle=90):
         # If not a direct relative move command
         if not rel:
+            BotUtils.try_toggle_map()
+            time.sleep(0.1)
             if not BotUtils.detect_bigmap_open(gamename):
+                # print("Didn't detect bigmap first time")
+                time.sleep(0.5)
                 BotUtils.try_toggle_map_clicking()
+                # BotUtils.try_toggle_map_clicking()
+                time.sleep(0.1)
             player_pos = BotUtils.grab_player_pos(gamename)
+            print("Player pos detected by diag:{}".format(player_pos))
             start_time = time.time()
             while not player_pos:
+                print("Attempting to find player again")
                 time.sleep(0.05)
                 if not BotUtils.detect_bigmap_open(gamename):
                     BotUtils.try_toggle_map_clicking()
@@ -184,12 +192,19 @@ class BotUtils:
             relx = player_pos[0] - int(x)
             rely = int(y) - player_pos[1]
             while abs(relx) > 100 or abs(rely > 100):
-                CustomInput.press_key(CustomInput.key_map["right"], "right")
-                CustomInput.release_key(CustomInput.key_map["right"], "right")
-                time.sleep(0.02)
+                # print("Travel distance is too far, x:{},y:{}".format(relx, rely))
+                # CustomInput.press_key(CustomInput.key_map["right"], "right")
+                # time.sleep(0.01)
+                # CustomInput.release_key(CustomInput.key_map["right"], "right")
+                time.sleep(0.4)
+                if not BotUtils.detect_bigmap_open(gamename):
+                    print("trying to open map")
+                    BotUtils.try_toggle_map_clicking()
+                    time.sleep(0.3)
                 player_pos = BotUtils.grab_player_pos(gamename)
                 relx = player_pos[0] - int(x)
                 rely = int(y) - player_pos[1]
+            BotUtils.close_map_and_menu(gamename)
         # Otherwise treat x,y as direct commands
         else:
             relx = x
@@ -660,7 +675,7 @@ class BotUtils:
         else:
             return False
 
-    def grab_player_pos(gamename=False, map_rect=None, rect_rel=False):
+    def grab_player_pos(gamename=False, map_rect=False, rect_rel=False):
         if not gamename:
             with open("gamename.txt") as f:
                 gamename = f.readline()
@@ -832,7 +847,7 @@ class BotUtils:
                 gamename = f.readline()
         game_wincap = WindowCapture(gamename)
         pydirectinput.click(
-            int(1262+game_wincap.window_rect[0]), int(64+game_wincap.window_rect[1]))
+            int(1263+game_wincap.window_rect[0]), int(64+game_wincap.window_rect[1]))
 
     def close_map(game_wincap=False):
         if not game_wincap:
@@ -2729,4 +2744,4 @@ if __name__ == "__main__":
     # start = time.time()
     # BotUtils.detect_xprompt(gamename)
     # print("Time taken: {}s".format(time.time()-start))
-    BotUtils.close_map_and_menu(gamename)
+    BotUtils.move_diagonal(749, 615, 22.5)
