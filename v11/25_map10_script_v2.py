@@ -126,7 +126,7 @@ class Map10_MS30():
                     result = self.move_diagonal_sectclrdet(
                         points[0], points[1], self.speed*4, self.gamename)
                     if result:
-                        BotUtils.stop_movement(self.gamename)
+                        BotUtils.stop_movement()
                         break
                     move_cd = time.time()
             else:
