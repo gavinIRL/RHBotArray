@@ -52,6 +52,10 @@ class Map10_MS30():
         self.perform_room1()
         for i in range(4):
             self.perform_room_after_first(i+1)
+        # Then move into the boss room
+        BotUtils.move_diagonal(882, 615, self.speed)
+        # And then perform the endmap routine
+        self.perform_endmap()
 
     def perform_room1(self):
         time.sleep(2)
@@ -131,6 +135,9 @@ class Map10_MS30():
         time.sleep(1.4)
         # BotUtils.stop_movement()
         print("Finished combat in room {}".format(num))
+
+    def perform_endmap(self):
+        pass
 
     def calculate_travel_time(self, x, y, currx=False, curry=False):
         if not currx:
