@@ -846,8 +846,15 @@ class BotUtils:
             with open("gamename.txt") as f:
                 gamename = f.readline()
         game_wincap = WindowCapture(gamename)
-        pydirectinput.click(
+        ctypes.windll.user32.SetCursorPos(
             int(1263+game_wincap.window_rect[0]), int(64+game_wincap.window_rect[1]))
+        ctypes.windll.user32.mouse_event(
+            0x0002, 0, 0, 0, 0)
+        time.sleep(0.05)
+        ctypes.windll.user32.mouse_event(
+            0x0004, 0, 0, 0, 0)
+        # pydirectinput.click(
+        #     int(1263+game_wincap.window_rect[0]), int(64+game_wincap.window_rect[1]))
 
     def close_map(game_wincap=False):
         if not game_wincap:
@@ -2744,4 +2751,5 @@ if __name__ == "__main__":
     # start = time.time()
     # BotUtils.detect_xprompt(gamename)
     # print("Time taken: {}s".format(time.time()-start))
-    BotUtils.move_diagonal(749, 615, 22.5)
+    # BotUtils.move_diagonal(749, 615, 22.5)
+    BotUtils.try_toggle_map_clicking(gamename)
