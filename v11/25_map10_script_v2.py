@@ -137,7 +137,8 @@ class Map10_MS30():
         print("Finished combat in room {}".format(num))
 
     def perform_endmap(self):
-        pass
+        self.kill_boss(self.gamename)
+        self.start_endlevel_script(self.gamename)
 
     def calculate_travel_time(self, x, y, currx=False, curry=False):
         if not currx:
