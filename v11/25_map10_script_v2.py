@@ -511,7 +511,13 @@ class Map10_MS30():
             wincap.window_rect[0]+656, wincap.window_rect[1]+276)
 
     def repeat_level(self, gamename):
-        # Don't do anything for now
+        # Close the shop
+        pydirectinput.press('esc')
+        time.sleep(0.1)
+        pydirectinput.press('esc')
+        time.sleep(0.1)
+        BotUtils.close_map_and_menu(gamename)
+        time.sleep(0.1)
         RHClick.click_explore_again(gamename)
 
     def move_to_boss(self):
