@@ -183,6 +183,8 @@ class BotUtils:
                 time.sleep(0.05)
                 if not BotUtils.detect_bigmap_open(gamename):
                     BotUtils.try_toggle_map_clicking()
+                if not BotUtils.detect_bigmap_open(gamename):
+                    BotUtils.try_toggle_map()
                 time.sleep(0.05)
                 player_pos = BotUtils.grab_player_pos(gamename)
                 if time.time() - start_time > 5:
@@ -636,14 +638,24 @@ class BotUtils:
         if not gamename:
             with open("gamename.txt") as f:
                 gamename = f.readline()
+        # wincap = WindowCapture(gamename, custom_rect=[
+        #     464+156, 640, 464+261, 741])
         wincap = WindowCapture(gamename, custom_rect=[
-            464+156, 640, 464+261, 641])
+            464+29, 640, 464+261, 641])
         image = wincap.get_screenshot()
         a, b, c = [int(i) for i in image[0][0]]
-        d, e, f = [int(i) for i in image[0][-1]]
-        if a+b+c > 700:
-            if d+e+f > 700:
-                return True
+        d, e, f = [int(i) for i in image[0][127]]
+        g, h, i = [int(i) for i in image[0][-1]]
+        if a+b+c > 760:
+            if d+e+f > 760:
+                if g+h+i > 760:
+                    # print("ABC:{},{},{}-DEF:{},{},{}".format(a, b, c, d, e, f))
+                    # wincap = WindowCapture(gamename, custom_rect=[
+                    #     464-100, 640, 464+461, 741])
+                    # image = wincap.get_screenshot()
+                    # cv2.imwrite("C:\\Games\\" +
+                    #             str(random.randint(1, 1000)) + ".jpg", image)
+                    return True
         return False
 
     def detect_boss_healthbar(gamename=False):
