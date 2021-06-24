@@ -54,8 +54,10 @@ class Map10_MS30():
             self.perform_room_after_first(i+1)
         # Then move into the boss room
         BotUtils.move_diagonal(882, 615, self.speed)
+        # Cancel summon of momo
+        self.cancel_momo_summon(self.gamename)
         # And then perform the endmap routine
-        self.perform_endmap()
+        # self.perform_endmap()
 
     def perform_room1(self):
         time.sleep(2)
@@ -83,9 +85,11 @@ class Map10_MS30():
                         BotUtils.stop_movement()
                         break
                     move_cd = time.time()
+                else:
+                    move_cd = time.time() - 4
             else:
                 self.continue_clear()
-                BotUtils.stop_movement()
+                # BotUtils.stop_movement()
         time.sleep(1.4)
 
     def perform_room_after_first(self, num):
@@ -129,6 +133,8 @@ class Map10_MS30():
                         BotUtils.stop_movement()
                         break
                     move_cd = time.time()
+                else:
+                    move_cd = time.time() - 4
             else:
                 self.continue_clear()
                 # BotUtils.stop_movement()
@@ -139,6 +145,28 @@ class Map10_MS30():
     def perform_endmap(self):
         self.kill_boss(self.gamename)
         self.start_endlevel_script(self.gamename)
+
+    def cancel_momo_summon(self, gamename):
+        wincap = WindowCapture(gamename)
+        x = wincap.window_rect[0]
+        y = wincap.window_rect[1]
+        pydirectinput.rightClick(x+82, y+197)
+        time.sleep(0.1)
+        pydirectinput.click(x+148, y+213)
+        time.sleep(0.1)
+
+    def summon_momo(self, gamename):
+        wincap = WindowCapture(gamename)
+        x = wincap.window_rect[0]
+        y = wincap.window_rect[1]
+        pydirectinput.press("j")
+        time.sleep(0.1)
+        pydirectinput.click(x+471, y+178)
+        time.sleep(0.1)
+        pydirectinput.click(x+713, y+682)
+        time.sleep(0.1)
+        pydirectinput.press("esc")
+        time.sleep(0.1)
 
     def calculate_travel_time(self, x, y, currx=False, curry=False):
         if not currx:
@@ -519,6 +547,8 @@ class Map10_MS30():
         BotUtils.close_map_and_menu(gamename)
         time.sleep(0.1)
         RHClick.click_explore_again(gamename)
+        time.sleep(3)
+        self.summon_momo(gamename)
 
     def move_to_boss(self):
         time.sleep(0.5)
