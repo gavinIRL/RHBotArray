@@ -687,6 +687,17 @@ class BotUtils:
         else:
             return False
 
+    def detect_petmenu_open(gamename):
+        wincap = WindowCapture(gamename, [604, 120, 657, 122])
+        image = wincap.get_screenshot()
+        a, b, c = [int(i) for i in image[0][0]]
+        d, e, f = [int(i) for i in image[0][8]]
+        g, h, i = [int(i) for i in image[0][-1]]
+        if a + g == 76:
+            if d+e+f > 750:
+                return True
+        return False
+
     def grab_player_pos(gamename=False, map_rect=False, rect_rel=False):
         if not gamename:
             with open("gamename.txt") as f:
