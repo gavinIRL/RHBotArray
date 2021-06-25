@@ -176,9 +176,9 @@ class BotUtils:
                 # BotUtils.try_toggle_map_clicking()
                 time.sleep(0.1)
             player_pos = BotUtils.grab_player_pos(gamename)
-            print("Player pos detected by diag:{}".format(player_pos))
+            # print("Player pos detected by diag:{}".format(player_pos))
             start_time = time.time()
-            while not player_pos:
+            while not player_pos[0]:
                 print("Attempting to find player again")
                 time.sleep(0.05)
                 if not BotUtils.detect_bigmap_open(gamename):
@@ -200,7 +200,7 @@ class BotUtils:
                 # CustomInput.release_key(CustomInput.key_map["right"], "right")
                 time.sleep(0.4)
                 if not BotUtils.detect_bigmap_open(gamename):
-                    print("trying to open map")
+                    print("trying to open map again")
                     BotUtils.try_toggle_map_clicking()
                     time.sleep(0.3)
                 player_pos = BotUtils.grab_player_pos(gamename)
