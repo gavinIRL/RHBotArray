@@ -151,7 +151,7 @@ class Map10_MS30():
         self.kill_boss(self.gamename)
         self.start_endlevel_script(self.gamename, repeat)
 
-    def perform_midmap_event():
+    def perform_midmap_event(self):
         print("Midmap event detected")
         pydirectinput.press("esc")
 
