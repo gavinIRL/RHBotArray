@@ -34,6 +34,8 @@ class Map10_MS30():
         self.enemy_minimap_wincap = WindowCapture(
             self.gamename, enemy_custom_rect)
         self.enemy_minimap_vision = Vision('enemy67.jpg')
+        # Var for tracking gold progress
+        self.gold = 0
 
     def load_map_rooms(self):
         # Temporary, will be replace by objects later
@@ -586,6 +588,9 @@ class Map10_MS30():
             wincap.window_rect[0]+656, wincap.window_rect[1]+276)
 
     def repeat_level(self, gamename):
+        gold = BotUtils.detect_gold_amount(gamename)
+        print("Total map profit: {}g".format(gold-self.gold))
+        self.gold = gold
         # Close the shop
         pydirectinput.press('esc')
         time.sleep(0.1)
