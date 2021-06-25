@@ -477,6 +477,9 @@ class Map10_MS30():
             BotUtils.try_toggle_map()
             time.sleep(0.01)
         self.loot_everything(gamename)
+        # Then have a second bite at looting
+        BotUtils.move_diagonal(50, 0, 50, True)
+        self.loot_everything(gamename)
 
     def leave_otherworld(self, gamename):
         if not BotUtils.detect_bigmap_open(gamename):
@@ -486,7 +489,9 @@ class Map10_MS30():
         relx = player_pos[0] - 667
         rely = 455 - player_pos[1]
         BotUtils.move_diagonal(relx, rely, 50, True)
-        os._exit(1)
+        time.sleep(1)
+        RHClick.click_yes(gamename)
+        time.sleep(3)
 
     def detect_enemies_overworld(self, gamename):
         if not BotUtils.detect_bigmap_open(gamename):
