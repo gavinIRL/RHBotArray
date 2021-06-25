@@ -7,6 +7,7 @@ import ctypes
 import logging
 from rhba_utils import BotUtils, Events, SellRepair, RHClick, Looting, WindowCapture, Vision, HsvFilter
 import pydirectinput
+import pytesseract
 from custom_input import CustomInput
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
@@ -33,6 +34,17 @@ def check_petmenu_open(gamename):
     return False
 
 
+def detect_gold_amount(gamename):
+    wincap = WindowCapture(gamename, [681, 473, 748, 490])
+    image = wincap.get_screenshot()
+    # cv2.imwrite("testytest.jpg", image)
+    tess_config = '--psm 8 --oem 3 -c tessedit_char_whitelist=0123456789,'
+    result = pytesseract.image_to_string(
+        image, lang='eng', config=tess_config)[:-2].replace(",", "")
+    print(result)
+
+
 with open("gamename.txt") as f:
     gamename = f.readline()
-    check_petmenu_open(gamename)
+    # check_petmenu_open(gamename)
+    detect_gold_amount(gamename)
