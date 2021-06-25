@@ -380,11 +380,23 @@ class Map10_MS30():
             time.sleep(0.006)
         # print("Got to pre-sectclear detect")
         # Then until sect cleared shows up
+        time.sleep(0.5)
+        start_time = time.time()
         while not BotUtils.detect_sect_clear():
             pydirectinput.press('esc')
-            time.sleep(0.2)
+            time.sleep(0.5)
             if Events.detect_move_reward_screen(gamename):
                 break
+            if time.time() - start_time > 5:
+                # Need to check if boss still alive
+                if Events.detect_in_dungeon():
+                    # Then continue fighting the boss
+                    self.perform_boss_moves()
+                    BotUtils.close_map_and_menu(gamename)
+                else:
+                    msg = "CRITICAL ERROR DURING POST-BOSS HANDLING"
+                    print(msg)
+                    os._exit(1)
         # print("Got to pre-endlevel event check")
         # Then wait for end-level event to show up
         event = False
@@ -674,7 +686,7 @@ class Map10_MS30():
 
 if __name__ == "__main__":
     time.sleep(2)
-    num_loops = 5
+    num_loops = 10
     for i in range(num_loops):
         map = Map10_MS30()
         if i == num_loops - 1:
