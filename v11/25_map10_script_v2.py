@@ -61,7 +61,7 @@ class Map10_MS30():
         self.perform_endmap(repeat)
 
     def perform_room1(self):
-        time.sleep(2)
+        time.sleep(0.25)
         room = self.rooms[0]
         BotUtils.move_diagonal(int(room[1]), int(room[2]), self.speed)
         time.sleep(0.4)
@@ -173,6 +173,15 @@ class Map10_MS30():
         pydirectinput.click(x+471, y+178)
         time.sleep(0.1)
         pydirectinput.click(x+713, y+682)
+        time.sleep(0.1)
+        # Now empty first 3 inventory slots
+        pydirectinput.rightClick(x+683, y+277)
+        time.sleep(0.1)
+        pydirectinput.rightClick(x+728, y+277)
+        time.sleep(0.1)
+        pydirectinput.rightClick(x+772, y+277)
+        time.sleep(0.1)
+        pydirectinput.rightClick(x+814, y+277)
         time.sleep(0.1)
         pydirectinput.press("esc")
         time.sleep(0.1)
