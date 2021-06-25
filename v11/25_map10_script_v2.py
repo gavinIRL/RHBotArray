@@ -641,6 +641,10 @@ class Map10_MS30():
 
 if __name__ == "__main__":
     time.sleep(2)
-    map = Map10_MS30()
-    # print(map.grab_off_cooldown())
-    map.start(True)
+    num_loops = 2
+    for i in range(num_loops):
+        map = Map10_MS30()
+        if i == num_loops - 1:
+            map.start(False)
+        else:
+            map.start(True)
