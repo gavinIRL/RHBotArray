@@ -687,7 +687,22 @@ class BotUtils:
         else:
             return False
 
-    def detect_petmenu_open(gamename):
+    def detect_gold_amount(gamename=False):
+        if not gamename:
+            with open("gamename.txt") as f:
+                gamename = f.readline()
+        wincap = WindowCapture(gamename, [681, 473, 748, 490])
+        image = wincap.get_screenshot()
+        # cv2.imwrite("testytest.jpg", image)
+        tess_config = '--psm 8 --oem 3 -c tessedit_char_whitelist=0123456789,'
+        result = pytesseract.image_to_string(
+            image, lang='eng', config=tess_config)[:-2].replace(",", "")
+        return result
+
+    def detect_petmenu_open(gamename=False):
+        if not gamename:
+            with open("gamename.txt") as f:
+                gamename = f.readline()
         wincap = WindowCapture(gamename, [604, 120, 657, 122])
         image = wincap.get_screenshot()
         a, b, c = [int(i) for i in image[0][0]]
