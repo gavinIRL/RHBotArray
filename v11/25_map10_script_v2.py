@@ -195,8 +195,10 @@ class Map10_MS30():
             BotUtils.close_map_and_menu(self.gamename)
         xdist = abs(currx - int(x))
         ydist = abs(int(y) - curry)
-        travel_time = (math.sqrt(xdist ^ 2+ydist ^ 2))/self.speed
-        print("Travel time calculated to be {}s".format(travel_time))
+        travel_time = (math.hypot(xdist, ydist))/self.speed
+        # print("Next dist to travel is x,y : {},{}".format(xdist, ydist))
+        # print("Travel time calculated to be {}s".format(travel_time))
+        # print("--------------------------")
         return travel_time
 
     def roomclear_skill(self):
@@ -375,41 +377,39 @@ class Map10_MS30():
             time.sleep(0.006)
         # print("Got to pre-sectclear detect")
         # Then until sect cleared shows up
-        skip_event_check = False
         while not BotUtils.detect_sect_clear():
             pydirectinput.press('esc')
             time.sleep(0.2)
             if Events.detect_move_reward_screen(gamename):
-                skip_event_check = True
                 break
         # print("Got to pre-endlevel event check")
         # Then wait for end-level event to show up
         event = False
-        if not skip_event_check:
-            start_time = time.time()
-            while True:
-                time.sleep(0.006)
-                if time.time() > start_time + 3.5:
+        start_time = time.time()
+        while True:
+            time.sleep(0.006)
+            if time.time() > start_time + 3.5:
+                break
+            if not Events.detect_in_dungeon():
+                # Press escape
+                pydirectinput.press('esc')
+                # Wait 2 seconds
+                time.sleep(0.5)
+                if Events.detect_move_reward_screen(gamename):
                     break
-                if not Events.detect_in_dungeon():
-                    # Press escape
-                    pydirectinput.press('esc')
-                    # Wait 2 seconds
-                    time.sleep(0.5)
-                    if Events.detect_move_reward_screen(gamename):
-                        break
-                    # Then if ok is detected turn flag on
-                    if Events.detect_endlevel_bonus_area(gamename):
-                        event = True
-                    break
+                # Then if ok is detected turn flag on
+                if Events.detect_endlevel_bonus_area(gamename):
+                    event = True
+                break
         # Then do the appropriate handling if event is detected
         # print("Got to pre-event handling")
         if event:
             self.do_otherworld_handling(gamename)
+        time.sleep(1)
         # Once event is complete move to correct place in room
         self.move_to_loot_point(gamename)
         # And then commence looting
-        # print("Got to post-move to loot point")
+        print("Got to post-move to loot point")
         while Events.detect_in_dungeon():
             if not self.loot_everything(gamename):
                 # Click centre of screen to skip
@@ -671,7 +671,7 @@ class Map10_MS30():
 
 if __name__ == "__main__":
     time.sleep(2)
-    num_loops = 2
+    num_loops = 5
     for i in range(num_loops):
         map = Map10_MS30()
         if i == num_loops - 1:
