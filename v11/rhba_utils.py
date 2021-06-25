@@ -697,7 +697,7 @@ class BotUtils:
         tess_config = '--psm 8 --oem 3 -c tessedit_char_whitelist=0123456789,'
         result = pytesseract.image_to_string(
             image, lang='eng', config=tess_config)[:-2].replace(",", "")
-        return result
+        return int(result)
 
     def detect_petmenu_open(gamename=False):
         if not gamename:
