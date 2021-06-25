@@ -73,12 +73,12 @@ class Map10_MS30():
         move_cd = time.time()
         while not BotUtils.detect_sect_clear(self.gamename):
             if time.time() - aim_cd > 2:
-                print("Aiming at enemies again")
+                # print("Aiming at enemies again")
                 self.aim_at_enemies()
                 aim_cd = time.time()
                 self.continue_clear()
             elif time.time() - move_cd > 6:
-                print("Moving closer to the enemy")
+                # print("Moving closer to the enemy")
                 # prob need to move closer to enemies at this point
                 points = self.find_nearest_enemy()
                 if points:
@@ -382,30 +382,48 @@ class Map10_MS30():
             time.sleep(0.006)
         # print("Got to pre-sectclear detect")
         # Then until sect cleared shows up
-        time.sleep(0.5)
-        start_time = time.time()
         while not BotUtils.detect_sect_clear():
-            pydirectinput.press('esc')
-            time.sleep(0.5)
             if Events.detect_move_reward_screen(gamename):
                 break
-            if time.time() - start_time > 5:
-                # Need to check if boss still alive
-                if Events.detect_in_dungeon():
-                    # Then continue fighting the boss
-                    self.perform_boss_moves()
-                    BotUtils.close_map_and_menu(gamename)
-                else:
-                    msg = "CRITICAL ERROR DURING POST-BOSS HANDLING"
-                    print(msg)
-                    os._exit(1)
+            if Events.detect_endlevel_bonus_area(gamename):
+                break
+            pydirectinput.press('esc')
+            time.sleep(0.05)
+            BotUtils.close_map_and_menu(gamename)
+            time.sleep(0.05)
+            print("Stuck in the first loop")
+        # print("Got to pre-endlevel event check")
+        # Then wait for end-level event to show up
+        start_time = time.time()
+        event = False
+        while True:
+            time.sleep(0.006)
+            if time.time() > start_time + 2.5:
+                print("Exited loop #2 due to timer")
+                break
+            if Events.detect_move_reward_screen(gamename):
+                break
+            if Events.detect_endlevel_bonus_area(gamename):
+                event = True
+                break
+            if not Events.detect_in_dungeon():
+                # Press escape
+                pydirectinput.press('esc')
+                time.sleep(0.05)
+                BotUtils.close_map_and_menu(gamename)
+                # Wait 2 seconds
+                time.sleep(0.5)
+                # Then if ok is detected turn flag on
+                if Events.detect_endlevel_bonus_area(gamename):
+                    event = True
+                break
         # print("Got to pre-endlevel event check")
         # Then wait for end-level event to show up
         event = False
         start_time = time.time()
         while True:
             time.sleep(0.006)
-            if time.time() > start_time + 3.5:
+            if time.time() - start_time > 3.5:
                 break
             if not Events.detect_in_dungeon():
                 # Press escape
@@ -413,6 +431,7 @@ class Map10_MS30():
                 # Wait 2 seconds
                 time.sleep(0.5)
                 if Events.detect_move_reward_screen(gamename):
+                    print("Managed to detect the skip to reward screen option #2")
                     break
                 # Then if ok is detected turn flag on
                 if Events.detect_endlevel_bonus_area(gamename):
@@ -692,8 +711,8 @@ class Map10_MS30():
 if __name__ == "__main__":
     time.sleep(2)
     num_loops = 10
+    map = Map10_MS30()
     for i in range(num_loops):
-        map = Map10_MS30()
         if i == num_loops - 1:
             map.start(False)
         else:
