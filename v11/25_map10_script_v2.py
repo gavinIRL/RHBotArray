@@ -441,13 +441,17 @@ class Map10_MS30():
         # print("Got to pre-event handling")
         if event:
             self.do_otherworld_handling(gamename)
-        time.sleep(1)
+            time.sleep(1)
+        Looting.grab_nearby_loot(gamename)
         # Once event is complete move to correct place in room
         self.move_to_loot_point(gamename)
         # And then commence looting
         print("Got to post-move to loot point")
         while Events.detect_in_dungeon():
             if not self.loot_everything(gamename):
+                # Try once more to loot
+                Looting.grab_nearby_loot(gamename)
+                self.loot_everything(gamename)
                 # Click centre of screen to skip
                 self.skip_to_reward(gamename)
                 break
@@ -710,7 +714,7 @@ class Map10_MS30():
 
 if __name__ == "__main__":
     time.sleep(2)
-    num_loops = 10
+    num_loops = 2
     map = Map10_MS30()
     for i in range(num_loops):
         if i == num_loops - 1:
