@@ -1862,6 +1862,12 @@ class Events:
         # Now accept the reward
         pydirectinput.click(
             wincap.window_rect[0]+750, wincap.window_rect[1]+720)
+        # And then perform clicks a second time just in case
+        time.sleep(0.1)
+        pydirectinput.click(int(posx), int(posy))
+        time.sleep(0.1)
+        pydirectinput.click(
+            wincap.window_rect[0]+750, wincap.window_rect[1]+720)
 
     def detect_reward_choice_open(gamename):
         wincap = WindowCapture(gamename, [503, 90, 535, 92])
