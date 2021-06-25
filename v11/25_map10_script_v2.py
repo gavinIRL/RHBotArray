@@ -356,28 +356,33 @@ class Map10_MS30():
             time.sleep(0.006)
         # print("Got to pre-sectclear detect")
         # Then until sect cleared shows up
+        skip_event_check = False
         while not BotUtils.detect_sect_clear():
             pydirectinput.press('esc')
-            time.sleep(0.05)
+            time.sleep(0.2)
+            if Events.detect_move_reward_screen(gamename):
+                skip_event_check = True
+                break
         # print("Got to pre-endlevel event check")
         # Then wait for end-level event to show up
-        start_time = time.time()
         event = False
-        while True:
-            time.sleep(0.006)
-            if time.time() > start_time + 3.5:
-                break
-            if not Events.detect_in_dungeon():
-                # Press escape
-                pydirectinput.press('esc')
-                # Wait 2 seconds
-                time.sleep(0.5)
-                if Events.detect_move_reward_screen(gamename):
+        if not skip_event_check:
+            start_time = time.time()
+            while True:
+                time.sleep(0.006)
+                if time.time() > start_time + 3.5:
                     break
-                # Then if ok is detected turn flag on
-                if Events.detect_endlevel_bonus_area(gamename):
-                    event = True
-                break
+                if not Events.detect_in_dungeon():
+                    # Press escape
+                    pydirectinput.press('esc')
+                    # Wait 2 seconds
+                    time.sleep(0.5)
+                    if Events.detect_move_reward_screen(gamename):
+                        break
+                    # Then if ok is detected turn flag on
+                    if Events.detect_endlevel_bonus_area(gamename):
+                        event = True
+                    break
         # Then do the appropriate handling if event is detected
         # print("Got to pre-event handling")
         if event:
