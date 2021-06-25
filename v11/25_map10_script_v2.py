@@ -139,13 +139,21 @@ class Map10_MS30():
             else:
                 self.continue_clear()
                 # BotUtils.stop_movement()
-        time.sleep(1.4)
+        time.sleep(0.2)
+        # Then check/handle for midmap event
+        if not Events.detect_in_dungeon():
+            self.perform_midmap_event()
+        time.sleep(1.2)
         # BotUtils.stop_movement()
         # print("Finished combat in room {}".format(num))
 
     def perform_endmap(self, repeat=False):
         self.kill_boss(self.gamename)
         self.start_endlevel_script(self.gamename, repeat)
+
+    def perform_midmap_event():
+        print("Midmap event detected")
+        pydirectinput.press("esc")
 
     def cancel_momo_summon(self, gamename):
         wincap = WindowCapture(gamename)
