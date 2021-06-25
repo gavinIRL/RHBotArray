@@ -195,10 +195,10 @@ class Map10_MS30():
             BotUtils.close_map_and_menu(self.gamename)
         xdist = abs(currx - int(x))
         ydist = abs(int(y) - curry)
-        travel_time = (math.hypot(xdist, ydist))/self.speed
-        # print("Next dist to travel is x,y : {},{}".format(xdist, ydist))
-        # print("Travel time calculated to be {}s".format(travel_time))
-        # print("--------------------------")
+        # travel_time = (math.hypot(xdist, ydist))/self.speed
+        smaller = min(xdist, ydist)
+        diag = math.hypot(smaller, smaller)
+        travel_time = (diag + max(xdist, ydist) - smaller)/self.speed
         return travel_time
 
     def roomclear_skill(self):
