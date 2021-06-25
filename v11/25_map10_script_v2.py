@@ -95,7 +95,7 @@ class Map10_MS30():
 
     def perform_room_after_first(self, num):
         room = self.rooms[num-1]
-        print("{},{}".format(int(room[1]), int(room[2])))
+        # print("{},{}".format(int(room[1]), int(room[2])))
         # print("Just about to move to next roomstart, room {}".format(num))
         BotUtils.move_diagonal(int(room[3]), int(room[4]), self.speed)
         # print("Finished moving to next roomstart, room {}".format(num))
@@ -119,12 +119,12 @@ class Map10_MS30():
         move_cd = time.time()
         while not BotUtils.detect_sect_clear(self.gamename):
             if time.time() - aim_cd > 2:
-                print("Aiming at enemies again")
+                # print("Aiming at enemies again")
                 self.aim_at_enemies()
                 aim_cd = time.time()
                 self.continue_clear()
             elif time.time() - move_cd > 6:
-                print("Moving closer to the enemy")
+                # print("Moving closer to the enemy")
                 # prob need to move closer to enemies at this point
                 points = self.find_nearest_enemy()
                 if points:
@@ -141,7 +141,7 @@ class Map10_MS30():
                 # BotUtils.stop_movement()
         time.sleep(1.4)
         # BotUtils.stop_movement()
-        print("Finished combat in room {}".format(num))
+        # print("Finished combat in room {}".format(num))
 
     def perform_endmap(self, repeat=False):
         self.kill_boss(self.gamename)
@@ -179,6 +179,7 @@ class Map10_MS30():
         xdist = abs(currx - int(x))
         ydist = abs(int(y) - curry)
         travel_time = (math.sqrt(xdist ^ 2+ydist ^ 2))/self.speed
+        print("Travel time calculated to be {}s".format(travel_time))
         return travel_time
 
     def roomclear_skill(self):
