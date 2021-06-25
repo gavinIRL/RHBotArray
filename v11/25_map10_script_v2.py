@@ -170,6 +170,9 @@ class Map10_MS30():
         y = wincap.window_rect[1]
         pydirectinput.press("j")
         time.sleep(0.1)
+        while not BotUtils.detect_petmenu_open(gamename):
+            pydirectinput.press("j")
+            time.sleep(0.1)
         pydirectinput.click(x+471, y+178)
         time.sleep(0.1)
         pydirectinput.click(x+713, y+682)
