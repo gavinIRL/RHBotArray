@@ -47,7 +47,8 @@ class Map10_MS30():
             return_list.append(line.split(","))
         return return_list
 
-    def start(self):
+    def start(self, repeat=False):
+        self.summon_momo(self.gamename)
         # Using placeholder individual methods for now
         self.perform_room1()
         for i in range(4):
@@ -57,7 +58,7 @@ class Map10_MS30():
         # Cancel summon of momo
         self.cancel_momo_summon(self.gamename)
         # And then perform the endmap routine
-        # self.perform_endmap()
+        self.perform_endmap(repeat)
 
     def perform_room1(self):
         time.sleep(2)
@@ -142,9 +143,9 @@ class Map10_MS30():
         # BotUtils.stop_movement()
         print("Finished combat in room {}".format(num))
 
-    def perform_endmap(self):
+    def perform_endmap(self, repeat=False):
         self.kill_boss(self.gamename)
-        self.start_endlevel_script(self.gamename)
+        self.start_endlevel_script(self.gamename, repeat)
 
     def cancel_momo_summon(self, gamename):
         wincap = WindowCapture(gamename)
@@ -348,7 +349,7 @@ class Map10_MS30():
         return False
 
     # Everything below this is for endmap handling from test 18
-    def start_endlevel_script(self, gamename):
+    def start_endlevel_script(self, gamename, repeat=False):
         # Need to first wait until dungeon check returns false
         while Events.detect_in_dungeon():
             time.sleep(0.006)
@@ -415,7 +416,8 @@ class Map10_MS30():
         sr.ident_sell_repair()
         # And then go to next level if needs be
         # print("Got to pre-restart")
-        self.repeat_level(gamename)
+        if repeat:
+            self.repeat_level(gamename)
 
     def do_otherworld_handling(self, gamename):
         time.sleep(0.4)
@@ -548,7 +550,7 @@ class Map10_MS30():
         time.sleep(0.1)
         RHClick.click_explore_again(gamename)
         time.sleep(3)
-        self.summon_momo(gamename)
+        # self.summon_momo(gamename)
 
     def move_to_boss(self):
         time.sleep(0.5)
@@ -641,4 +643,4 @@ if __name__ == "__main__":
     time.sleep(2)
     map = Map10_MS30()
     # print(map.grab_off_cooldown())
-    map.start()
+    map.start(True)
