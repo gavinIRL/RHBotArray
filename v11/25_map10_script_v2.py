@@ -199,7 +199,7 @@ class Map10_MS30():
         smaller = min(xdist, ydist)
         diag = math.hypot(smaller, smaller)
         travel_time = (diag + max(xdist, ydist) - smaller)/self.speed
-        return travel_time
+        return travel_time + 0.1
 
     def roomclear_skill(self):
         CustomInput.press_key(CustomInput.key_map["h"])
