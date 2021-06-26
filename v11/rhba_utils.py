@@ -163,9 +163,12 @@ class BotUtils:
         sorted_by_second = sorted(coords, key=lambda tup: tup[1], reverse=True)
         return sorted_by_second
 
-    def move_bigmap_dynamic(x, y, gamename=False, rect=False):
-        while not BotUtils.detect_bigmap_open(gamename):
-            BotUtils.try_toggle_map_clicking()
+    def move_bigmap_dynamic(x, y, gamename=False, rect=False, checkmap=True):
+        if checkmap:
+            while not BotUtils.detect_bigmap_open(gamename):
+                BotUtils.try_toggle_map_clicking()
+        else:
+            BotUtils.try_toggle_map()
         if not gamename:
             with open("gamename.txt") as f:
                 gamename = f.readline()
@@ -178,11 +181,11 @@ class BotUtils:
             return False
         relx = x - playerx
         rely = playery - y
-        margin = 2
+        margin = 1
         follower = Follower(margin)
         noplyr_count = 0
         while abs(relx) > margin or abs(rely) > margin:
-            rect = [playerx - 40, playery - 40, playerx + 40, playery + 40]
+            rect = [playerx - 50, playery - 50, playerx + 50, playery + 50]
             playerx, playery = BotUtils.grab_player_posv2(gamename, rect)
             if playerx:
                 if noplyr_count > 0:
@@ -194,8 +197,9 @@ class BotUtils:
                 noplyr_count += 1
                 if noplyr_count > 10:
                     break
-            time.sleep(0.03)
-        BotUtils.close_map_and_menu(gamename)
+            time.sleep(0.05)
+        follower.release_all_keys()
+        BotUtils.try_toggle_map()
         if noplyr_count > 10:
             return False
         else:
@@ -2949,6 +2953,10 @@ class Follower():
         self.relx = 0
         self.rely = 0
         self.margin = margin
+
+    def release_all_keys(self):
+        for key in self.pressed_keys:
+            CustomInput.release_key(CustomInput.key_map[key], key)
 
     def navigate_towards(self, x, y):
         self.relx = x
