@@ -741,13 +741,36 @@ class BotUtils:
         if len(rectangles) < 1:
             return False, False
         points = vision.get_click_points(rectangles)
-        output_image = vision.draw_crosshairs(image, points)
         x, y = points[0]
         if rect_rel:
             return x, y
         else:
             x += map_rect[0]
             y += map_rect[1]
+            return x, y
+
+    def grab_player_posv2(gamename=False, map_rect=False, rect_rel=False):
+        if not gamename:
+            with open("gamename.txt") as f:
+                gamename = f.readline()
+        if not map_rect:
+            map_rect = [561, 282, 1111, 666]
+        wincap = WindowCapture(gamename, map_rect)
+        vision = VisionRGB("plyrv2.jpg")
+        screenshot = wincap.get_screenshot()
+        output_image = cv2.blur(screenshot, (6, 6))
+        rgb_filter = RgbFilter(79, 129, 0, 140, 206, 65)
+        output_image = vision.apply_rgb_filter(output_image, rgb_filter)
+        rectangles = vision.find(
+            output_image, threshold=0.51, epsilon=0.5)
+        if len(rectangles) < 1:
+            return False, False
+        else:
+            points = vision.get_click_points(rectangles)
+            if rect_rel:
+                return points[0]
+            x = points[0][0] + map_rect[0]
+            y = points[0][1] + map_rect[1]
             return x, y
 
     def grab_level_rects():
