@@ -66,7 +66,7 @@ class Map10_MS30():
         time.sleep(0.25)
         room = self.rooms[0]
         # BotUtils.move_diagonal(int(room[1]), int(room[2]), self.speed)
-        outcome = BotUtils.move_bigmap_dynamic(int(room[3]), int(room[4]))
+        outcome = BotUtils.move_bigmap_dynamic(int(room[1]), int(room[2]))
         nodetcnt = 0
         while not outcome:
             nodetcnt += 1
@@ -76,7 +76,7 @@ class Map10_MS30():
             key = "right"
             CustomInput.press_key(CustomInput.key_map[key], key)
             CustomInput.release_key(CustomInput.key_map[key], key)
-            outcome = BotUtils.move_bigmap_dynamic(int(room[3]), int(room[4]))
+            outcome = BotUtils.move_bigmap_dynamic(int(room[1]), int(room[2]))
         time.sleep(0.4)
         self.roomclear_skill()
         time.sleep(0.6)
