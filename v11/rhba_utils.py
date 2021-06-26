@@ -163,6 +163,44 @@ class BotUtils:
         sorted_by_second = sorted(coords, key=lambda tup: tup[1], reverse=True)
         return sorted_by_second
 
+    def move_bigmap_dynamic(x, y, gamename=False, rect=False):
+        while not BotUtils.detect_bigmap_open(gamename):
+            BotUtils.try_toggle_map_clicking()
+        if not gamename:
+            with open("gamename.txt") as f:
+                gamename = f.readline()
+        # Then need to find where the player is
+        if not rect:
+            rect = [561, 282, 1111, 666]
+        playerx, playery = BotUtils.grab_player_posv2(gamename, rect)
+        if not playerx:
+            print("Didn't find player first time")
+            return False
+        relx = x - playerx
+        rely = playery - y
+        margin = 2
+        follower = Follower(margin)
+        noplyr_count = 0
+        while abs(relx) > margin or abs(rely) > margin:
+            rect = [playerx - 40, playery - 40, playerx + 40, playery + 40]
+            playerx, playery = BotUtils.grab_player_posv2(gamename, rect)
+            if playerx:
+                if noplyr_count > 0:
+                    noplyr_count -= 1
+                relx = x - playerx
+                rely = playery - y
+                follower.navigate_towards(relx, rely)
+            else:
+                noplyr_count += 1
+                if noplyr_count > 10:
+                    break
+            time.sleep(0.03)
+        BotUtils.close_map_and_menu(gamename)
+        if noplyr_count > 10:
+            return False
+        else:
+            return True
+
     # Angle is left->right travel of room angle, north being 0deg
     def move_diagonal(x, y, speed=20, rel=False, gamename=False, angle=90):
         # If not a direct relative move command
@@ -2906,15 +2944,16 @@ class QuestHandle():
 
 
 class Follower():
-    def __init__(self) -> None:
+    def __init__(self, margin=2) -> None:
         self.pressed_keys = []
         self.relx = 0
         self.rely = 0
+        self.margin = margin
 
     def navigate_towards(self, x, y):
         self.relx = x
         self.rely = y
-        if self.relx > 1:
+        if self.relx > self.margin:
             # Check if opposite key held down
             if "left" in self.pressed_keys:
                 self.pressed_keys.remove("left")
@@ -2925,7 +2964,7 @@ class Follower():
                 # Hold the key down
                 CustomInput.press_key(CustomInput.key_map["right"], "right")
 
-        elif self.relx < -1:
+        elif self.relx < -self.margin:
             # Check if opposite key held down
             if "right" in self.pressed_keys:
                 self.pressed_keys.remove("right")
@@ -2946,7 +2985,7 @@ class Follower():
                 CustomInput.release_key(CustomInput.key_map["left"], "left")
 
         # Handling for y-dir next
-        if self.rely > 1:
+        if self.rely > self.margin:
             # Check if opposite key held down
             if "down" in self.pressed_keys:
                 self.pressed_keys.remove("down")
@@ -2957,7 +2996,7 @@ class Follower():
                 # Hold the key down
                 CustomInput.press_key(CustomInput.key_map["up"], "up")
 
-        elif self.rely < -1:
+        elif self.rely < -self.margin:
             # Check if opposite key held down
             if "up" in self.pressed_keys:
                 self.pressed_keys.remove("up")
