@@ -444,7 +444,7 @@ class Map10_MS30():
             time.sleep(1)
         Looting.grab_nearby_loot(gamename)
         # Once event is complete move to correct place in room
-        self.move_to_loot_point(gamename)
+        self.move_to_loot_point()
         # And then commence looting
         print("Got to post-move to loot point")
         while Events.detect_in_dungeon():
@@ -573,13 +573,8 @@ class Map10_MS30():
             return True
         return False
 
-    def move_to_loot_point(self, gamename):
-        # Placeholder for now
-        CustomInput.press_key(CustomInput.key_map["right"], "right")
-        # CustomInput.press_key(CustomInput.key_map["up"], "up")
-        time.sleep(0.3)
-        CustomInput.release_key(CustomInput.key_map["right"], "right")
-        # CustomInput.release_key(CustomInput.key_map["up"], "up")
+    def move_to_loot_point(self):
+        BotUtils.move_bigmap_dynamic(1041, 627)
 
     def check_loot_preshop(self, gamename):
         # Move to primary lootpoint
@@ -773,7 +768,7 @@ class Map10_MS30():
             time.sleep(1)
         Looting.grab_nearby_loot(gamename)
         # Once event is complete move to correct place in room
-        self.move_to_loot_point(gamename)
+        self.move_to_loot_point()
         # And then commence looting
         # print("Got to post-move to loot point")
         while Events.detect_in_dungeon():
