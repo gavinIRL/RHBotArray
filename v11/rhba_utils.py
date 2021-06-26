@@ -2973,7 +2973,7 @@ class Follower():
                 self.pressed_keys.remove("left")
                 CustomInput.release_key(CustomInput.key_map["left"], "left")
             # Check that wasn't very recently pressed
-            if time.time() - self.last_press["right"] < 0.19:
+            if time.time() - self.last_press["right"] < 0.21:
                 pass
             # Check that not already being held down
             elif "right" not in self.pressed_keys:
@@ -2988,7 +2988,7 @@ class Follower():
                 self.pressed_keys.remove("right")
                 CustomInput.release_key(CustomInput.key_map["right"], "right")
             # Check that wasn't very recently pressed
-            if time.time() - self.last_press["left"] < 0.19:
+            if time.time() - self.last_press["left"] < 0.21:
                 pass
             # Check that not already being held down
             elif "left" not in self.pressed_keys:
@@ -3013,7 +3013,7 @@ class Follower():
                 self.pressed_keys.remove("down")
                 CustomInput.release_key(CustomInput.key_map["down"], "down")
             # Check that wasn't very recently pressed
-            if time.time() - self.last_press["up"] < 0.19:
+            if time.time() - self.last_press["up"] < 0.21:
                 pass
             # Check that not already being held down
             elif "up" not in self.pressed_keys:
@@ -3028,7 +3028,7 @@ class Follower():
                 self.pressed_keys.remove("up")
                 CustomInput.release_key(CustomInput.key_map["up"], "up")
             # Check that wasn't very recently pressed
-            if time.time() - self.last_press["down"] < 0.19:
+            if time.time() - self.last_press["down"] < 0.21:
                 pass
             # Check that not already being held down
             elif "down" not in self.pressed_keys:
