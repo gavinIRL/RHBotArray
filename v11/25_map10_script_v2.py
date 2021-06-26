@@ -158,7 +158,7 @@ class Map10_MS30():
         self.start_endlevel_scriptv2(self.gamename, repeat)
 
     def perform_midmap_event(self):
-        print("Midmap event detected")
+        # print("Midmap event detected")
         pydirectinput.press("esc")
 
     def cancel_momo_summon(self, gamename):
@@ -613,7 +613,7 @@ class Map10_MS30():
 
     def repeat_level(self, gamename):
         gold = BotUtils.detect_gold_amount(gamename)
-        print("Total map profit: {}g".format(gold-self.gold))
+        # print("Total map profit: {}g".format(gold-self.gold))
         self.gold = gold
         # Close the shop
         pydirectinput.press('esc')
@@ -827,9 +827,12 @@ if __name__ == "__main__":
         gamename = f.readline()
     time.sleep(2)
     num_loops = 10
+    start = time.time()
     map = Map10_MS30()
     for i in range(num_loops):
         if i == num_loops - 1:
             map.start(False)
         else:
             map.start(True)
+    timing = int((time.time()-start)/60)
+    print("{} loops took {}mins".format(num_loops, timing))
