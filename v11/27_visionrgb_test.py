@@ -24,8 +24,44 @@ class RgbFilter:
 
 class VisionRGB:
     TRACKBAR_WINDOW = "Trackbars"
+    needle_img = None
+    needle_w = 0
+    needle_h = 0
+    method = None
+
+    def __init__(self, needle_img_path, method=cv2.TM_CCOEFF_NORMED) -> None:
+        self.needle_img = cv2.imread(needle_img_path, cv2.IMREAD_UNCHANGED)
+        # Save the dimensions of the needle image
+        self.needle_w = self.needle_img.shape[1]
+        self.needle_h = self.needle_img.shape[0]
+        # TM_CCOEFF, TM_CCOEFF_NORMED, TM_CCORR, TM_CCORR_NORMED, TM_SQDIFF, TM_SQDIFF_NORMED
+        self.method = method
+
+    def find(self, haystack_img, threshold=0.7, max_results=15, epsilon=0.5):
+        # run the OpenCV algorithm
+        result = cv2.matchTemplate(haystack_img, self.needle_img, self.method)
+        # Grab results above threshold
+        locations = np.where(result >= threshold)
+        locations = list(zip(*locations[::-1]))
+        # if we found no results
+        if not locations:
+            return np.array([], dtype=np.int32).reshape(0, 4)
+        # First we need to create the list of [x, y, w, h] rectangles
+        rectangles = []
+        for loc in locations:
+            rect = [int(loc[0]), int(loc[1]), self.needle_w, self.needle_h]
+            # Add every box to the list twice in order to retain single (non-overlapping) boxes
+            rectangles.append(rect)
+            rectangles.append(rect)
+        # Apply group rectangles.
+        rectangles, _ = cv2.groupRectangles(
+            rectangles, groupThreshold=1, eps=epsilon)
+        if len(rectangles) > max_results:
+            rectangles = rectangles[:max_results]
+        return rectangles
 
     # create gui window with controls for adjusting arguments in real-time
+
     def init_control_gui(self):
         cv2.namedWindow(self.TRACKBAR_WINDOW, cv2.WINDOW_NORMAL)
         cv2.resizeWindow(self.TRACKBAR_WINDOW, 350, 400)
@@ -75,8 +111,10 @@ class VisionRGB:
 
 
 # Now the live filter stuff
-wincap = WindowCapture(custom_rect=[200, 150, 1400, 1200])
-
+# wincap = WindowCapture(custom_rect=[300, 150, 2100, 1100])
+with open("gamename.txt") as f:
+    gamename = f.readline()
+wincap = WindowCapture(gamename, [561, 282, 1111, 666])
 # initialize the Vision class
 vision_limestone = VisionRGB()
 vision_limestone.init_control_gui()
@@ -85,14 +123,11 @@ while(True):
 
     # get an updated image of the game
     screenshot = wincap.get_screenshot()
+    screenshot = cv2.blur(screenshot, (6, 6))
     # pre-process the image
     output_image = vision_limestone.apply_rgb_filter(screenshot)
     # display the processed image
     cv2.imshow('Matches', output_image)
-
-    # debug the loop rate
-    # print('FPS {}'.format(1 / (time() - loop_time)))
-    # loop_time = time()
 
     # press 'q' with the output window focused to exit.
     # waits 1 ms every loop to process key presses
