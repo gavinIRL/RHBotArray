@@ -177,8 +177,16 @@ class BotUtils:
             rect = [561, 282, 1111, 666]
         playerx, playery = BotUtils.grab_player_posv2(gamename, rect)
         if not playerx:
-            print("Didn't find player first time")
-            return False
+            if not checkmap:
+                time.sleep(0.5)
+                BotUtils.try_toggle_map()
+                time.sleep(0.005)
+                playerx, playery = BotUtils.grab_player_posv2(gamename, rect)
+                if not playerx:
+                    return False
+            else:
+                print("Didn't find player first time")
+                return False
         relx = x - playerx
         rely = playery - y
         margin = 1
