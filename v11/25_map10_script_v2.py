@@ -65,7 +65,8 @@ class Map10_MS30():
     def perform_room1(self):
         time.sleep(0.25)
         room = self.rooms[0]
-        BotUtils.move_diagonal(int(room[1]), int(room[2]), self.speed)
+        # BotUtils.move_diagonal(int(room[1]), int(room[2]), self.speed)
+        BotUtils.move_bigmap_dynamic(int(room[1]), int(room[2]))
         time.sleep(0.4)
         self.roomclear_skill()
         time.sleep(0.6)
@@ -99,7 +100,8 @@ class Map10_MS30():
         room = self.rooms[num-1]
         # print("{},{}".format(int(room[1]), int(room[2])))
         # print("Just about to move to next roomstart, room {}".format(num))
-        BotUtils.move_diagonal(int(room[3]), int(room[4]), self.speed)
+        # BotUtils.move_diagonal(int(room[3]), int(room[4]), self.speed)
+        BotUtils.move_bigmap_dynamic(int(room[3]), int(room[4]))
         # print("Finished moving to next roomstart, room {}".format(num))
         time.sleep(0.4)
         # Now calculate the travel time to figure out
@@ -113,7 +115,8 @@ class Map10_MS30():
             time.sleep(sleep_time)
         room = self.rooms[num]
         # print("Preparing to move to clear position, room {}".format(num))
-        BotUtils.move_diagonal(int(room[1]), int(room[2]), self.speed)
+        # BotUtils.move_diagonal(int(room[1]), int(room[2]), self.speed)
+        BotUtils.move_bigmap_dynamic(int(room[1]), int(room[2]))
         time.sleep(0.6)
         self.roomclear_skill()
         time.sleep(0.6)
