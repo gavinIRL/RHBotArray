@@ -205,4 +205,28 @@ def rgb_find_test():
             break
 
 
-rgb_find_test()
+def live_rgb_find_test():
+    with open("gamename.txt") as f:
+        gamename = f.readline()
+    wincap = WindowCapture(gamename, [561, 282, 1111, 666])
+    # initialize the Vision class
+    vision_limestone = VisionRGB("plyrv2.jpg")
+    rgb_filter = RgbFilter(79, 129, 0, 140, 206, 65)
+    detected = wincap.get_screenshot()
+    while True:
+        screenshot = wincap.get_screenshot()
+        output_image = cv2.blur(screenshot, (6, 6))
+        output_image = vision_limestone.apply_rgb_filter(
+            output_image, rgb_filter)
+        rectangles = vision_limestone.find(
+            output_image, threshold=0.51, epsilon=0.5)
+        if len(rectangles) > 0:
+            points = vision_limestone.get_click_points(rectangles)
+            detected = vision_limestone.draw_crosshairs(screenshot, points)
+        cv2.imshow('Matches', detected)
+        if cv2.waitKey(1) == ord('q'):
+            cv2.destroyAllWindows()
+            break
+
+
+live_rgb_find_test()
