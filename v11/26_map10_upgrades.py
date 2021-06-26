@@ -5,7 +5,7 @@ import cv2
 import math
 import ctypes
 import logging
-from rhba_utils import BotUtils, Events, SellRepair, RHClick, Looting, WindowCapture, Vision, HsvFilter
+from rhba_utils import BotUtils, Events, SellRepair, RHClick, Looting, WindowCapture, Vision, HsvFilter, Follower
 import pydirectinput
 import pytesseract
 from custom_input import CustomInput
@@ -86,6 +86,45 @@ def detect_enemies_overworld(gamename):
     return False
 
 
+def move_bigmap_dynamic(x, y, gamename=False, rect=False):
+    while not BotUtils.detect_bigmap_open(gamename):
+        BotUtils.try_toggle_map_clicking()
+    if not gamename:
+        with open("gamename.txt") as f:
+            gamename = f.readline()
+    # Then need to find where the player is
+    if not rect:
+        rect = [561, 282, 1111, 666]
+    playerx, playery = BotUtils.grab_player_posv2(gamename, rect)
+    if not playerx:
+        print("Didn't find player first time")
+        return False
+    relx = x - playerx
+    rely = playery - y
+    margin = 2
+    follower = Follower(margin)
+    noplyr_count = 0
+    while abs(relx) > margin or abs(rely) > margin:
+        rect = [playerx - 40, playery - 40, playerx + 40, playery + 40]
+        playerx, playery = BotUtils.grab_player_posv2(gamename, rect)
+        if playerx:
+            if noplyr_count > 0:
+                noplyr_count -= 1
+            relx = x - playerx
+            rely = playery - y
+            follower.navigate_towards(relx, rely)
+        else:
+            noplyr_count += 1
+            if noplyr_count > 10:
+                break
+        time.sleep(0.03)
+    BotUtils.close_map_and_menu(gamename)
+    if noplyr_count > 10:
+        return False
+    else:
+        return True
+
+
 time.sleep(1.5)
 with open("gamename.txt") as f:
     gamename = f.readline()
@@ -93,4 +132,5 @@ with open("gamename.txt") as f:
 # detect_gold_amount(gamename)
 # print(Events.detect_move_reward_screen(gamename))
 # grab_obscured_loot(gamename)
-detect_enemies_overworld(gamename)
+# detect_enemies_overworld(gamename)
+move_bigmap_dynamic(663, 635)
