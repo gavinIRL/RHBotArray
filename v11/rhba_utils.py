@@ -650,8 +650,9 @@ class BotUtils:
             if d+e+f > 760:
                 if g+h+i > 760:
                     # print("ABC:{},{},{}-DEF:{},{},{}".format(a, b, c, d, e, f))
-                    # wincap = WindowCapture(gamename, custom_rect=[
-                    #     464-100, 640, 464+461, 741])
+                    # wincap = WindowCapture(gamename)
+                    # # wincap = WindowCapture(gamename, custom_rect=[
+                    # #     464+29, 640, 464+261, 741])
                     # image = wincap.get_screenshot()
                     # cv2.imwrite("C:\\Games\\" +
                     #             str(random.randint(1, 1000)) + ".jpg", image)
@@ -697,7 +698,19 @@ class BotUtils:
         tess_config = '--psm 8 --oem 3 -c tessedit_char_whitelist=0123456789,'
         result = pytesseract.image_to_string(
             image, lang='eng', config=tess_config)[:-2].replace(",", "")
-        return int(result)
+        try:
+            return int(result)
+        except:
+            image = wincap.get_screenshot()
+            cv2.imwrite("testytest.jpg", image)
+            tess_config = '--psm 8 --oem 3 -c tessedit_char_whitelist=0123456789,'
+            result = pytesseract.image_to_string(
+                image, lang='eng', config=tess_config)[:-2].replace(",", "")
+            try:
+                return int(result)
+            except:
+                print("Unable to detect gold value, see image saved")
+                return 0
 
     def detect_petmenu_open(gamename=False):
         if not gamename:
@@ -1128,6 +1141,28 @@ class Looting:
                     pydirectinput.press("x")
                     count += 1
                     time.sleep(0.23)
+        if Looting.check_for_nearby_obscured_loot(gamename):
+            Looting.grab_obscured_loot(gamename)
+
+    def grab_obscured_loot(gamename):
+        CustomInput.press_key(CustomInput.key_map["up"], "up")
+        start = time.time()
+        check_again = False
+        while not BotUtils.detect_xprompt(gamename):
+            time.sleep(0.003)
+            if time.time() - start > 0.5:
+                check_again = True
+                break
+        CustomInput.release_key(CustomInput.key_map["up"], "up")
+        count = 0
+        while BotUtils.detect_xprompt(gamename):
+            if count > 12:
+                break
+            pydirectinput.press("x")
+            count += 1
+            time.sleep(0.23)
+        if check_again:
+            Looting.grab_all_visible_lootv2(gamename)
 
     def check_for_loot(gamename):
         # This will be a lightweight check for any positive loot ident
