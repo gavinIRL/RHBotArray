@@ -699,7 +699,7 @@ class BotUtils:
             return int(result)
         except:
             image = wincap.get_screenshot()
-            cv2.imwrite("testytest.jpg", image)
+            # cv2.imwrite("testytest.jpg", image)
             tess_config = '--psm 8 --oem 3 -c tessedit_char_whitelist=0123456789,'
             result = pytesseract.image_to_string(
                 image, lang='eng', config=tess_config)[:-2].replace(",", "")
@@ -728,30 +728,26 @@ class BotUtils:
             with open("gamename.txt") as f:
                 gamename = f.readline()
         if not map_rect:
-            wincap = WindowCapture(gamename, [561, 282, 1111, 666])
-        else:
-            wincap = WindowCapture(gamename, map_rect)
+            map_rect = [561, 282, 1111, 666]
+        wincap = WindowCapture(gamename, map_rect)
         filter = HsvFilter(34, 160, 122, 50, 255, 255, 0, 0, 0, 0)
         image = wincap.get_screenshot()
         save_image = BotUtils.filter_blackwhite_invert(filter, image)
+        # cv2.imwrite("C:\\Games\\first" +
+        #             str(random.randint(0, 10000))+".jpg", save_image)
         vision = Vision('plyr.jpg')
         rectangles = vision.find(
             save_image, threshold=0.31, epsilon=0.5)
         if len(rectangles) < 1:
             return False, False
         points = vision.get_click_points(rectangles)
+        output_image = vision.draw_crosshairs(image, points)
         x, y = points[0]
-        if not map_rect:
-            x += 561
-            y += 282
-            return x, y
-        elif rect_rel:
-            x += map_rect[0]
-            y += map_rect[1]
+        if rect_rel:
             return x, y
         else:
-            x += wincap.window_rect[0]
-            y += wincap.window_rect[1]
+            x += map_rect[0]
+            y += map_rect[1]
             return x, y
 
     def grab_level_rects():
