@@ -646,16 +646,13 @@ class BotUtils:
         a, b, c = [int(i) for i in image[0][0]]
         d, e, f = [int(i) for i in image[0][127]]
         g, h, i = [int(i) for i in image[0][-1]]
+        j, k, l = [int(i) for i in image[0][163]]
+        if j+k+l > 760:
+            # This is a false positive
+            return False
         if a+b+c > 760:
             if d+e+f > 760:
                 if g+h+i > 760:
-                    # print("ABC:{},{},{}-DEF:{},{},{}".format(a, b, c, d, e, f))
-                    # wincap = WindowCapture(gamename)
-                    # # wincap = WindowCapture(gamename, custom_rect=[
-                    # #     464+29, 640, 464+261, 741])
-                    # image = wincap.get_screenshot()
-                    # cv2.imwrite("C:\\Games\\" +
-                    #             str(random.randint(1, 1000)) + ".jpg", image)
                     return True
         return False
 
