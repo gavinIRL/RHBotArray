@@ -724,6 +724,115 @@ class Map10_MS30():
         # And then perform the preset initial moves
         self.perform_boss_moves()
 
+    def start_endlevel_script_test(self, gamename, repeat=False):
+        # Need to first wait until dungeon check returns false
+        while Events.detect_in_dungeon():
+            time.sleep(0.006)
+        print("Got to boss cinematic")
+        # Then until sect cleared shows up
+        while not Events.detect_in_dungeon():
+            pydirectinput.press('esc')
+            time.sleep(0.05)
+            BotUtils.close_map_and_menu(gamename)
+            time.sleep(0.25)
+            print("First loop")
+        print("Got to pre-endlevel event check")
+        # Then wait for end-level event to show up
+        time.sleep(1.5)
+        start_time = time.time()
+        event = False
+        while not Events.detect_move_reward_screen(gamename):
+            time.sleep(0.006)
+            if time.time() > start_time + 2.5:
+                print("Exited loop #2 due to timer")
+                break
+            if Events.detect_move_reward_screen(gamename):
+                print("Detected move reward in second loop")
+                break
+            if Events.detect_endlevel_bonus_area(gamename):
+                print("Detected event in second loop")
+                event = True
+                break
+            if not Events.detect_in_dungeon():
+                print("Got into the no detect in dungeon loop #2")
+                # Press escape
+                pydirectinput.press('esc')
+                # time.sleep(0.05)
+                # BotUtils.close_map_and_menu(gamename)
+                # # Wait 2 seconds
+                # time.sleep(0.5)
+                # # Then if ok is detected turn flag on
+                # if Events.detect_endlevel_bonus_area(gamename):
+                #     print("Detected event in second loop second branch")
+                #     event = True
+                # break
+        print("Got to pre-endlevel event check")
+        # Then wait for end-level event to show up
+        # event = False
+        # start_time = time.time()
+        # while True:
+        #     time.sleep(0.006)
+        #     if time.time() - start_time > 3.5:
+        #         break
+        #     if not Events.detect_in_dungeon():
+        #         # Press escape
+        #         pydirectinput.press('esc')
+        #         # Wait 2 seconds
+        #         time.sleep(0.5)
+        #         if Events.detect_move_reward_screen(gamename):
+        #             print("Managed to detect the skip to reward screen option loop #3")
+        #             break
+        #         # Then if ok is detected turn flag on
+        #         if Events.detect_endlevel_bonus_area(gamename):
+        #             event = True
+        #         break
+        # Then do the appropriate handling if event is detected
+        print("Got to pre-event handling")
+        if event:
+            self.do_otherworld_handling(gamename)
+            time.sleep(1)
+        Looting.grab_nearby_loot(gamename)
+        # Once event is complete move to correct place in room
+        self.move_to_loot_point(gamename)
+        # And then commence looting
+        print("Got to post-move to loot point")
+        while Events.detect_in_dungeon():
+            if not self.loot_everything(gamename):
+                # Try once more to loot
+                Looting.grab_nearby_loot(gamename)
+                self.loot_everything(gamename)
+                # Click centre of screen to skip
+                self.skip_to_reward(gamename)
+                break
+        print("Got to pre-card check")
+        # Then wait until card select appears
+        while not Events.detect_reward_choice_open(gamename):
+            time.sleep(0.2)
+        print("Got to pre-choose reward")
+        # Then wait until the cards become selectable
+        time.sleep(4)
+        # Then choose a random card
+        Events.choose_random_reward(gamename)
+        # Then wait until store is detected
+        print("Got to pre-shop check")
+        while not Events.detect_store(gamename):
+            time.sleep(0.2)
+        print("Got to pre-sellrepair")
+        # Then wait to see if chest event appears
+        time.sleep(2)
+        if Events.detect_endlevel_chest(gamename):
+            pydirectinput.press('esc')
+            time.sleep(0.05)
+        # Then check for loot one last time
+        self.check_loot_preshop(gamename)
+        # And then perform the sell and repair actions
+        sr = SellRepair()
+        sr.ident_sell_repair()
+        # And then go to next level if needs be
+        print("Got to pre-restart")
+        if repeat:
+            self.repeat_level(gamename)
+
 
 if __name__ == "__main__":
     with open("gamename.txt") as f:
