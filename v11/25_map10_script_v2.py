@@ -582,14 +582,8 @@ class Map10_MS30():
         # CustomInput.release_key(CustomInput.key_map["up"], "up")
 
     def check_loot_preshop(self, gamename):
-        # Simple placeholder for now
-        CustomInput.press_key(CustomInput.key_map["right"], "right")
-        start_time = time.time()
-        while time.time() - start_time < 1.5:
-            if Looting.check_for_lootv2(gamename):
-                CustomInput.release_key(CustomInput.key_map["right"], "right")
-                self.loot_everything(gamename)
-        CustomInput.release_key(CustomInput.key_map["right"], "right")
+        # Move to primary lootpoint
+        BotUtils.move_bigmap_dynamic(1041, 627)
         # Then perform one final check
         time.sleep(0.1)
         if Looting.check_for_lootv2(gamename):
