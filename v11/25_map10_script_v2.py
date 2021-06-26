@@ -390,8 +390,8 @@ class Map10_MS30():
             pydirectinput.press('esc')
             time.sleep(0.05)
             BotUtils.close_map_and_menu(gamename)
-            time.sleep(0.05)
-            print("Stuck in the first loop")
+            time.sleep(0.25)
+            # print("Stuck in the first loop")
         # print("Got to pre-endlevel event check")
         # Then wait for end-level event to show up
         start_time = time.time()
@@ -515,11 +515,18 @@ class Map10_MS30():
         time.sleep(0.005)
         CustomInput.release_key(CustomInput.key_map["h"])
         start_time = time.time()
-        while self.detect_enemies_overworld(gamename):
+        counter = 10
+        while counter > 0:
+            if self.detect_enemies_overworld(gamename):
+                if counter < 20:
+                    counter += 1
+            else:
+                counter -= 1
             self.continue_otherworld_attacks()
             if time.time()-start_time > 20:
                 print("need to move closer to detected enemies")
-                os._exit(1)
+                start_time = time.time() - 5
+                # os._exit(1)
 
     def continue_otherworld_attacks(self):
         for key in ["a", "g", "f", "h"]:
@@ -559,8 +566,14 @@ class Map10_MS30():
         time.sleep(3)
 
     def detect_enemies_overworld(self, gamename):
-        if not BotUtils.detect_bigmap_open(gamename):
-            BotUtils.try_toggle_map()
+        count = 0
+        while not BotUtils.detect_bigmap_open(gamename):
+            count += 1
+            if count % 2 == 0:
+                BotUtils.try_toggle_map()
+            else:
+                BotUtils.try_toggle_map_clicking()
+            time.sleep(0.008)
         wincap = WindowCapture(gamename, [530, 331, 781, 580])
         othr_plyr_vision = Vision("otherplayerinvert.jpg")
         image = wincap.get_screenshot()
@@ -713,11 +726,14 @@ class Map10_MS30():
 
 
 if __name__ == "__main__":
+    with open("gamename.txt") as f:
+        gamename = f.readline()
     time.sleep(2)
-    num_loops = 2
+    num_loops = 10
     map = Map10_MS30()
-    for i in range(num_loops):
-        if i == num_loops - 1:
-            map.start(False)
-        else:
-            map.start(True)
+    map.start_endlevel_script_test(gamename)
+    # for i in range(num_loops):
+    #     if i == num_loops - 1:
+    #         map.start(False)
+    #     else:
+    #         map.start(True)
