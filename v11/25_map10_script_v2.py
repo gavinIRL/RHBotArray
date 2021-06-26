@@ -195,7 +195,7 @@ class Map10_MS30():
         if not currx:
             if not BotUtils.BotUtils.detect_bigmap_open(self.gamename):
                 BotUtils.try_toggle_map_clicking(self.gamename)
-            currx, curry = BotUtils.grab_player_pos(
+            currx, curry = BotUtils.grab_player_posv2(
                 self.gamename, [x-75, y-75, x+75, y+75])
             BotUtils.close_map_and_menu(self.gamename)
         xdist = abs(currx - int(x))
@@ -204,7 +204,7 @@ class Map10_MS30():
         smaller = min(xdist, ydist)
         diag = math.hypot(smaller, smaller)
         travel_time = (diag + max(xdist, ydist) - smaller)/self.speed
-        return travel_time + 0.1
+        return travel_time
 
     def roomclear_skill(self):
         CustomInput.press_key(CustomInput.key_map["h"])
@@ -535,35 +535,21 @@ class Map10_MS30():
             CustomInput.release_key(CustomInput.key_map[key], key)
 
     def navigate_otherworld_loot(self, gamename):
-        if not BotUtils.detect_bigmap_open(gamename):
-            BotUtils.try_toggle_map()
-        player_pos = BotUtils.grab_player_pos()
-        BotUtils.try_toggle_map()
-        relx = player_pos[0] - 590
-        rely = 468 - player_pos[1]
-        BotUtils.move_diagonal(relx, rely, 50, True)
-        relx = 590 - 667
-        rely = 407 - 468
-        BotUtils.move_diagonal(relx, rely, 50, True)
+        BotUtils.move_bigmap_dynamic(590, 468)
+        BotUtils.move_bigmap_dynamic(667, 407)
         while BotUtils.detect_bigmap_open(gamename):
             BotUtils.try_toggle_map()
             time.sleep(0.01)
         self.loot_everything(gamename)
         # Then have a second bite at looting
-        BotUtils.move_diagonal(50, 0, 50, True)
+        BotUtils.move_bigmap_dynamic(667, 407)
         self.loot_everything(gamename)
 
     def leave_otherworld(self, gamename):
-        if not BotUtils.detect_bigmap_open(gamename):
-            BotUtils.try_toggle_map()
-        player_pos = BotUtils.grab_player_pos()
-        BotUtils.try_toggle_map()
-        relx = player_pos[0] - 667
-        rely = 455 - player_pos[1]
-        BotUtils.move_diagonal(relx, rely, 50, True)
-        time.sleep(1)
+        BotUtils.move_bigmap_dynamic(667, 455)
+        time.sleep(0.5)
         RHClick.click_yes(gamename)
-        time.sleep(3)
+        time.sleep(2.5)
 
     def detect_enemies_overworld(self, gamename):
         count = 0
