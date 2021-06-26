@@ -180,29 +180,34 @@ def live_filter_chooser():
 def rgb_find_test():
     with open("gamename.txt") as f:
         gamename = f.readline()
-    wincap = WindowCapture(gamename, [561, 282, 1111, 666])
+    rect = [561, 282, 1111, 666]
+    wincap = WindowCapture(gamename, rect)
     # initialize the Vision class
-    vision_limestone = VisionRGB("plyr.jpg")
+    vision_limestone = VisionRGB("plyrv2.jpg")
     screenshot = wincap.get_screenshot()
     output_image = cv2.blur(screenshot, (6, 6))
     # pre-process the image
     rgb_filter = RgbFilter(79, 129, 0, 140, 206, 65)
     output_image = vision_limestone.apply_rgb_filter(output_image, rgb_filter)
-    cv2.imwrite("testytest.jpg", output_image)
+    # cv2.imwrite("testytest.jpg", output_image)
     rectangles = vision_limestone.find(
-        output_image, threshold=0.61, epsilon=0.5)
+        output_image, threshold=0.51, epsilon=0.5)
     if len(rectangles) < 1:
         print("Didn't find player")
         return False
-    points = vision_limestone.get_click_points(rectangles)
-    output_image = vision_limestone.draw_crosshairs(screenshot, points)
-    cv2.imwrite("testypoints.jpg", output_image)
-    while True:
-        time.sleep(0.1)
-        cv2.imshow('Matches', output_image)
-        if cv2.waitKey(1) == ord('q'):
-            cv2.destroyAllWindows()
-            break
+    else:
+        points = vision_limestone.get_click_points(rectangles)
+        output_image = vision_limestone.draw_crosshairs(screenshot, points)
+        cv2.imwrite("testypoints.jpg", output_image)
+        x = points[0][0] + rect[0]
+        y = points[0][1] + rect[1]
+        return x, y
+    # while True:
+    #     time.sleep(0.1)
+    #     cv2.imshow('Matches', output_image)
+    #     if cv2.waitKey(1) == ord('q'):
+    #         cv2.destroyAllWindows()
+    #         break
 
 
 def live_rgb_find_test():
@@ -229,4 +234,10 @@ def live_rgb_find_test():
             break
 
 
-live_rgb_find_test()
+start = time.time()
+print(rgb_find_test())
+print("time taken for rgb: {}s".format(time.time()-start))
+
+start = time.time()
+print(BotUtils.grab_player_pos(map_rect=[561, 282, 1111, 666]))
+print("time taken for hsv: {}s".format(time.time()-start))
