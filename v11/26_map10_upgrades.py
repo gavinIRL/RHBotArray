@@ -125,6 +125,17 @@ def move_bigmap_dynamic(x, y, gamename=False, rect=False):
         return True
 
 
+def dodge_time_check(time_sleep=0.1):
+    key = "right"
+    CustomInput.press_key(CustomInput.key_map[key], key)
+    time.sleep(0.01)
+    CustomInput.release_key(CustomInput.key_map[key], key)
+    time.sleep(time_sleep)
+    CustomInput.press_key(CustomInput.key_map[key], key)
+    time.sleep(0.01)
+    CustomInput.release_key(CustomInput.key_map[key], key)
+
+
 time.sleep(1.5)
 with open("gamename.txt") as f:
     gamename = f.readline()
@@ -133,4 +144,5 @@ with open("gamename.txt") as f:
 # print(Events.detect_move_reward_screen(gamename))
 # grab_obscured_loot(gamename)
 # detect_enemies_overworld(gamename)
-move_bigmap_dynamic(663, 635)
+# move_bigmap_dynamic(663, 635)
+dodge_time_check(0.19)
