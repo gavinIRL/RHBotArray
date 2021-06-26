@@ -110,29 +110,44 @@ class VisionRGB:
         return cv2.max(original_image, combined_mask_rgb)
 
 
-# Now the live filter stuff
-# wincap = WindowCapture(custom_rect=[300, 150, 2100, 1100])
-with open("gamename.txt") as f:
-    gamename = f.readline()
-wincap = WindowCapture(gamename, [561, 282, 1111, 666])
-# initialize the Vision class
-vision_limestone = VisionRGB()
-vision_limestone.init_control_gui()
+def live_filter_chooser():
+    # Now the live filter stuff
+    # wincap = WindowCapture(custom_rect=[300, 150, 2100, 1100])
+    with open("gamename.txt") as f:
+        gamename = f.readline()
+    wincap = WindowCapture(gamename, [561, 282, 1111, 666])
+    # initialize the Vision class
+    vision_limestone = VisionRGB("plyr.jpg")
+    vision_limestone.init_control_gui()
 
-while(True):
+    while(True):
 
-    # get an updated image of the game
+        # get an updated image of the game
+        screenshot = wincap.get_screenshot()
+        screenshot = cv2.blur(screenshot, (6, 6))
+        # pre-process the image
+        output_image = vision_limestone.apply_rgb_filter(screenshot)
+        # display the processed image
+        cv2.imshow('Matches', output_image)
+
+        # press 'q' with the output window focused to exit.
+        # waits 1 ms every loop to process key presses
+        if cv2.waitKey(1) == ord('q'):
+            cv2.destroyAllWindows()
+            break
+
+    print('Done.')
+
+
+def rgb_find_test():
+    with open("gamename.txt") as f:
+        gamename = f.readline()
+    wincap = WindowCapture(gamename, [561, 282, 1111, 666])
+    # initialize the Vision class
+    vision_limestone = VisionRGB("plyr.jpg")
     screenshot = wincap.get_screenshot()
     screenshot = cv2.blur(screenshot, (6, 6))
     # pre-process the image
     output_image = vision_limestone.apply_rgb_filter(screenshot)
-    # display the processed image
-    cv2.imshow('Matches', output_image)
-
-    # press 'q' with the output window focused to exit.
-    # waits 1 ms every loop to process key presses
-    if cv2.waitKey(1) == ord('q'):
-        cv2.destroyAllWindows()
-        break
-
-print('Done.')
+    rectangles = vision_limestone.find(
+        output_image, threshold=0.61, epsilon=0.5)
