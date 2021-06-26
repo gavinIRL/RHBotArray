@@ -41,10 +41,34 @@ def detect_gold_amount(gamename):
     tess_config = '--psm 8 --oem 3 -c tessedit_char_whitelist=0123456789,'
     result = pytesseract.image_to_string(
         image, lang='eng', config=tess_config)[:-2].replace(",", "")
-    print(result)
+    return result
 
 
+def grab_obscured_loot(gamename):
+    CustomInput.press_key(CustomInput.key_map["up"], "up")
+    start = time.time()
+    check_again = False
+    while not BotUtils.detect_xprompt(gamename):
+        time.sleep(0.003)
+        if time.time() - start > 0.5:
+            check_again = True
+            break
+    CustomInput.release_key(CustomInput.key_map["up"], "up")
+    count = 0
+    while BotUtils.detect_xprompt(gamename):
+        if count > 12:
+            break
+        pydirectinput.press("x")
+        count += 1
+        time.sleep(0.23)
+    if check_again:
+        Looting.grab_all_visible_lootv2(gamename)
+
+
+time.sleep(1.5)
 with open("gamename.txt") as f:
     gamename = f.readline()
-    # check_petmenu_open(gamename)
-    detect_gold_amount(gamename)
+# check_petmenu_open(gamename)
+# detect_gold_amount(gamename)
+# print(Events.detect_move_reward_screen(gamename))
+grab_obscured_loot(gamename)
