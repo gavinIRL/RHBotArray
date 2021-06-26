@@ -114,10 +114,11 @@ class Map10_MS30():
         if sleep_time > 0:
             time.sleep(sleep_time)
         room = self.rooms[num]
-        # print("Preparing to move to clear position, room {}".format(num))
+        # print("Trvel time for room {} is {}s".format(num, travel_time))
         # BotUtils.move_diagonal(int(room[1]), int(room[2]), self.speed)
         BotUtils.move_bigmap_dynamic(int(room[1]), int(room[2]))
-        time.sleep(0.6)
+        if travel_time < 1.8:
+            time.sleep(0.6)
         self.roomclear_skill()
         time.sleep(0.6)
         aim_cd = time.time()
@@ -217,7 +218,7 @@ class Map10_MS30():
 
     def continue_clear(self):
         available = self.grab_off_cooldown(
-            ["a", "g", "f", "s", "d", "h"], self.gamename)
+            ["h", "a", "g", "f", "s", "d"], self.gamename)
         if not available:
             # Need to dodge right and left?
             return False
@@ -816,7 +817,7 @@ if __name__ == "__main__":
     with open("gamename.txt") as f:
         gamename = f.readline()
     time.sleep(2)
-    num_loops = 3
+    num_loops = 10
     map = Map10_MS30()
     for i in range(num_loops):
         if i == num_loops - 1:
