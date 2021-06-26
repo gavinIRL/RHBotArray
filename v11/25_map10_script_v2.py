@@ -66,7 +66,17 @@ class Map10_MS30():
         time.sleep(0.25)
         room = self.rooms[0]
         # BotUtils.move_diagonal(int(room[1]), int(room[2]), self.speed)
-        BotUtils.move_bigmap_dynamic(int(room[1]), int(room[2]))
+        outcome = BotUtils.move_bigmap_dynamic(int(room[3]), int(room[4]))
+        nodetcnt = 0
+        while not outcome:
+            nodetcnt += 1
+            if nodetcnt > 10:
+                print("QUIT DUE TO CATASTROPHIC ERROR WITH NAVIGATION")
+                os._exit(1)
+            key = "right"
+            CustomInput.press_key(CustomInput.key_map[key], key)
+            CustomInput.release_key(CustomInput.key_map[key], key)
+            outcome = BotUtils.move_bigmap_dynamic(int(room[3]), int(room[4]))
         time.sleep(0.4)
         self.roomclear_skill()
         time.sleep(0.6)
@@ -101,7 +111,17 @@ class Map10_MS30():
         # print("{},{}".format(int(room[1]), int(room[2])))
         # print("Just about to move to next roomstart, room {}".format(num))
         # BotUtils.move_diagonal(int(room[3]), int(room[4]), self.speed)
-        BotUtils.move_bigmap_dynamic(int(room[3]), int(room[4]))
+        outcome = BotUtils.move_bigmap_dynamic(int(room[3]), int(room[4]))
+        nodetcnt = 0
+        while not outcome:
+            nodetcnt += 1
+            if nodetcnt > 10:
+                print("QUIT DUE TO CATASTROPHIC ERROR WITH NAVIGATION")
+                os._exit(1)
+            key = "right"
+            CustomInput.press_key(CustomInput.key_map[key], key)
+            CustomInput.release_key(CustomInput.key_map[key], key)
+            outcome = BotUtils.move_bigmap_dynamic(int(room[3]), int(room[4]))
         # print("Finished moving to next roomstart, room {}".format(num))
         time.sleep(0.4)
         # Now calculate the travel time to figure out
@@ -116,7 +136,17 @@ class Map10_MS30():
         room = self.rooms[num]
         # print("Trvel time for room {} is {}s".format(num, travel_time))
         # BotUtils.move_diagonal(int(room[1]), int(room[2]), self.speed)
-        BotUtils.move_bigmap_dynamic(int(room[1]), int(room[2]))
+        outcome = BotUtils.move_bigmap_dynamic(int(room[1]), int(room[2]))
+        nodetcnt = 0
+        while not outcome:
+            nodetcnt += 1
+            if nodetcnt > 10:
+                print("QUIT DUE TO CATASTROPHIC ERROR WITH NAVIGATION")
+                os._exit(1)
+            key = "right"
+            CustomInput.press_key(CustomInput.key_map[key], key)
+            CustomInput.release_key(CustomInput.key_map[key], key)
+            outcome = BotUtils.move_bigmap_dynamic(int(room[1]), int(room[2]))
         if travel_time < 1.8:
             time.sleep(0.6)
         self.roomclear_skill()
