@@ -109,6 +109,44 @@ class VisionRGB:
         combined_mask_rgb = cv2.cvtColor(combined_mask_inv, cv2.COLOR_GRAY2BGR)
         return cv2.max(original_image, combined_mask_rgb)
 
+    def get_click_points(self, rectangles):
+        points = []
+        # Loop over all the rectangles
+        for (x, y, w, h) in rectangles:
+            # Determine the center position
+            center_x = x + int(w/2)
+            center_y = y + int(h/2)
+            # Save the points
+            points.append((center_x, center_y))
+
+        return points
+
+    def draw_rectangles(self, haystack_img, rectangles):
+        # these colors are actually BGR
+        line_color = (0, 255, 0)
+        line_type = cv2.LINE_4
+
+        for (x, y, w, h) in rectangles:
+            # determine the box positions
+            top_left = (x, y)
+            bottom_right = (x + w, y + h)
+            # draw the box
+            cv2.rectangle(haystack_img, top_left, bottom_right,
+                          line_color, lineType=line_type)
+
+        return haystack_img
+
+    def draw_crosshairs(self, haystack_img, points):
+        marker_color = (255, 0, 255)
+        marker_type = cv2.MARKER_CROSS
+
+        for (center_x, center_y) in points:
+            # draw the center point
+            cv2.drawMarker(haystack_img, (center_x, center_y),
+                           marker_color, marker_type)
+
+        return haystack_img
+
 
 def live_filter_chooser():
     # Now the live filter stuff
@@ -146,8 +184,25 @@ def rgb_find_test():
     # initialize the Vision class
     vision_limestone = VisionRGB("plyr.jpg")
     screenshot = wincap.get_screenshot()
-    screenshot = cv2.blur(screenshot, (6, 6))
+    output_image = cv2.blur(screenshot, (6, 6))
     # pre-process the image
-    output_image = vision_limestone.apply_rgb_filter(screenshot)
+    rgb_filter = RgbFilter(79, 129, 0, 140, 206, 65)
+    output_image = vision_limestone.apply_rgb_filter(output_image, rgb_filter)
+    cv2.imwrite("testytest.jpg", output_image)
     rectangles = vision_limestone.find(
         output_image, threshold=0.61, epsilon=0.5)
+    if len(rectangles) < 1:
+        print("Didn't find player")
+        return False
+    points = vision_limestone.get_click_points(rectangles)
+    output_image = vision_limestone.draw_crosshairs(screenshot, points)
+    cv2.imwrite("testypoints.jpg", output_image)
+    while True:
+        time.sleep(0.1)
+        cv2.imshow('Matches', output_image)
+        if cv2.waitKey(1) == ord('q'):
+            cv2.destroyAllWindows()
+            break
+
+
+rgb_find_test()
