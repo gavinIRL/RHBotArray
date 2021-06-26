@@ -65,10 +65,32 @@ def grab_obscured_loot(gamename):
         Looting.grab_all_visible_lootv2(gamename)
 
 
+def detect_enemies_overworld(gamename):
+    # if not BotUtils.detect_bigmap_open(gamename):
+    #     BotUtils.try_toggle_map()
+    # wincap = WindowCapture(gamename, [530, 331, 781, 580])
+    othr_plyr_vision = Vision("otherplayerinvert.jpg")
+    orig_image = cv2.imread("testycont.jpg")
+    orig_image = orig_image[331:580, 530:781]
+    filter = HsvFilter(0, 198, 141, 8, 255, 255, 0, 0, 0, 0)
+    image = cv2.blur(orig_image, (4, 4))
+    image = BotUtils.filter_blackwhite_invert(filter, image)
+    cv2.imwrite("testytest.jpg", image)
+    rectangles = othr_plyr_vision.find(
+        image, threshold=0.41, epsilon=0.5)
+    points = othr_plyr_vision.get_click_points(rectangles)
+    if len(points) >= 1:
+        output_image = othr_plyr_vision.draw_crosshairs(orig_image, points)
+        cv2.imwrite("testypoints.jpg", output_image)
+        return True
+    return False
+
+
 time.sleep(1.5)
 with open("gamename.txt") as f:
     gamename = f.readline()
 # check_petmenu_open(gamename)
 # detect_gold_amount(gamename)
 # print(Events.detect_move_reward_screen(gamename))
-grab_obscured_loot(gamename)
+# grab_obscured_loot(gamename)
+detect_enemies_overworld(gamename)
