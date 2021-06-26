@@ -577,11 +577,11 @@ class Map10_MS30():
         return False
 
     def move_to_loot_point(self):
-        BotUtils.move_bigmap_dynamic(1041, 627)
+        BotUtils.move_bigmap_dynamic(1041, 627, checkmap=False)
 
     def check_loot_preshop(self, gamename):
         # Move to primary lootpoint
-        BotUtils.move_bigmap_dynamic(1041, 627)
+        BotUtils.move_bigmap_dynamic(1041, 627, checkmap=False)
         # Then perform one final check
         time.sleep(0.1)
         if Looting.check_for_lootv2(gamename):
@@ -816,7 +816,7 @@ if __name__ == "__main__":
     with open("gamename.txt") as f:
         gamename = f.readline()
     time.sleep(2)
-    num_loops = 10
+    num_loops = 3
     map = Map10_MS30()
     for i in range(num_loops):
         if i == num_loops - 1:
