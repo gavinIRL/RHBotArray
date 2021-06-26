@@ -184,14 +184,16 @@ class Map10_MS30():
         pydirectinput.click(x+713, y+682)
         time.sleep(0.1)
         # Now empty first 3 inventory slots
+        pydirectinput.click(x+471, y+178)
+        time.sleep(0.05)
         pydirectinput.rightClick(x+683, y+277)
-        time.sleep(0.1)
+        time.sleep(0.05)
         pydirectinput.rightClick(x+728, y+277)
-        time.sleep(0.1)
-        pydirectinput.rightClick(x+772, y+277)
-        time.sleep(0.1)
-        pydirectinput.rightClick(x+814, y+277)
-        time.sleep(0.1)
+        time.sleep(0.05)
+        # pydirectinput.rightClick(x+772, y+277)
+        # time.sleep(0.1)
+        # pydirectinput.rightClick(x+814, y+277)
+        # time.sleep(0.1)
         pydirectinput.press("esc")
         time.sleep(0.1)
 
@@ -435,7 +437,7 @@ class Map10_MS30():
                 # Wait 2 seconds
                 time.sleep(0.5)
                 if Events.detect_move_reward_screen(gamename):
-                    print("Managed to detect the skip to reward screen option #2")
+                    # print("Managed to detect the skip to reward screen option #2")
                     break
                 # Then if ok is detected turn flag on
                 if Events.detect_endlevel_bonus_area(gamename):
@@ -456,7 +458,13 @@ class Map10_MS30():
                 # Try once more to loot
                 Looting.grab_nearby_loot(gamename)
                 self.loot_everything(gamename)
+                # And one final time
+                pydirectinput.press("right")
+                Looting.grab_nearby_loot(gamename)
+                self.loot_everything(gamename)
                 # Click centre of screen to skip
+                self.skip_to_reward(gamename)
+                # Need to double click this to make sure
                 self.skip_to_reward(gamename)
                 break
         # print("Got to pre-card check")
@@ -533,10 +541,11 @@ class Map10_MS30():
                 # os._exit(1)
 
     def continue_otherworld_attacks(self):
-        for key in ["a", "g", "f", "h"]:
-            CustomInput.press_key(CustomInput.key_map[key], key)
-            time.sleep(0.02)
-            CustomInput.release_key(CustomInput.key_map[key], key)
+        self.continue_clear()
+        # for key in ["a", "g", "f", "h"]:
+        #     CustomInput.press_key(CustomInput.key_map[key], key)
+        #     time.sleep(0.02)
+        #     CustomInput.release_key(CustomInput.key_map[key], key)
 
     def navigate_otherworld_loot(self, gamename):
         BotUtils.move_bigmap_dynamic(590, 468)
