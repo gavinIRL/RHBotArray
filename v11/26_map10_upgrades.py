@@ -125,11 +125,47 @@ def move_bigmap_dynamic(x, y, gamename=False, rect=False):
         return True
 
 
-def dodge_time_check(time_sleep=0.1):
+def dodge_time_check(time_sleep=0.17):
     key = "right"
     CustomInput.press_key(CustomInput.key_map[key], key)
     time.sleep(0.01)
     CustomInput.release_key(CustomInput.key_map[key], key)
+    time.sleep(time_sleep)
+    CustomInput.press_key(CustomInput.key_map[key], key)
+    time.sleep(0.01)
+    CustomInput.release_key(CustomInput.key_map[key], key)
+
+
+def double_dir_dodge_check(time_sleep=0.17):
+    key = "right"
+    key2 = "up"
+    CustomInput.press_key(CustomInput.key_map[key], key)
+    # time.sleep(0.005)
+    CustomInput.press_key(CustomInput.key_map[key2], key2)
+    time.sleep(0.005)
+    CustomInput.release_key(CustomInput.key_map[key], key)
+    # time.sleep(0.005)
+    CustomInput.release_key(CustomInput.key_map[key2], key2)
+    time.sleep(time_sleep)
+    CustomInput.press_key(CustomInput.key_map[key], key)
+    # time.sleep(0.005)
+    CustomInput.press_key(CustomInput.key_map[key2], key2)
+    time.sleep(0.005)
+    CustomInput.release_key(CustomInput.key_map[key], key)
+    # time.sleep(0.005)
+    CustomInput.release_key(CustomInput.key_map[key2], key2)
+
+
+def prevent_dodge_check(time_sleep=0.17):
+    key = "right"
+    CustomInput.press_key(CustomInput.key_map[key], key)
+    time.sleep(0.01)
+    CustomInput.release_key(CustomInput.key_map[key], key)
+    key = "left"
+    CustomInput.press_key(CustomInput.key_map[key], key)
+    time.sleep(0.001)
+    CustomInput.release_key(CustomInput.key_map[key], key)
+    key = "right"
     time.sleep(time_sleep)
     CustomInput.press_key(CustomInput.key_map[key], key)
     time.sleep(0.01)
@@ -145,4 +181,4 @@ with open("gamename.txt") as f:
 # grab_obscured_loot(gamename)
 # detect_enemies_overworld(gamename)
 # move_bigmap_dynamic(663, 635)
-dodge_time_check(0.19)
+prevent_dodge_check(0.05)
