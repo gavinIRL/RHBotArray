@@ -64,7 +64,20 @@ class WindowCapture:
         dcObj = win32ui.CreateDCFromHandle(wDC)
         cDC = dcObj.CreateCompatibleDC()
         dataBitMap = win32ui.CreateBitmap()
-        dataBitMap.CreateCompatibleBitmap(dcObj, self.w, self.h)
+        try:
+            dataBitMap.CreateCompatibleBitmap(dcObj, self.w, self.h)
+        except:
+            print("Error with window handle, trying to continue")
+            time.sleep(0.01)
+            wDC = win32gui.GetWindowDC(self.hwnd)
+            dcObj = win32ui.CreateDCFromHandle(wDC)
+            cDC = dcObj.CreateCompatibleDC()
+            dataBitMap = win32ui.CreateBitmap()
+            try:
+                dataBitMap.CreateCompatibleBitmap(dcObj, self.w, self.h)
+            except:
+                print("Could not do handle second time")
+                os._exit(1)
         cDC.SelectObject(dataBitMap)
         cDC.BitBlt((0, 0), (self.w, self.h), dcObj,
                    (self.cropped_x, self.cropped_y), win32con.SRCCOPY)
@@ -819,7 +832,7 @@ class BotUtils:
         rgb_filter = RgbFilter(79, 129, 0, 140, 206, 65)
         output_image = vision.apply_rgb_filter(output_image, rgb_filter)
         rectangles = vision.find(
-            output_image, threshold=0.51, epsilon=0.5)
+            output_image, threshold=0.41, epsilon=0.5)
         if len(rectangles) < 1:
             return False, False
         else:
@@ -1444,7 +1457,11 @@ class Looting:
                 time_remaining = further
                 last_detect = time.time()
                 zero_speed_framesx = 0
+                count = 0
                 while not BotUtils.detect_xprompt(gamename):
+                    count += 1
+                    if count+1 % 10 == 0:
+                        print(" Did 50 more loot #1 loops {}".format(count))
                     time.sleep(0.003)
                     loop_time = time.time() - last_loop
                     last_loop = time.time()
@@ -1499,8 +1516,13 @@ class Looting:
                 time_remaining = further
                 last_detect = time.time()
                 zero_speed_framesy = 0
+                count = 0
                 while not BotUtils.detect_xprompt(gamename):
+                    count += 1
+                    if count+1 % 10 == 0:
+                        print(" Did 50 more loot #2 loops {}".format(count))
                     if BotUtils.check_up_down_pressed():
+                        # print("Both keys pressed down #2")
                         CustomInput.release_key(
                             CustomInput.key_map["down"], "down")
                     time.sleep(0.003)
@@ -1590,8 +1612,13 @@ class Looting:
             require_seek = False
             last_loop = time.time()
             last_detect = time.time()
+            count = 0
             while time_remaining > 0:
+                count += 1
+                if count+1 % 10 == 0:
+                    print(" Did 50 more loot #3 loops {}".format(count))
                 if BotUtils.check_up_down_pressed():
+                    # print("Both keys pressed down #3")
                     CustomInput.release_key(
                         CustomInput.key_map["down"], "down")
                 time.sleep(0.002)
