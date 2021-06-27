@@ -549,7 +549,7 @@ class Map10_MS30():
 
     def perform_otherworld_combat(self, gamename):
         CustomInput.press_key(CustomInput.key_map["down"], "down")
-        time.sleep(2)
+        time.sleep(1.8)
         CustomInput.release_key(CustomInput.key_map["down"], "down")
         time.sleep(0.005)
         CustomInput.press_key(CustomInput.key_map["up"], "up")
@@ -559,6 +559,14 @@ class Map10_MS30():
         CustomInput.press_key(CustomInput.key_map["h"])
         time.sleep(0.005)
         CustomInput.release_key(CustomInput.key_map["h"])
+        time.sleep(1)
+        CustomInput.press_key(CustomInput.key_map["left"], "left")
+        time.sleep(0.7)
+        CustomInput.release_key(CustomInput.key_map["left"], "left")
+        time.sleep(0.005)
+        CustomInput.press_key(CustomInput.key_map["up"], "up")
+        time.sleep(0.005)
+        CustomInput.release_key(CustomInput.key_map["up"], "up")
         start_time = time.time()
         counter = 10
         while counter > 0:
@@ -582,8 +590,14 @@ class Map10_MS30():
 
     def navigate_otherworld_loot(self, gamename):
         # BotUtils.try_toggle_map_clicking()
-        BotUtils.move_bigmap_dynamic(593, 419)
+        result = BotUtils.move_bigmap_dynamic(593, 419)
+        while not result:
+            BotUtils.try_toggle_map_clicking()
+            result = BotUtils.move_bigmap_dynamic(593, 419)
         BotUtils.move_bigmap_dynamic(667, 392)
+        while not result:
+            BotUtils.try_toggle_map_clicking()
+            result = BotUtils.move_bigmap_dynamic(667, 392)
         BotUtils.close_map_and_menu(gamename)
         self.loot_everything(gamename)
         # Then have a second bite at looting
@@ -605,7 +619,7 @@ class Map10_MS30():
             else:
                 BotUtils.try_toggle_map_clicking()
             time.sleep(0.008)
-        wincap = WindowCapture(gamename, [530, 331, 781, 580])
+        wincap = WindowCapture(gamename, [519, 304, 830, 610])
         othr_plyr_vision = Vision("otherplayerinvert.jpg")
         image = wincap.get_screenshot()
         filter = HsvFilter(0, 198, 141, 8, 255, 255, 0, 0, 0, 0)
@@ -887,7 +901,7 @@ if __name__ == "__main__":
     with open("gamename.txt") as f:
         gamename = f.readline()
     time.sleep(0.5)
-    num_loops = 30
+    num_loops = 10
     start = time.time()
     map = Map10_MS30()
     map.create_towncheck_thread(gamename)
