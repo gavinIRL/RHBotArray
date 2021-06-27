@@ -163,7 +163,7 @@ class BotUtils:
         sorted_by_second = sorted(coords, key=lambda tup: tup[1], reverse=True)
         return sorted_by_second
 
-    def move_bigmap_dynamic(x, y, gamename=False, rect=False, checkmap=True):
+    def move_bigmap_dynamic(x, y, gamename=False, rect=False, checkmap=True, margin=2):
         if checkmap:
             while not BotUtils.detect_bigmap_open(gamename):
                 BotUtils.try_toggle_map_clicking()
@@ -186,11 +186,15 @@ class BotUtils:
                 if not playerx:
                     return False
             else:
-                print("Didn't find player first time")
-                return False
+                time.sleep(0.5)
+                BotUtils.try_toggle_map()
+                time.sleep(0.005)
+                playerx, playery = BotUtils.grab_player_posv2(gamename, rect)
+                if not playerx:
+                    print("Unable to find player")
+                    return False
         relx = x - playerx
         rely = playery - y
-        margin = 1
         follower = Follower(margin)
         noplyr_count = 0
         while abs(relx) > margin or abs(rely) > margin:
@@ -206,7 +210,7 @@ class BotUtils:
                 noplyr_count += 1
                 if noplyr_count > 10:
                     break
-            time.sleep(0.05)
+            time.sleep(0.02)
         follower.release_all_keys()
         BotUtils.try_toggle_map()
         if noplyr_count > 10:
