@@ -896,16 +896,29 @@ class Map10_MS30():
         t = Thread(target=self.in_town_check_thread, args=args_)
         t.start()
 
+    def click_on_game(gamename):
+        wincap = WindowCapture(gamename)
+        centre_x = int(0.5 * wincap.w +
+                       wincap.window_rect[0])
+        centre_y = int(3 +
+                       wincap.window_rect[1])
+        ctypes.windll.user32.SetCursorPos(centre_x, centre_y)
+        ctypes.windll.user32.mouse_event(
+            0x0002, 0, 0, 0, 0)
+        ctypes.windll.user32.mouse_event(
+            0x0004, 0, 0, 0, 0)
+
 
 if __name__ == "__main__":
     with open("gamename.txt") as f:
         gamename = f.readline()
-    time.sleep(0.5)
+    time.sleep(1)
     num_loops = 15
     start = time.time()
     map = Map10_MS30()
+    map.click_on_game(gamename)
     map.create_towncheck_thread(gamename)
-    time.sleep(1.5)
+    time.sleep(1)
     for i in range(num_loops):
         print("Starting run {} of {}".format(i+1, num_loops))
         if i == num_loops - 1:
