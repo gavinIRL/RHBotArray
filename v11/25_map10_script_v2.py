@@ -53,9 +53,9 @@ class Map10_MS30():
         self.summon_momo(self.gamename)
         # Using placeholder individual methods for now
         self.perform_room1()
-        for i in range(4):
+        for i in range(len(self.rooms)-1):
             self.perform_room_after_first(i+1)
-        # Then move into the boss room
+        # Then move towards pre-boss point
         BotUtils.move_diagonal(882, 615, self.speed)
         # Cancel summon of momo
         self.cancel_momo_summon(self.gamename)
