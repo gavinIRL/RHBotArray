@@ -68,16 +68,22 @@ class WindowCapture:
             dataBitMap.CreateCompatibleBitmap(dcObj, self.w, self.h)
         except:
             print("Error with window handle, trying to continue")
-            time.sleep(0.01)
-            wDC = win32gui.GetWindowDC(self.hwnd)
-            dcObj = win32ui.CreateDCFromHandle(wDC)
-            cDC = dcObj.CreateCompatibleDC()
-            dataBitMap = win32ui.CreateBitmap()
-            try:
-                dataBitMap.CreateCompatibleBitmap(dcObj, self.w, self.h)
-            except:
-                print("Could not do handle second time")
-                os._exit(1)
+            count = 0
+            result = False
+            while not result:
+                time.sleep(0.01)
+                wDC = win32gui.GetWindowDC(self.hwnd)
+                dcObj = win32ui.CreateDCFromHandle(wDC)
+                cDC = dcObj.CreateCompatibleDC()
+                dataBitMap = win32ui.CreateBitmap()
+                try:
+                    dataBitMap.CreateCompatibleBitmap(dcObj, self.w, self.h)
+                    result = True
+                except:
+                    count += 1
+                    if count > 5:
+                        print("Could not do handle multiple times")
+                        os._exit(1)
         cDC.SelectObject(dataBitMap)
         cDC.BitBlt((0, 0), (self.w, self.h), dcObj,
                    (self.cropped_x, self.cropped_y), win32con.SRCCOPY)
