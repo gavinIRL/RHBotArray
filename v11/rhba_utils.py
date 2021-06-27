@@ -1131,6 +1131,14 @@ class BotUtils:
             # if result != 0 and result != 1:
             CustomInput.release_key(CustomInput.key_map[key], key)
 
+    def check_up_down_pressed():
+        result1 = ctypes.windll.user32.GetKeyState(38)
+        if result1 not in [0, 1]:
+            result2 = ctypes.windll.user32.GetKeyState(40)
+            if result2 not in [0, 1]:
+                return True
+        return False
+
 
 class Looting:
     def loot_current_room(gamename, player_name, search_points=False):
@@ -1492,6 +1500,9 @@ class Looting:
                 last_detect = time.time()
                 zero_speed_framesy = 0
                 while not BotUtils.detect_xprompt(gamename):
+                    if BotUtils.check_up_down_pressed():
+                        CustomInput.release_key(
+                            CustomInput.key_map["down"], "down")
                     time.sleep(0.003)
                     loop_time = time.time() - last_loop
                     last_loop = time.time()
@@ -1580,6 +1591,9 @@ class Looting:
             last_loop = time.time()
             last_detect = time.time()
             while time_remaining > 0:
+                if BotUtils.check_up_down_pressed():
+                    CustomInput.release_key(
+                        CustomInput.key_map["down"], "down")
                 time.sleep(0.002)
                 if BotUtils.detect_xprompt(gamename):
                     break
