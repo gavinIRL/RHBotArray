@@ -163,7 +163,7 @@ class BotUtils:
         sorted_by_second = sorted(coords, key=lambda tup: tup[1], reverse=True)
         return sorted_by_second
 
-    def move_bigmap_dynamic(x, y, gamename=False, rect=False, checkmap=True, margin=2):
+    def move_bigmap_dynamic(x, y, gamename=False, rect=False, checkmap=True, margin=1):
         if checkmap:
             while not BotUtils.detect_bigmap_open(gamename):
                 BotUtils.try_toggle_map_clicking()
