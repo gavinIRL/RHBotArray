@@ -37,7 +37,7 @@ class Map10_MS30():
             self.gamename, enemy_custom_rect)
         self.enemy_minimap_vision = Vision('enemy67.jpg')
         # Var for tracking gold progress
-        self.gold = 500000
+        self.gold = 700000
 
     def load_map_rooms(self):
         # Temporary, will be replace by objects later
@@ -901,7 +901,7 @@ if __name__ == "__main__":
     with open("gamename.txt") as f:
         gamename = f.readline()
     time.sleep(0.5)
-    num_loops = 10
+    num_loops = 15
     start = time.time()
     map = Map10_MS30()
     map.create_towncheck_thread(gamename)
