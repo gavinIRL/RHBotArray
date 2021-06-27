@@ -167,6 +167,7 @@ class BotUtils:
         if checkmap:
             while not BotUtils.detect_bigmap_open(gamename):
                 BotUtils.try_toggle_map_clicking()
+                time.sleep(0.03)
         else:
             BotUtils.try_toggle_map()
         if not gamename:

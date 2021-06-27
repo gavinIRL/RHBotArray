@@ -578,11 +578,10 @@ class Map10_MS30():
         #     CustomInput.release_key(CustomInput.key_map[key], key)
 
     def navigate_otherworld_loot(self, gamename):
-        BotUtils.move_bigmap_dynamic(590, 468)
-        BotUtils.move_bigmap_dynamic(667, 407)
-        while BotUtils.detect_bigmap_open(gamename):
-            BotUtils.try_toggle_map()
-            time.sleep(0.01)
+        BotUtils.try_toggle_map_clicking()
+        BotUtils.move_bigmap_dynamic(590, 448)
+        BotUtils.move_bigmap_dynamic(667, 397)
+        BotUtils.close_map_and_menu(gamename)
         self.loot_everything(gamename)
         # Then have a second bite at looting
         BotUtils.move_bigmap_dynamic(667, 407)
@@ -860,6 +859,7 @@ if __name__ == "__main__":
     start = time.time()
     map = Map10_MS30()
     for i in range(num_loops):
+        print("Starting run {} of {}".format(i+1, num_loops))
         if i == num_loops - 1:
             map.start(False)
         else:
