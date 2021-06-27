@@ -10,20 +10,41 @@ class Room():
         # format coords is x,y
         # ------------------------------------
         # list actions is as follows:
-        # clearl - position to perform clear from, point left (r,u,d)
-        # bossl - position to perform boss attacks from (r,u,d)
+        # clear,l - position to perform clear from, point left (r,u,d)
+        # boss,l - position to perform boss attacks from (r,u,d)
         # exit - position to exit room from
-        # chestl - position to attack chest, point left (r,u,d)
-        # reposl - position to reposition to, point left (r,u,d)
+        # chest,l - position to attack chest, point left (r,u,d)
+        # repos,l - position to reposition to, point left (r,u,d)
         # loot - position to attempt to loot from
         # wypt - this is a travel waypoint only
         # ------------------------------------
         # list of tags is as follows
-        # nxtbssl - next room is the boss room, hold l to enter (r,u,d)
+        # nxtbss,l - next room is the boss room, hold l to enter (r,u,d)
         # curbss - this room is the boss room
         # nocmbt - this room is just for walking through
         coords, actions, tags = line.split("#")
-        pass
+        self.action_list = []
+        self.coord_list = []
+        self.tags = []
+        for coord in coords.split("|"):
+            x, y = coord.split(",")
+            self.coord_list.append((int(x), int(y)))
+        for action in actions.split("|"):
+            self.action_list.append(action)
+        for tag in tags.split("|"):
+            if "nxtbss" in tag:
+                _, dir = tag.split(",")
+            self.tags.append(tag)
+
+
+class RoomTest():
+    dir_list = ["l", "r", "u", "d"]
+
+    def room_handler(self, room: Room):
+        # Check through the tags first
+        nocmbt = False if not "nocmbt" in "".join(room.tags) else True
+        curbss = False if not "curbss" in "".join(room.tags) else True
+        nxtbss = False if not "nxtbss" in "".join(room.tags) else True
 
 
 def load_rooms(filename):
@@ -38,3 +59,5 @@ def load_rooms(filename):
 filename = os.path.dirname(
     os.path.abspath(__file__)) + "/levels/map10updated.txt"
 rooms = load_rooms(filename)
+room1 = rooms[0]
+print(room1.action_list)
