@@ -616,7 +616,7 @@ class Map10_MS30():
         return False
 
     def move_to_loot_point(self):
-        BotUtils.move_bigmap_dynamic(1041, 627, checkmap=False)
+        BotUtils.move_bigmap_dynamic(1035, 622, checkmap=False)
 
     def check_loot_preshop(self, gamename):
         # Move to primary lootpoint
