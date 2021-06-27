@@ -560,7 +560,7 @@ class Map10_MS30():
         counter = 10
         while counter > 0:
             if self.detect_enemies_overworld(gamename):
-                if counter < 20:
+                if counter < 15:
                     counter += 1
             else:
                 counter -= 1
@@ -578,9 +578,9 @@ class Map10_MS30():
         #     CustomInput.release_key(CustomInput.key_map[key], key)
 
     def navigate_otherworld_loot(self, gamename):
-        BotUtils.try_toggle_map_clicking()
-        BotUtils.move_bigmap_dynamic(590, 448)
-        BotUtils.move_bigmap_dynamic(667, 397)
+        # BotUtils.try_toggle_map_clicking()
+        BotUtils.move_bigmap_dynamic(593, 419)
+        BotUtils.move_bigmap_dynamic(667, 392)
         BotUtils.close_map_and_menu(gamename)
         self.loot_everything(gamename)
         # Then have a second bite at looting
