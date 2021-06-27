@@ -878,7 +878,8 @@ class Map10_MS30():
             time.sleep(5)
 
     def create_towncheck_thread(self, gamename):
-        t = Thread(target=self.in_town_check_thread, args=(self, gamename))
+        args_ = [gamename]
+        t = Thread(target=self.in_town_check_thread, args=args_)
         t.start()
 
 
@@ -899,3 +900,4 @@ if __name__ == "__main__":
             map.start(True)
     timing = int((time.time()-start)/60)
     print("{} loops took {}mins".format(num_loops, timing))
+    os._exit(1)
