@@ -14,7 +14,7 @@ class Room():
         # boss,l - position to perform boss attacks from (r,u,d)
         # exit - position to exit room from
         # chest,l - position to attack chest, point left (r,u,d)
-        # repos,l - position to reposition to, point left (r,u,d)
+        # repos,l,5 - position to reposition to, point left, after seconds (r,u,d)
         # loot - position to attempt to loot from
         # wypt - this is a travel waypoint only
         # ------------------------------------
@@ -32,8 +32,6 @@ class Room():
         for action in actions.split("|"):
             self.action_list.append(action)
         for tag in tags.split("|"):
-            if "nxtbss" in tag:
-                _, dir = tag.split(",")
             self.tags.append(tag)
 
 
@@ -45,6 +43,27 @@ class RoomTest():
         nocmbt = False if not "nocmbt" in "".join(room.tags) else True
         curbss = False if not "curbss" in "".join(room.tags) else True
         nxtbss = False if not "nxtbss" in "".join(room.tags) else True
+
+    def perform_clear(self, coords, dir, repos=False):
+        pass
+
+    def perform_boss(self, coords, dir, repos=False):
+        pass
+
+    def perform_exit(self, coords):
+        pass
+
+    def perform_chest(self, coords, dir):
+        pass
+
+    def perform_repos(self, coords, dir):
+        pass
+
+    def perform_loot(self, coords):
+        pass
+
+    def perform_wypt(self, coords):
+        pass
 
 
 def load_rooms(filename):
