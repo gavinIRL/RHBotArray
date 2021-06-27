@@ -648,7 +648,7 @@ class BotUtils:
                 biggest = len(entry)
         return name
 
-    def detect_level_name(gamename):
+    def detect_level_name(gamename, chars=False):
         wincap = WindowCapture(gamename, [1121, 31, 1248, 44])
         existing_image = wincap.get_screenshot()
         filter = HsvFilter(0, 0, 0, 169, 34, 255, 0, 0, 0, 0)
@@ -660,7 +660,9 @@ class BotUtils:
         inverted = (255-blackAndWhiteImage)
         save_image = cv2.cvtColor(inverted, cv2.COLOR_GRAY2BGR)
         rgb = cv2.cvtColor(save_image, cv2.COLOR_BGR2RGB)
-        tess_config = '--psm 7 --oem 3 -c tessedit_char_whitelist=01234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
+        if not chars:
+            chars = "01234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+        tess_config = '--psm 7 --oem 3 -c tessedit_char_whitelist=' + chars
         result = pytesseract.image_to_string(
             rgb, lang='eng', config=tess_config)[:-2]
         return result
