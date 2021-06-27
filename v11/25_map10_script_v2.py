@@ -896,7 +896,7 @@ class Map10_MS30():
         t = Thread(target=self.in_town_check_thread, args=args_)
         t.start()
 
-    def click_on_game(gamename):
+    def click_on_game(self, gamename):
         wincap = WindowCapture(gamename)
         centre_x = int(0.5 * wincap.w +
                        wincap.window_rect[0])
