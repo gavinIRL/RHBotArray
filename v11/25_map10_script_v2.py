@@ -118,9 +118,10 @@ class Map10_MS30():
             if nodetcnt > 10:
                 print("QUIT DUE TO CATASTROPHIC ERROR WITH NAVIGATION")
                 os._exit(1)
-            key = "right"
-            CustomInput.press_key(CustomInput.key_map[key], key)
-            CustomInput.release_key(CustomInput.key_map[key], key)
+            if nodetcnt % 3 == 0:
+                key = "right"
+                CustomInput.press_key(CustomInput.key_map[key], key)
+                CustomInput.release_key(CustomInput.key_map[key], key)
             outcome = BotUtils.move_bigmap_dynamic(int(room[3]), int(room[4]))
         # print("Finished moving to next roomstart, room {}".format(num))
         time.sleep(0.4)
@@ -616,11 +617,11 @@ class Map10_MS30():
         return False
 
     def move_to_loot_point(self):
-        BotUtils.move_bigmap_dynamic(1035, 622, checkmap=False)
+        BotUtils.move_bigmap_dynamic(1038, 617, checkmap=False)
 
     def check_loot_preshop(self, gamename):
         # Move to primary lootpoint
-        BotUtils.move_bigmap_dynamic(1041, 627, checkmap=False)
+        self.move_to_loot_point()
         # Then perform one final check
         time.sleep(0.1)
         if Looting.check_for_lootv2(gamename):
@@ -855,7 +856,7 @@ if __name__ == "__main__":
     with open("gamename.txt") as f:
         gamename = f.readline()
     time.sleep(2)
-    num_loops = 10
+    num_loops = 5
     start = time.time()
     map = Map10_MS30()
     for i in range(num_loops):
