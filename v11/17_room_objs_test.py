@@ -43,6 +43,24 @@ class RoomTest():
         nocmbt = False if not "nocmbt" in "".join(room.tags) else True
         curbss = False if not "curbss" in "".join(room.tags) else True
         nxtbss = False if not "nxtbss" in "".join(room.tags) else True
+        repos = False if not "repos" in "".join(room.action_list) else True
+        # Then go through the actions and carry them out
+        for i, action in enumerate(room.action_list):
+            coords = room.coord_list[i]
+            if "clear" in action:
+                pass
+            elif "boss" in action:
+                pass
+            elif "exit" in action:
+                pass
+            elif "chest" in action:
+                pass
+            elif "repos" in action:
+                pass
+            elif "loot" in action:
+                pass
+            elif "wypt" in action:
+                pass
 
     def perform_clear(self, coords, dir, repos=False):
         pass
@@ -50,7 +68,7 @@ class RoomTest():
     def perform_boss(self, coords, dir, repos=False):
         pass
 
-    def perform_exit(self, coords):
+    def perform_exit(self, coords, nxtbss=False):
         pass
 
     def perform_chest(self, coords, dir):
@@ -59,7 +77,7 @@ class RoomTest():
     def perform_repos(self, coords, dir):
         pass
 
-    def perform_loot(self, coords):
+    def perform_loot(self, coords, currbss=False):
         pass
 
     def perform_wypt(self, coords):
