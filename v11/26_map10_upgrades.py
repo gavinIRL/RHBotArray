@@ -188,6 +188,19 @@ def in_town_check_thread(gamename, flag):
             os._exit(1)
 
 
+def click_on_game(gamename):
+    wincap = WindowCapture(gamename)
+    centre_x = int(0.5 * wincap.w +
+                   wincap.window_rect[0])
+    centre_y = int(3 +
+                   wincap.window_rect[1])
+    ctypes.windll.user32.SetCursorPos(centre_x, centre_y)
+    ctypes.windll.user32.mouse_event(
+        0x0002, 0, 0, 0, 0)
+    ctypes.windll.user32.mouse_event(
+        0x0004, 0, 0, 0, 0)
+
+
 time.sleep(1.5)
 with open("gamename.txt") as f:
     gamename = f.readline()
@@ -198,4 +211,5 @@ with open("gamename.txt") as f:
 # detect_enemies_overworld(gamename)
 # move_bigmap_dynamic(663, 635)
 # prevent_dodge_check(0.05)
-in_town_check_thread(gamename, [True])
+# in_town_check_thread(gamename, [True])
+click_on_game(gamename)
