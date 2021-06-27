@@ -870,15 +870,15 @@ class Map10_MS30():
             return True
         return False
 
-    def in_town_check_thread(self, gamename, flag):
-        while flag[0]:
+    def in_town_check_thread(self, gamename):
+        while True:
             if self.check_in_town(gamename):
                 print("Exited as detected in town")
                 os._exit(1)
             time.sleep(5)
 
     def create_towncheck_thread(self, gamename):
-        t = Thread(target=self.in_town_check_thread, args=[gamename, [True]])
+        t = Thread(target=self.in_town_check_thread, args=(self, gamename))
         t.start()
 
 
@@ -886,7 +886,7 @@ if __name__ == "__main__":
     with open("gamename.txt") as f:
         gamename = f.readline()
     time.sleep(0.5)
-    num_loops = 5
+    num_loops = 30
     start = time.time()
     map = Map10_MS30()
     map.create_towncheck_thread(gamename)
