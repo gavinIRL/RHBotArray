@@ -5,6 +5,7 @@ import cv2
 import math
 import ctypes
 import logging
+from fuzzywuzzy import fuzz
 from rhba_utils import BotUtils, Events, SellRepair, RHClick, Looting, WindowCapture, Vision, HsvFilter, Follower
 import pydirectinput
 import pytesseract
@@ -173,11 +174,15 @@ def prevent_dodge_check(time_sleep=0.17):
 
 
 def check_in_town(gamename):
+    name = BotUtils.detect_level_name(gamename, chars="BramunezMkt")
+    if fuzz.ratio(name, "BramunezMarket") > 85:
+        return True
     return False
 
 
 def in_town_check_thread(gamename, flag):
     while flag[0]:
+        time.sleep(5)
         if check_in_town(gamename):
             print("Exited as detected in town")
             os._exit(1)
@@ -192,4 +197,5 @@ with open("gamename.txt") as f:
 # grab_obscured_loot(gamename)
 # detect_enemies_overworld(gamename)
 # move_bigmap_dynamic(663, 635)
-prevent_dodge_check(0.05)
+# prevent_dodge_check(0.05)
+in_town_check_thread(gamename, [True])
