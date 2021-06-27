@@ -1,5 +1,6 @@
 # This file will automatically run through map 10
 from random import randint
+from threading import Thread
 import time
 import os
 import numpy as np
@@ -7,6 +8,7 @@ import cv2
 import math
 import ctypes
 import logging
+from fuzzywuzzy import fuzz
 from rhba_utils import BotUtils, Events, SellRepair, RHClick, Looting, WindowCapture, Vision, HsvFilter
 import pydirectinput
 from custom_input import CustomInput
@@ -851,14 +853,33 @@ class Map10_MS30():
         if repeat:
             self.repeat_level(gamename)
 
+    def check_in_town(self, gamename):
+        name = BotUtils.detect_level_name(gamename, chars="BramunezMkt")
+        if fuzz.ratio(name, "BramunezMarket") > 85:
+            return True
+        return False
+
+    def in_town_check_thread(self, gamename, flag):
+        while flag[0]:
+            if self.check_in_town(gamename):
+                print("Exited as detected in town")
+                os._exit(1)
+            time.sleep(5)
+
+    def create_towncheck_thread(self, gamename):
+        t = Thread(target=self.in_town_check_thread, args=[gamename, [True]])
+        t.start()
+
 
 if __name__ == "__main__":
     with open("gamename.txt") as f:
         gamename = f.readline()
-    time.sleep(2)
+    time.sleep(0.5)
     num_loops = 5
     start = time.time()
     map = Map10_MS30()
+    map.create_towncheck_thread(gamename)
+    time.sleep(1.5)
     for i in range(num_loops):
         print("Starting run {} of {}".format(i+1, num_loops))
         if i == num_loops - 1:
