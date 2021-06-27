@@ -172,6 +172,17 @@ def prevent_dodge_check(time_sleep=0.17):
     CustomInput.release_key(CustomInput.key_map[key], key)
 
 
+def check_in_town(gamename):
+    return False
+
+
+def in_town_check_thread(gamename, flag):
+    while flag[0]:
+        if check_in_town(gamename):
+            print("Exited as detected in town")
+            os._exit(1)
+
+
 time.sleep(1.5)
 with open("gamename.txt") as f:
     gamename = f.readline()
