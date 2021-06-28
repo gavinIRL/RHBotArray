@@ -201,6 +201,21 @@ def click_on_game(gamename):
         0x0004, 0, 0, 0, 0)
 
 
+def detect_store(gamename=False):
+    if not gamename:
+        with open("gamename.txt") as f:
+            gamename = f.readline()
+    wincap = WindowCapture(gamename, [1084, 265, 1099, 267])
+    image = wincap.get_screenshot()
+    a, b, c = [int(i) for i in image[0][0]]
+    d, e, f = [int(i) for i in image[-1][0]]
+    if a + d > 500:
+        if b + e > 500:
+            if c + f > 500:
+                return True
+    return False
+
+
 time.sleep(1.5)
 with open("gamename.txt") as f:
     gamename = f.readline()
@@ -212,4 +227,5 @@ with open("gamename.txt") as f:
 # move_bigmap_dynamic(663, 635)
 # prevent_dodge_check(0.05)
 # in_town_check_thread(gamename, [True])
-click_on_game(gamename)
+# click_on_game(gamename)
+print(detect_store(gamename))
