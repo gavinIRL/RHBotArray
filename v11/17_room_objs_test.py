@@ -16,6 +16,42 @@ os.chdir(os.path.dirname(os.path.abspath(__file__)))
 logging.getLogger().setLevel(logging.ERROR)
 
 
+class Map10_MS30():
+    def __init__(self, roomdata):
+        self.rooms = roomdata
+        self.speed = 22.5
+        self.map_rect = [561, 282, 1111, 666]
+        with open("gamename.txt") as f:
+            self.gamename = f.readline()
+        self.game_wincap = WindowCapture(self.gamename)
+        # This is for determining wait time before next clear
+        self.last_clear = 0
+        self.clearskill_cd = 8.9
+        # This is for keeping track of where player is
+        self.current_room = 0
+        # For aiming at enemies
+        self.enemy_minimap_filter = HsvFilter(
+            0, 128, 82, 8, 255, 255, 0, 66, 30, 34)
+        enemy_custom_rect = [1094, 50, 1284, 210]
+        self.enemy_minimap_wincap = WindowCapture(
+            self.gamename, enemy_custom_rect)
+        self.enemy_minimap_vision = Vision('enemy67.jpg')
+        # Var for tracking gold progress
+        self.gold = 860000
+
+    def start(self, repeat=False):
+        time.sleep(1.5)
+        while not Events.detect_in_dungeon():
+            time.sleep(0.25)
+        self.summon_momo(self.gamename)
+        # Now using full universal room handler instead
+        for room in self.rooms:
+            rh = RoomHandler(room)
+            rh.start_room()
+        # And then perform the endmap routine
+        self.perform_endmap(repeat)
+
+
 class Room():
     def __init__(self, line: str) -> None:
         # Format of each line in the file should be as follows
@@ -32,6 +68,7 @@ class Room():
         # wypt - this is a travel waypoint only
         # ------------------------------------
         # list of tags is as follows
+        # pet,on - this makes sure the pet is summoned (pre) or hidden (post)
         # nxtbss,dir - next room is the boss room, hold l to enter
         # curbss - this room is the boss room
         coords, actions, tags = line.split("#")
@@ -47,17 +84,19 @@ class Room():
             self.tags.append(tag)
 
 
-class RoomTest():
-    dir_list = ["l", "r", "u", "d"]
-
-    def __init__(self) -> None:
+class RoomHandler():
+    def __init__(self, room: Room) -> None:
         # Add a timestamp to catch if have gotten stuck
         self.last_event_time = time.time()
+        self.room = room
 
-    def room_handler(self, room: Room):
+    def start_room(self):
+        room = self.room
         # Check through the tags first
         curbss = False if not "curbss" in "".join(room.tags) else True
         nxtbss = False if not "nxtbss" in "".join(room.tags) else True
+        peton = False if not "pet,on" in "".join(room.tags) else True
+        petoff = False if not "pet,off" in "".join(room.tags) else True
         repos = False if not "repos" in "".join(room.action_list) else True
         sect_cleared = False
         # Then go through the actions and carry them out
@@ -116,7 +155,7 @@ class RoomTest():
         pass
 
 
-def load_rooms(filename):
+def load_level_data(filename):
     with open(filename) as f:
         lines = f.readlines()
     list_rooms = []
@@ -127,6 +166,6 @@ def load_rooms(filename):
 
 filename = os.path.dirname(
     os.path.abspath(__file__)) + "/levels/map10updated.txt"
-rooms = load_rooms(filename)
+rooms = load_level_data(filename)
 room1 = rooms[0]
 print(room1.action_list)
