@@ -89,16 +89,26 @@ class RoomHandler():
         # Add a timestamp to catch if have gotten stuck
         self.last_event_time = time.time()
         self.room = room
+        with open("gamename.txt") as f:
+            self.gamename = f.readline()
 
     def start_room(self):
         room = self.room
         # Check through the tags first
-        curbss = False if not "curbss" in "".join(room.tags) else True
-        nxtbss = False if not "nxtbss" in "".join(room.tags) else True
-        peton = False if not "pet,on" in "".join(room.tags) else True
-        petoff = False if not "pet,off" in "".join(room.tags) else True
-        repos = False if not "repos" in "".join(room.action_list) else True
+        tags = "".join(room.tags)
+        acts = "".join(room.action_list)
+        curbss = False if not "curbss" in tags else True
+        nxtbss = False if not "nxtbss" in tags else True
+        peton = False if not "pet,on" in tags else True
+        petoff = False if not "pet,off" in tags else True
+        repos = False if not "repos" in acts else True
         sect_cleared = False
+        nxtbss_dir = False
+        # Check which direction for nxtboss if reqd
+        if nxtbss:
+            nxtbss_dir = tags.split("curbss", 1)[1].split("|", 1)[
+                0].replace(",", "")
+
         # Then go through the actions and carry them out
         for i, action in enumerate(room.action_list):
             self.last_event_time = time.time()
@@ -120,7 +130,7 @@ class RoomHandler():
                 if outcome:
                     sect_cleared = True
             elif "exit" in action:
-                outcome = self.perform_exit(coords, nxtbss)
+                outcome = self.perform_exit(coords, nxtbss_dir, petoff)
             elif "chest" in action:
                 _, dir = action.split(",")
                 outcome = self.perform_chest(coords, dir)
@@ -139,8 +149,28 @@ class RoomHandler():
     def perform_boss(self, coords, dir, repos=False, curbss=False):
         pass
 
-    def perform_exit(self, coords, nxtbss=False):
-        pass
+    def perform_exit(self, coords, nxtbss_dir=False, petoff=False):
+        outcome = BotUtils.move_bigmap_dynamic(int(coords[1]), int(coords[2]))
+        nodetcnt = 0
+        while not outcome:
+            nodetcnt += 1
+            if nodetcnt > 10:
+                print("QUIT DUE TO CATASTROPHIC ERROR WITH NAVIGATION")
+                os._exit(1)
+            if nodetcnt % 3 == 0:
+                key = "right"
+                CustomInput.press_key(CustomInput.key_map[key], key)
+                CustomInput.release_key(CustomInput.key_map[key], key)
+            outcome = BotUtils.move_bigmap_dynamic(
+                int(coords[1]), int(coords[2]))
+        # Then turn pet off if required
+        if petoff:
+            self.cancel_momo_summon()
+        if nxtbss_dir:
+            # Need to press down the required key
+            CustomInput.press_key(CustomInput.key_map[nxtbss_dir], nxtbss_dir)
+        else:
+            time.sleep(0.3)
 
     def perform_chest(self, coords, dir):
         pass
@@ -153,6 +183,15 @@ class RoomHandler():
 
     def perform_wypt(self, coords):
         pass
+
+    def cancel_momo_summon(self):
+        wincap = WindowCapture(self.gamename)
+        x = wincap.window_rect[0]
+        y = wincap.window_rect[1]
+        pydirectinput.rightClick(x+82, y+197)
+        time.sleep(0.1)
+        pydirectinput.click(x+148, y+213)
+        time.sleep(0.1)
 
 
 def load_level_data(filename):
