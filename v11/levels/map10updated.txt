@@ -3,4 +3,4 @@
 754,547|805,536#clear,up|exit#
 861,540|836,556#clear,right|exit#
 833,617|898,615#clear,up|exit#nxtbss,left
-1022,617|1035,617|1041,617#boss,right|repos,right|loot#curbss
+1022,617|1035,617|1041,617#boss,right|repos,right,10|loot#curbss
