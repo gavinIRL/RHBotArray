@@ -1,6 +1,19 @@
 # This file will test how to best store data on each room
 # Will preferably load information from a single file
+from threading import Thread
+import time
 import os
+import numpy as np
+import cv2
+import math
+import ctypes
+import logging
+from fuzzywuzzy import fuzz
+from rhba_utils import BotUtils, Events, SellRepair, RHClick, Looting, WindowCapture, Vision, HsvFilter
+import pydirectinput
+from custom_input import CustomInput
+os.chdir(os.path.dirname(os.path.abspath(__file__)))
+logging.getLogger().setLevel(logging.ERROR)
 
 
 class Room():
@@ -37,6 +50,10 @@ class Room():
 class RoomTest():
     dir_list = ["l", "r", "u", "d"]
 
+    def __init__(self) -> None:
+        # Add a timestamp to catch if have gotten stuck
+        self.last_event_time = time.time()
+
     def room_handler(self, room: Room):
         # Check through the tags first
         curbss = False if not "curbss" in "".join(room.tags) else True
@@ -45,6 +62,7 @@ class RoomTest():
         sect_cleared = False
         # Then go through the actions and carry them out
         for i, action in enumerate(room.action_list):
+            self.last_event_time = time.time()
             # Need to check if reposition is the next item
             repos_time = False
             if repos:
