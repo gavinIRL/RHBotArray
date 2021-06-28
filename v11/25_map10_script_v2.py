@@ -52,6 +52,9 @@ class Map10_MS30():
         return return_list
 
     def start(self, repeat=False):
+        time.sleep(1.5)
+        while not Events.detect_in_dungeon():
+            time.sleep(0.25)
         self.summon_momo(self.gamename)
         # Using placeholder individual methods for now
         self.perform_room1()
@@ -211,7 +214,7 @@ class Map10_MS30():
         time.sleep(0.1)
         while not BotUtils.detect_petmenu_open(gamename):
             pydirectinput.press("j")
-            time.sleep(0.1)
+            time.sleep(0.25)
         pydirectinput.click(x+471, y+178)
         time.sleep(0.1)
         pydirectinput.click(x+713, y+682)
@@ -679,7 +682,7 @@ class Map10_MS30():
         BotUtils.close_map_and_menu(gamename)
         time.sleep(0.1)
         RHClick.click_explore_again(gamename)
-        time.sleep(3)
+        time.sleep(1.5)
         # self.summon_momo(gamename)
 
     def move_to_boss(self):
@@ -842,6 +845,7 @@ class Map10_MS30():
         # print("Got to post-move to loot point")
         while Events.detect_in_dungeon():
             if not self.loot_everything(gamename):
+                self.move_slightly_left()
                 # Try once more to loot
                 Looting.grab_nearby_loot(gamename)
                 self.loot_everything(gamename)
@@ -877,6 +881,12 @@ class Map10_MS30():
         self.calculate_profit(gamename)
         if repeat:
             self.repeat_level(gamename)
+
+    def move_slightly_left(self):
+        CustomInput.press_key(CustomInput.key_map["left"], "left")
+        time.sleep(0.25)
+        CustomInput.release_key(CustomInput.key_map["left"], "left")
+        time.sleep(0.1)
 
     def check_in_town(self, gamename):
         name = BotUtils.detect_level_name(gamename, chars="BramunezMkt")
