@@ -207,12 +207,15 @@ def detect_store(gamename=False):
             gamename = f.readline()
     wincap = WindowCapture(gamename, [1084, 265, 1099, 267])
     image = wincap.get_screenshot()
+    # cv2.imwrite("testytest.jpg", image)
     a, b, c = [int(i) for i in image[0][0]]
-    d, e, f = [int(i) for i in image[-1][0]]
-    if a + d > 500:
-        if b + e > 500:
-            if c + f > 500:
-                return True
+    d, e, f = [int(i) for i in image[0][-1]]
+    g, h, i = [int(i) for i in image[0][4]]
+    # print("GHI:{},{},{}".format(g, h, i))
+    if a + b+c+d+e+f > 1500:
+        # Value of 7 is disabled shop
+        if g == 8:
+            return True
     return False
 
 
