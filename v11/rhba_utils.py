@@ -67,7 +67,7 @@ class WindowCapture:
         try:
             dataBitMap.CreateCompatibleBitmap(dcObj, self.w, self.h)
         except:
-            print("Error with window handle, trying to continue")
+            # print("Error with window handle, trying to continue")
             count = 0
             result = False
             while not result:
