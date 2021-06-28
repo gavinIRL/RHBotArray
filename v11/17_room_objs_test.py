@@ -131,6 +131,9 @@ class RoomHandler():
                     sect_cleared = True
             elif "exit" in action:
                 outcome = self.perform_exit(coords, nxtbss_dir, petoff)
+                if not outcome:
+                    print("Problem with nav during exit, need to add handling")
+                    os._exit(1)
             elif "chest" in action:
                 _, dir = action.split(",")
                 outcome = self.perform_chest(coords, dir)
@@ -155,8 +158,9 @@ class RoomHandler():
         while not outcome:
             nodetcnt += 1
             if nodetcnt > 10:
-                print("QUIT DUE TO CATASTROPHIC ERROR WITH NAVIGATION")
-                os._exit(1)
+                print("ERROR WITH NAVIGATION")
+                return False
+                # os._exit(1)
             if nodetcnt % 3 == 0:
                 key = "right"
                 CustomInput.press_key(CustomInput.key_map[key], key)
@@ -171,6 +175,7 @@ class RoomHandler():
             CustomInput.press_key(CustomInput.key_map[nxtbss_dir], nxtbss_dir)
         else:
             time.sleep(0.3)
+        return True
 
     def perform_chest(self, coords, dir):
         pass
