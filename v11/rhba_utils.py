@@ -1465,7 +1465,12 @@ class Looting:
                 time_remaining = further
                 last_detect = time.time()
                 zero_speed_framesx = 0
+                start_time = time.time()
                 while not BotUtils.detect_xprompt(gamename):
+                    if time.time() - start_time > 5:
+                        BotUtils.stop_movement()
+                        require_seek = True
+                        break
                     time.sleep(0.003)
                     loop_time = time.time() - last_loop
                     last_loop = time.time()
@@ -1524,7 +1529,12 @@ class Looting:
                 time_remaining = further
                 last_detect = time.time()
                 zero_speed_framesy = 0
+                start_time = time.time()
                 while not BotUtils.detect_xprompt(gamename):
+                    if time.time() - start_time > 5:
+                        BotUtils.stop_movement()
+                        require_seek = True
+                        break
                     # print("looping through y-dir only")
                     if BotUtils.check_up_down_pressed():
                         # print("Both keys pressed down #2")
@@ -1621,7 +1631,12 @@ class Looting:
             require_seek = False
             last_loop = time.time()
             last_detect = time.time()
+            start_time = time.time()
             while time_remaining > 0:
+                if time.time() - start_time > 5:
+                    # BotUtils.stop_movement()
+                    require_seek = True
+                    break
                 if BotUtils.check_up_down_pressed():
                     # print("Both keys pressed down #3")
                     CustomInput.release_key(
