@@ -1448,6 +1448,7 @@ class Looting:
         if closer < 0.05:
             # If both tiny then return false
             if further < 0.05:
+                # print("Both were very close")
                 BotUtils.stop_movement()
                 return False
             # Otherwise need to just travel in second direction
@@ -1455,6 +1456,7 @@ class Looting:
             # Do this to make it clear which direction being sorted
             require_seek = False
             if further == timeleftx:
+                # print("Travelled in x dir only")
                 CustomInput.press_key(
                     CustomInput.key_map[second_key], second_key)
                 last_loop = time.time()
@@ -1463,11 +1465,7 @@ class Looting:
                 time_remaining = further
                 last_detect = time.time()
                 zero_speed_framesx = 0
-                count = 0
                 while not BotUtils.detect_xprompt(gamename):
-                    count += 1
-                    if count+1 % 10 == 0:
-                        print(" Did 50 more loot #1 loops {}".format(count))
                     time.sleep(0.003)
                     loop_time = time.time() - last_loop
                     last_loop = time.time()
@@ -1481,8 +1479,10 @@ class Looting:
                         totalx = truex - newx
                         percentx = abs(totalx)/abs(relx)
                         if percentx > 1:
+                            # print("Percent x was {}".format(percentx))
                             BotUtils.stop_movement()
                             require_seek = True
+                            break
                         if movementx == 0:
                             zero_speed_framesx += 1
                             if zero_speed_framesx > 8:
@@ -1502,6 +1502,7 @@ class Looting:
                             (relx - relx*percentx)/avg_x_speed)
                         rect = [newx-100, newy-30, newx+100, newy+30]
                         lastx = newx
+                        # print("successfully looping through x-dir only")
                     except:
                         time_remaining -= loop_time
                         if time_remaining < 0:
@@ -1514,6 +1515,7 @@ class Looting:
                         total_frames = 0
             # Alternatively try handle the y case only
             else:
+                # print("Travelled in y dir only")
                 CustomInput.press_key(
                     CustomInput.key_map[second_key], second_key)
                 last_loop = time.time()
@@ -1522,11 +1524,8 @@ class Looting:
                 time_remaining = further
                 last_detect = time.time()
                 zero_speed_framesy = 0
-                count = 0
                 while not BotUtils.detect_xprompt(gamename):
-                    count += 1
-                    if count+1 % 10 == 0:
-                        print(" Did 50 more loot #2 loops {}".format(count))
+                    # print("looping through y-dir only")
                     if BotUtils.check_up_down_pressed():
                         # print("Both keys pressed down #2")
                         CustomInput.release_key(
@@ -1546,6 +1545,7 @@ class Looting:
                         if percenty > 1:
                             BotUtils.stop_movement()
                             require_seek = True
+                            break
                         if movementy == 0:
                             zero_speed_framesy += 1
                             if zero_speed_framesy > 8:
@@ -1577,12 +1577,13 @@ class Looting:
                         total_frames = 0
             # Finally if can't find it then search in both directions for y
             if require_seek:
+                # print("A seek was required")
                 if not seek:
                     BotUtils.stop_movement()
                     return False
                 # Need to move up and down for 0.5sec each way checking for loot
                 start_time = time.time()
-                keyy = "down"
+                keyy = "up"
                 CustomInput.press_key(CustomInput.key_map[keyy], keyy)
                 while not BotUtils.detect_xprompt(gamename):
                     time.sleep(0.003)
@@ -1592,7 +1593,7 @@ class Looting:
                 if not BotUtils.detect_xprompt(gamename):
                     # Then move in opposite direction
                     start_time = time.time()
-                    keyy = "up"
+                    keyy = "down"
                     CustomInput.press_key(CustomInput.key_map[keyy], keyy)
                     while not BotUtils.detect_xprompt(gamename):
                         time.sleep(0.003)
@@ -1602,9 +1603,11 @@ class Looting:
                     # Then need to check no keys are still pressed again
                 BotUtils.stop_movement()
             if BotUtils.detect_xprompt(gamename):
+                # print("Detected xprompt, pressed x")
                 pydirectinput.press("x")
                 return True
         else:
+            # print("This is a 2-direction job")
             # Need to start moving in the right direction
             CustomInput.press_key(CustomInput.key_map[keyx], keyx)
             CustomInput.press_key(CustomInput.key_map[keyy], keyy)
@@ -1618,11 +1621,7 @@ class Looting:
             require_seek = False
             last_loop = time.time()
             last_detect = time.time()
-            count = 0
             while time_remaining > 0:
-                count += 1
-                if count+1 % 10 == 0:
-                    print(" Did 50 more loot #3 loops {}".format(count))
                 if BotUtils.check_up_down_pressed():
                     # print("Both keys pressed down #3")
                     CustomInput.release_key(
@@ -1729,12 +1728,13 @@ class Looting:
             BotUtils.stop_movement()
             # Then need to seek out loot if flag set
             if require_seek:
+                # print("Required seek #2")
                 if not seek:
                     BotUtils.stop_movement()
                     return False
                 # Need to move up and down for 0.5sec each way checking for loot
                 start_time = time.time()
-                keyy = "down"
+                keyy = "up"
                 CustomInput.press_key(CustomInput.key_map[keyy], keyy)
                 while not BotUtils.detect_xprompt(gamename):
                     time.sleep(0.003)
@@ -1745,7 +1745,7 @@ class Looting:
                 if not BotUtils.detect_xprompt(gamename):
                     # Then move in opposite direction
                     start_time = time.time()
-                    keyy = "up"
+                    keyy = "down"
                     CustomInput.press_key(CustomInput.key_map[keyy], keyy)
                     while not BotUtils.detect_xprompt(gamename):
                         time.sleep(0.003)
@@ -1755,6 +1755,7 @@ class Looting:
                     # Then need to check no keys are still pressed again
                 BotUtils.stop_movement()
             if BotUtils.detect_xprompt(gamename):
+                # print("Detected xprompt #2")
                 BotUtils.stop_movement()
                 pydirectinput.press("x")
                 return True
