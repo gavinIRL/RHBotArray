@@ -1,6 +1,6 @@
-734,615|749,615#clearl|exit#
-777,596|771,563#clearu|exit#
-754,547|805,536#clearu|exit#
-861,540|836,556#clearr|exit#
-833,617|898,615#clearu|exit#nxtbssl
-1022,617|1035,617|1041,617#bossr|reposr|loot#curbss
+734,615|749,615#clear,left|exit#
+777,596|771,563#clear,up|exit#
+754,547|805,536#clear,up|exit#
+861,540|836,556#clear,right|exit#
+833,617|898,615#clear,up|exit#nxtbss,left
+1022,617|1035,617|1041,617#boss,right|repos,right|loot#curbss
