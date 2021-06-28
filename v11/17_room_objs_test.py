@@ -10,18 +10,17 @@ class Room():
         # format coords is x,y
         # ------------------------------------
         # list actions is as follows:
-        # clear,l - position to perform clear from, point left (r,u,d)
-        # boss,l - position to perform boss attacks from (r,u,d)
+        # clear,dir - position to perform clear from, point left
+        # boss,dir - position to perform boss attacks from
         # exit - position to exit room from
-        # chest,l - position to attack chest, point left (r,u,d)
-        # repos,l,5 - position to reposition to, point left, after seconds (r,u,d)
+        # chest,dir - position to attack chest, point left
+        # repos,dir,5 - position to reposition to, point left, after seconds
         # loot - position to attempt to loot from
         # wypt - this is a travel waypoint only
         # ------------------------------------
         # list of tags is as follows
-        # nxtbss,l - next room is the boss room, hold l to enter (r,u,d)
+        # nxtbss,dir - next room is the boss room, hold l to enter
         # curbss - this room is the boss room
-        # nocmbt - this room is just for walking through
         coords, actions, tags = line.split("#")
         self.action_list = []
         self.coord_list = []
@@ -40,32 +39,47 @@ class RoomTest():
 
     def room_handler(self, room: Room):
         # Check through the tags first
-        nocmbt = False if not "nocmbt" in "".join(room.tags) else True
         curbss = False if not "curbss" in "".join(room.tags) else True
         nxtbss = False if not "nxtbss" in "".join(room.tags) else True
         repos = False if not "repos" in "".join(room.action_list) else True
+        sect_cleared = False
         # Then go through the actions and carry them out
         for i, action in enumerate(room.action_list):
+            # Need to check if reposition is the next item
+            repos_time = False
+            if repos:
+                next = room.action_list[i+1]
+                if "repos" in next:
+                    _, _, repos_time = next.split(",")
             coords = room.coord_list[i]
             if "clear" in action:
-                pass
+                _, dir = action.split(",")
+                outcome = self.perform_clear(coords, dir, repos_time)
+                if outcome:
+                    sect_cleared = True
             elif "boss" in action:
-                pass
+                _, dir = action.split(",")
+                outcome = self.perform_boss(coords, dir, repos_time, curbss)
+                if outcome:
+                    sect_cleared = True
             elif "exit" in action:
-                pass
+                outcome = self.perform_exit(coords, nxtbss)
             elif "chest" in action:
-                pass
+                _, dir = action.split(",")
+                outcome = self.perform_chest(coords, dir)
             elif "repos" in action:
-                pass
+                _, dir, sec = action.split(",")
+                if not sect_cleared:
+                    self.perform_repos(coords, dir)
             elif "loot" in action:
-                pass
+                self.perform_loot(coords, curbss)
             elif "wypt" in action:
-                pass
+                self.perform_wypt(coords)
 
     def perform_clear(self, coords, dir, repos=False):
         pass
 
-    def perform_boss(self, coords, dir, repos=False):
+    def perform_boss(self, coords, dir, repos=False, curbss=False):
         pass
 
     def perform_exit(self, coords, nxtbss=False):
