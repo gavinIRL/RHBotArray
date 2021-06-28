@@ -645,6 +645,10 @@ class Map10_MS30():
         time.sleep(0.1)
         if Looting.check_for_lootv2(gamename):
             self.loot_everything(gamename)
+        # Try once more to loot
+        Looting.grab_nearby_loot(gamename)
+        self.move_slightly_left()
+        self.loot_everything(gamename)
 
     def loot_everything(self, gamename):
         player_name = False
