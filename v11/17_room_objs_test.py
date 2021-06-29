@@ -233,6 +233,18 @@ class RoomHandler():
         time.sleep(0.1)
 
 
+class AntiStickUtils:
+
+    def move_bigmap_dynamic():
+        pass
+
+    def grab_nearby_loot():
+        pass
+
+    def loot_everything():
+        pass
+
+
 def load_level_data(filename):
     with open(filename) as f:
         lines = f.readlines()
