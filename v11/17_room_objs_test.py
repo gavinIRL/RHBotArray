@@ -144,7 +144,10 @@ class RoomHandler():
             elif "loot" in action:
                 self.perform_loot(coords, curbss)
             elif "wypt" in action:
-                self.perform_wypt(coords)
+                outcome = self.perform_wypt(coords)
+                if not outcome:
+                    print("Problem with nav during exit, need to add handling")
+                    os._exit(1)
 
     def perform_clear(self, coords, dir, repos=False):
         pass
@@ -153,7 +156,7 @@ class RoomHandler():
         pass
 
     def perform_exit(self, coords, nxtbss_dir=False, petoff=False):
-        outcome = BotUtils.move_bigmap_dynamic(int(coords[1]), int(coords[2]))
+        outcome = BotUtils.move_bigmap_dynamic(int(coords[0]), int(coords[1]))
         nodetcnt = 0
         while not outcome:
             nodetcnt += 1
@@ -166,7 +169,7 @@ class RoomHandler():
                 CustomInput.press_key(CustomInput.key_map[key], key)
                 CustomInput.release_key(CustomInput.key_map[key], key)
             outcome = BotUtils.move_bigmap_dynamic(
-                int(coords[1]), int(coords[2]))
+                int(coords[0]), int(coords[1]))
         # Then turn pet off if required
         if petoff:
             self.cancel_momo_summon()
@@ -184,10 +187,41 @@ class RoomHandler():
         pass
 
     def perform_loot(self, coords, currbss=False):
-        pass
+        outcome = BotUtils.move_bigmap_dynamic(int(coords[0]), int(coords[1]))
+        nodetcnt = 0
+        while not outcome:
+            nodetcnt += 1
+            if nodetcnt > 10:
+                print("ERROR WITH NAVIGATION")
+                return False
+                # os._exit(1)
+            if nodetcnt % 3 == 0:
+                key = "right"
+                CustomInput.press_key(CustomInput.key_map[key], key)
+                CustomInput.release_key(CustomInput.key_map[key], key)
+            outcome = BotUtils.move_bigmap_dynamic(
+                int(coords[0]), int(coords[1]))
+        print("Will perform looting from this point in future")
+        time.sleep(0.3)
+        return True
 
     def perform_wypt(self, coords):
-        pass
+        outcome = BotUtils.move_bigmap_dynamic(int(coords[0]), int(coords[1]))
+        nodetcnt = 0
+        while not outcome:
+            nodetcnt += 1
+            if nodetcnt > 10:
+                print("ERROR WITH NAVIGATION")
+                return False
+                # os._exit(1)
+            if nodetcnt % 3 == 0:
+                key = "right"
+                CustomInput.press_key(CustomInput.key_map[key], key)
+                CustomInput.release_key(CustomInput.key_map[key], key)
+            outcome = BotUtils.move_bigmap_dynamic(
+                int(coords[0]), int(coords[1]))
+        time.sleep(0.3)
+        return True
 
     def cancel_momo_summon(self):
         wincap = WindowCapture(self.gamename)
