@@ -2159,7 +2159,10 @@ class Events:
                     return True
         return False
 
-    def detect_yes_no(gamename):
+    def detect_yes_no(gamename=False):
+        if not gamename:
+            with open("gamename.txt") as f:
+                gamename = f.readline()
         wincap = WindowCapture(gamename, [516, 426, 541, 441])
         image = wincap.get_screenshot()
         rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
@@ -2167,6 +2170,15 @@ class Events:
         result = pytesseract.image_to_string(
             rgb, lang='eng', config=tess_config)[:-2]
         if result == "Yes":
+            return True
+        wincap = WindowCapture(gamename, [748, 426, 775, 441])
+        image = wincap.get_screenshot()
+        cv2.imwrite("testytest.jpg", image)
+        rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        tess_config = '--psm 7 --oem 3 -c tessedit_char_whitelist=No'
+        result = pytesseract.image_to_string(
+            rgb, lang='eng', config=tess_config)[:-2]
+        if result == "No":
             return True
         return False
 
