@@ -256,7 +256,60 @@ class AntiStickUtils:
         pass
 
     def try_find_and_grab_loot(gamename=False, player_name=False, loot_lowest=True, allow_noplyr=True):
-        pass
+        if not gamename:
+            with open("gamename.txt") as f:
+                gamename = f.readline()
+        # First need to close anything that might be in the way
+        BotUtils.close_map_and_menu(gamename)
+        # Then grab loot locations
+        loot_list = Looting.grab_farloot_locationsv2(gamename)
+        if not loot_list:
+            return "noloot"
+        # Then look for player
+        if player_name:
+            playerx, playery = BotUtils.grab_character_location(
+                player_name, gamename)
+            # If didn't find player then try once more
+            if not playerx:
+                playerx, playery = BotUtils.grab_character_location(
+                    player_name, gamename)
+                if not playerx:
+                    if not allow_noplyr:
+                        return "noplayer"
+                    else:
+                        playerx, playery = [641, 387]
+        # Otherwise assume a standard player position
+        else:
+            playerx, playery = [641, 387]
+        # The decide whether to loot nearest or lowest
+        # Difference between first is faster,
+        # second less likely to miss loot by walking out of FOV
+        if not loot_lowest:
+            # Then convert lootlist to rel_pos list
+            relatives = BotUtils.convert_list_to_rel(
+                loot_list, playerx, playery, 150)
+            # Grab the indexes in ascending order of closesness
+            order = BotUtils.grab_order_closeness(relatives)
+            # Then reorder the lootlist to match
+            loot_list = [x for _, x in sorted(zip(order, loot_list))]
+        else:
+            # Grab the indexes in ascending order of distance from
+            # bottom of the screen
+            # print(loot_list)
+            loot_list.sort(key=lambda x: x[1], reverse=True)
+            # order = BotUtils.grab_order_lowest_y(loot_list)
+            # Then reorder the lootlist to match
+            # loot_list = [x for _, x in sorted(zip(order, loot_list))]
+            # print(loot_list)
+        true_coords = [loot_list[0][0], loot_list[0][1]]
+        # Now calculate relative loot position
+        relx = playerx - loot_list[0][0]
+        rely = loot_list[0][1] - playery - 150
+        # Grab the small rect for speed tracking
+        rect = [loot_list[0][0]-90, loot_list[0][1] -
+                30, loot_list[0][0]+90, loot_list[0][1]+30]
+        # Then send to dedicated function for diagonal looting run
+        return Looting.move_loot_diagonal(true_coords, [relx, rely], rect, gamename, True)
 
 
 def load_level_data(filename):
