@@ -219,6 +219,27 @@ def detect_store(gamename=False):
     return False
 
 
+def detect_yes_no_robust(gamename):
+    wincap = WindowCapture(gamename, [516, 426, 541, 441])
+    image = wincap.get_screenshot()
+    rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+    tess_config = '--psm 7 --oem 3 -c tessedit_char_whitelist=Yes'
+    result = pytesseract.image_to_string(
+        rgb, lang='eng', config=tess_config)[:-2]
+    if result == "Yes":
+        return True
+    wincap = WindowCapture(gamename, [748, 426, 775, 441])
+    image = wincap.get_screenshot()
+    cv2.imwrite("testytest.jpg", image)
+    rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+    tess_config = '--psm 7 --oem 3 -c tessedit_char_whitelist=No'
+    result = pytesseract.image_to_string(
+        rgb, lang='eng', config=tess_config)[:-2]
+    if result == "No":
+        return True
+    return False
+
+
 time.sleep(1.5)
 with open("gamename.txt") as f:
     gamename = f.readline()
@@ -231,4 +252,4 @@ with open("gamename.txt") as f:
 # prevent_dodge_check(0.05)
 # in_town_check_thread(gamename, [True])
 # click_on_game(gamename)
-print(detect_store(gamename))
+print(detect_yes_no_robust(gamename))
