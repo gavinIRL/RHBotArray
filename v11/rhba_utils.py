@@ -843,6 +843,18 @@ class BotUtils:
             return False, False
         else:
             points = vision.get_click_points(rectangles)
+            # If more than one point detected
+            # Need to choose the one closest to rect centre
+            if len(points) > 1:
+                midx = 0.5*(map_rect[2] - map_rect[0]) + map_rect[0]
+                midy = 0.5*(map_rect[3] - map_rect[1]) + map_rect[1]
+                # Then convert lootlist to rel_pos list
+                relatives = BotUtils.convert_list_to_rel(
+                    points, midx, midy, 150)
+                # Grab the indexes in ascending order of closesness
+                order = BotUtils.grab_order_closeness(relatives)
+                # Then reorder the lootlist to match
+                points = [x for _, x in sorted(zip(order, points))]
             if rect_rel:
                 return points[0]
             x = points[0][0] + map_rect[0]
