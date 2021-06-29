@@ -55,7 +55,9 @@ class Map10_MS30():
 class Room():
     def __init__(self, line: str) -> None:
         # Format of each line in the file should be as follows
-        # coords_n | coords_n+1 # action_n | action_n+1 # tags
+        # rect # coords_n | coords_n+1 # action_n | action_n+1 # tags
+        # ------------------------------------
+        # format rect is leftx, topy, rightx, bottomy
         # format coords is x,y
         # ------------------------------------
         # list actions is as follows:
@@ -71,10 +73,13 @@ class Room():
         # pet,on - this makes sure the pet is summoned (pre) or hidden (post)
         # nxtbss,dir - next room is the boss room, hold l to enter
         # curbss - this room is the boss room
-        coords, actions, tags = line.split("#")
+        rect, coords, actions, tags = line.split("#")
         self.action_list = []
         self.coord_list = []
         self.tags = []
+        self.rect = []
+        for point in rect.split(","):
+            self.rect.append(int(point))
         for coord in coords.split("|"):
             x, y = coord.split(",")
             self.coord_list.append((int(x), int(y)))
@@ -235,13 +240,22 @@ class RoomHandler():
 
 class AntiStickUtils:
 
-    def move_bigmap_dynamic():
+    def check_bigmap_open(gamename=False):
         pass
 
-    def grab_nearby_loot():
+    def open_bigmap(gamename=False):
+        pass
+
+    def move_bigmap_dynamic(x, y, gamename=False, rect=False):
         pass
 
     def loot_everything():
+        pass
+
+    def move_loot_diagonal(true_coords, relcoords, rect=False, gamename=False):
+        pass
+
+    def try_find_and_grab_loot(gamename=False, player_name=False, loot_lowest=True, allow_noplyr=True):
         pass
 
 
