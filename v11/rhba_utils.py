@@ -60,11 +60,11 @@ class WindowCapture:
 
     def get_screenshot(self):
         # get the window image data
-        wDC = win32gui.GetWindowDC(self.hwnd)
-        dcObj = win32ui.CreateDCFromHandle(wDC)
-        cDC = dcObj.CreateCompatibleDC()
-        dataBitMap = win32ui.CreateBitmap()
         try:
+            wDC = win32gui.GetWindowDC(self.hwnd)
+            dcObj = win32ui.CreateDCFromHandle(wDC)
+            cDC = dcObj.CreateCompatibleDC()
+            dataBitMap = win32ui.CreateBitmap()
             dataBitMap.CreateCompatibleBitmap(dcObj, self.w, self.h)
             cDC.SelectObject(dataBitMap)
             cDC.BitBlt((0, 0), (self.w, self.h), dcObj,
@@ -75,12 +75,12 @@ class WindowCapture:
             result = False
             while not result:
                 time.sleep(0.01)
-                wDC = win32gui.GetWindowDC(self.hwnd)
-                dcObj = win32ui.CreateDCFromHandle(wDC)
-                cDC = dcObj.CreateCompatibleDC()
-                dataBitMap = win32ui.CreateBitmap()
-                cDC.SelectObject(dataBitMap)
                 try:
+                    wDC = win32gui.GetWindowDC(self.hwnd)
+                    dcObj = win32ui.CreateDCFromHandle(wDC)
+                    cDC = dcObj.CreateCompatibleDC()
+                    dataBitMap = win32ui.CreateBitmap()
+                    cDC.SelectObject(dataBitMap)
                     dataBitMap.CreateCompatibleBitmap(dcObj, self.w, self.h)
                     cDC.SelectObject(dataBitMap)
                     cDC.BitBlt((0, 0), (self.w, self.h), dcObj,
