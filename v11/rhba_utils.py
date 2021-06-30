@@ -80,8 +80,6 @@ class WindowCapture:
                 cDC = dcObj.CreateCompatibleDC()
                 dataBitMap = win32ui.CreateBitmap()
                 cDC.SelectObject(dataBitMap)
-                cDC.BitBlt((0, 0), (self.w, self.h), dcObj,
-                           (self.cropped_x, self.cropped_y), win32con.SRCCOPY)
                 try:
                     dataBitMap.CreateCompatibleBitmap(dcObj, self.w, self.h)
                     cDC.SelectObject(dataBitMap)
