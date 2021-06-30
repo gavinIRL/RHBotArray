@@ -77,9 +77,9 @@ class Room():
         self.action_list = []
         self.coord_list = []
         self.tags = []
-        self.rect = []
+        self.rects = []
         for point in rect.split(","):
-            self.rect.append(int(point))
+            self.rects.append(int(point))
         for coord in coords.split("|"):
             x, y = coord.split(",")
             self.coord_list.append((int(x), int(y)))
@@ -161,7 +161,8 @@ class RoomHandler():
         pass
 
     def perform_exit(self, coords, nxtbss_dir=False, petoff=False):
-        outcome = BotUtils.move_bigmap_dynamic(int(coords[0]), int(coords[1]))
+        outcome = AntiStickUtils.move_bigmap_dynamic(
+            int(coords[0]), int(coords[1]))
         nodetcnt = 0
         while not outcome:
             nodetcnt += 1
@@ -173,7 +174,7 @@ class RoomHandler():
                 key = "right"
                 CustomInput.press_key(CustomInput.key_map[key], key)
                 CustomInput.release_key(CustomInput.key_map[key], key)
-            outcome = BotUtils.move_bigmap_dynamic(
+            outcome = AntiStickUtils.move_bigmap_dynamic(
                 int(coords[0]), int(coords[1]))
         # Then turn pet off if required
         if petoff:
@@ -192,7 +193,8 @@ class RoomHandler():
         pass
 
     def perform_loot(self, coords, currbss=False):
-        outcome = BotUtils.move_bigmap_dynamic(int(coords[0]), int(coords[1]))
+        outcome = AntiStickUtils.move_bigmap_dynamic(
+            int(coords[0]), int(coords[1]))
         nodetcnt = 0
         while not outcome:
             nodetcnt += 1
@@ -204,14 +206,15 @@ class RoomHandler():
                 key = "right"
                 CustomInput.press_key(CustomInput.key_map[key], key)
                 CustomInput.release_key(CustomInput.key_map[key], key)
-            outcome = BotUtils.move_bigmap_dynamic(
+            outcome = AntiStickUtils.move_bigmap_dynamic(
                 int(coords[0]), int(coords[1]))
         print("Will perform looting from this point in future")
         time.sleep(0.3)
         return True
 
     def perform_wypt(self, coords):
-        outcome = BotUtils.move_bigmap_dynamic(int(coords[0]), int(coords[1]))
+        outcome = AntiStickUtils.move_bigmap_dynamic(
+            int(coords[0]), int(coords[1]))
         nodetcnt = 0
         while not outcome:
             nodetcnt += 1
@@ -223,7 +226,7 @@ class RoomHandler():
                 key = "right"
                 CustomInput.press_key(CustomInput.key_map[key], key)
                 CustomInput.release_key(CustomInput.key_map[key], key)
-            outcome = BotUtils.move_bigmap_dynamic(
+            outcome = AntiStickUtils.move_bigmap_dynamic(
                 int(coords[0]), int(coords[1]))
         time.sleep(0.3)
         return True
