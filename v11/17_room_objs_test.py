@@ -155,27 +155,48 @@ class RoomHandler():
                     os._exit(1)
 
     def perform_clear(self, coords, dir, repos=False):
-        pass
+        self.perform_navigation(coords, True)
+        self.face_direction(dir)
+        if not repos:
+            pass
+            # Then need to press the primary clear button
+
+            # And continue attacking until sectclr is detected
+        # Alternative handling if reposition is required mid-clear
+        else:
+            pass
+            # Then need to press the primary clear button
+
+            # And continue attacking until sectclr is detected
+            # or reposition time has been reached
 
     def perform_boss(self, coords, dir, repos=False, curbss=False):
-        pass
+        self.perform_navigation(coords, True)
+        self.face_direction(dir)
+        if not repos:
+            pass
+            # Then need to start the primary bosskill combo
+            # And continue attacking until bosskill is detected
+            if curbss:
+                pass
+            # or else until sectclear detected
+            else:
+                pass
+        # Alternative handling if reposition is required mid-clear
+        else:
+            pass
+            # Then need to start the primary bosskill combo
+            # And continue attacking until bosskill is detected
+            # or reposition time has been reached
+            if curbss:
+                pass
+            # or else until sectclear detected
+            # or reposition time has been reached
+            else:
+                pass
 
     def perform_exit(self, coords, nxtbss_dir=False, petoff=False):
-        outcome = AntiStickUtils.move_bigmap_dynamic(
-            int(coords[0]), int(coords[1]))
-        nodetcnt = 0
-        while not outcome:
-            nodetcnt += 1
-            if nodetcnt > 10:
-                print("ERROR WITH NAVIGATION")
-                return False
-                # os._exit(1)
-            if nodetcnt % 3 == 0:
-                key = "right"
-                CustomInput.press_key(CustomInput.key_map[key], key)
-                CustomInput.release_key(CustomInput.key_map[key], key)
-            outcome = AntiStickUtils.move_bigmap_dynamic(
-                int(coords[0]), int(coords[1]))
+        self.perform_navigation(coords)
         # Then turn pet off if required
         if petoff:
             self.cancel_momo_summon()
@@ -187,63 +208,27 @@ class RoomHandler():
         return True
 
     def perform_chest(self, coords, dir):
-        outcome = AntiStickUtils.move_bigmap_dynamic(
-            int(coords[0]), int(coords[1]))
-        nodetcnt = 0
-        while not outcome:
-            nodetcnt += 1
-            if nodetcnt > 10:
-                print("ERROR WITH NAVIGATION")
-                return False
-                # os._exit(1)
-            if nodetcnt % 3 == 0:
-                key = "right"
-                CustomInput.press_key(CustomInput.key_map[key], key)
-                CustomInput.release_key(CustomInput.key_map[key], key)
-            outcome = AntiStickUtils.move_bigmap_dynamic(
-                int(coords[0]), int(coords[1]))
+        self.perform_navigation(coords)
         self.face_direction(dir)
         self.hit_chest()
 
     def perform_repos(self, coords, dir):
-        pass
+        self.perform_navigation(coords, True)
+        self.face_direction(dir)
 
     def perform_loot(self, coords, currbss=False):
-        outcome = AntiStickUtils.move_bigmap_dynamic(
-            int(coords[0]), int(coords[1]))
-        nodetcnt = 0
-        while not outcome:
-            nodetcnt += 1
-            if nodetcnt > 10:
-                print("ERROR WITH NAVIGATION")
-                return False
-                # os._exit(1)
-            if nodetcnt % 3 == 0:
-                key = "right"
-                CustomInput.press_key(CustomInput.key_map[key], key)
-                CustomInput.release_key(CustomInput.key_map[key], key)
-            outcome = AntiStickUtils.move_bigmap_dynamic(
-                int(coords[0]), int(coords[1]))
-        print("Will perform looting from this point in future")
+        self.perform_navigation(coords)
+        # TBD need to loot until can't detect indungeon if curbss
+        if currbss:
+            pass
+        # Otherwise need to loot until all gone
+        else:
+            pass
         time.sleep(0.3)
         return True
 
     def perform_wypt(self, coords):
-        outcome = AntiStickUtils.move_bigmap_dynamic(
-            int(coords[0]), int(coords[1]))
-        nodetcnt = 0
-        while not outcome:
-            nodetcnt += 1
-            if nodetcnt > 10:
-                print("ERROR WITH NAVIGATION")
-                return False
-                # os._exit(1)
-            if nodetcnt % 3 == 0:
-                key = "right"
-                CustomInput.press_key(CustomInput.key_map[key], key)
-                CustomInput.release_key(CustomInput.key_map[key], key)
-            outcome = AntiStickUtils.move_bigmap_dynamic(
-                int(coords[0]), int(coords[1]))
+        self.perform_navigation(coords)
         time.sleep(0.3)
         return True
 
@@ -269,6 +254,51 @@ class RoomHandler():
         CustomInput.press_key(CustomInput.key_map[key], key)
         CustomInput.release_key(CustomInput.key_map[key], key)
 
+    def perform_navigation(self, coords, sectclr_chk=False):
+        if not sectclr_chk:
+            outcome = AntiStickUtils.move_bigmap_dynamic(
+                int(coords[0]), int(coords[1]))
+            nodetcnt = 0
+            while not outcome:
+                nodetcnt += 1
+                if nodetcnt > 10:
+                    print("ERROR WITH NAVIGATION")
+                    return False
+                    # os._exit(1)
+                if nodetcnt % 3 == 0:
+                    key = "right"
+                    CustomInput.press_key(CustomInput.key_map[key], key)
+                    CustomInput.release_key(CustomInput.key_map[key], key)
+                outcome = AntiStickUtils.move_bigmap_dynamic(
+                    int(coords[0]), int(coords[1]))
+        else:
+            outcome = AntiStickUtils.move_bigmap_dynamic_sectclrchk(
+                int(coords[0]), int(coords[1]))
+            nodetcnt = 0
+            while not outcome:
+                if BotUtils.detect_sect_clear(self.gamename):
+                    return True
+                nodetcnt += 1
+                if nodetcnt > 10:
+                    print("ERROR WITH NAVIGATION")
+                    return False
+                    # os._exit(1)
+                if nodetcnt % 3 == 0:
+                    key = "right"
+                    CustomInput.press_key(CustomInput.key_map[key], key)
+                    CustomInput.release_key(CustomInput.key_map[key], key)
+                outcome = AntiStickUtils.move_bigmap_dynamic_sectclrchk(
+                    int(coords[0]), int(coords[1]))
+
+    def perform_primary_clear(self):
+        pass
+
+    def perform_continue_clear(self):
+        pass
+
+    def perform_boss_combo(self):
+        pass
+
 
 class AntiStickUtils:
 
@@ -279,6 +309,75 @@ class AntiStickUtils:
         pass
 
     def move_bigmap_dynamic(x, y, gamename=False, rect=False, checkmap=True):
+        if not gamename:
+            with open("gamename.txt") as f:
+                gamename = f.readline()
+        if Events.detect_yes_no(gamename):
+            RHClick.click_no(gamename)
+        if checkmap:
+            count = 0
+            while not BotUtils.detect_bigmap_open(gamename):
+                count += 1
+                if count % 2 == 0:
+                    BotUtils.try_toggle_map_clicking()
+                else:
+                    BotUtils.try_toggle_map()
+                time.sleep(0.03)
+        else:
+            BotUtils.try_toggle_map()
+        # Then need to find where the player is
+        if not rect:
+            rect = [561, 282, 1111, 666]
+        playerx, playery = BotUtils.grab_player_posv2(gamename, rect)
+        if not playerx:
+            if not checkmap:
+                time.sleep(0.5)
+                BotUtils.try_toggle_map()
+                time.sleep(0.005)
+                playerx, playery = BotUtils.grab_player_posv2(gamename, rect)
+                if not playerx:
+                    return False
+            else:
+                time.sleep(0.5)
+                BotUtils.try_toggle_map()
+                time.sleep(0.005)
+                playerx, playery = BotUtils.grab_player_posv2(gamename, rect)
+                if not playerx:
+                    print("Unable to find player")
+                    return False
+        relx = x - playerx
+        rely = playery - y
+        margin = 1
+        follower = Follower(margin)
+        noplyr_count = 0
+        start_time = time.time()
+        while abs(relx) > margin or abs(rely) > margin:
+            rect = [playerx - 50, playery - 50, playerx + 50, playery + 50]
+            playerx, playery = BotUtils.grab_player_posv2(gamename, rect)
+            if playerx:
+                if noplyr_count > 0:
+                    noplyr_count -= 1
+                relx = x - playerx
+                rely = playery - y
+                follower.navigate_towards(relx, rely)
+            else:
+                noplyr_count += 1
+                if noplyr_count > 10:
+                    break
+            if time.time() - start_time > 10:
+                print("Got stuck during navigation")
+                BotUtils.try_toggle_map()
+                follower.release_all_keys()
+                return False
+            time.sleep(0.02)
+        follower.release_all_keys()
+        BotUtils.try_toggle_map()
+        if noplyr_count > 10:
+            return False
+        else:
+            return True
+
+    def move_bigmap_dynamic_sectclrchk(x, y, gamename=False, rect=False, checkmap=True):
         if not gamename:
             with open("gamename.txt") as f:
                 gamename = f.readline()
