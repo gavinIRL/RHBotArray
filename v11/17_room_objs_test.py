@@ -187,7 +187,23 @@ class RoomHandler():
         return True
 
     def perform_chest(self, coords, dir):
-        pass
+        outcome = AntiStickUtils.move_bigmap_dynamic(
+            int(coords[0]), int(coords[1]))
+        nodetcnt = 0
+        while not outcome:
+            nodetcnt += 1
+            if nodetcnt > 10:
+                print("ERROR WITH NAVIGATION")
+                return False
+                # os._exit(1)
+            if nodetcnt % 3 == 0:
+                key = "right"
+                CustomInput.press_key(CustomInput.key_map[key], key)
+                CustomInput.release_key(CustomInput.key_map[key], key)
+            outcome = AntiStickUtils.move_bigmap_dynamic(
+                int(coords[0]), int(coords[1]))
+        self.face_direction(dir)
+        self.hit_chest()
 
     def perform_repos(self, coords, dir):
         pass
@@ -239,6 +255,19 @@ class RoomHandler():
         time.sleep(0.1)
         pydirectinput.click(x+148, y+213)
         time.sleep(0.1)
+
+    def face_direction(self, dir):
+        CustomInput.press_key(CustomInput.key_map[dir], dir)
+        CustomInput.release_key(CustomInput.key_map[dir], dir)
+
+    def hit_chest(self):
+        Looting.grab_nearby_loot(self.gamename)
+        key = "x"
+        CustomInput.press_key(CustomInput.key_map[key], key)
+        CustomInput.release_key(CustomInput.key_map[key], key)
+        time.sleep(0.3)
+        CustomInput.press_key(CustomInput.key_map[key], key)
+        CustomInput.release_key(CustomInput.key_map[key], key)
 
 
 class AntiStickUtils:
