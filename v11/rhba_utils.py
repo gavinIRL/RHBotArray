@@ -66,6 +66,9 @@ class WindowCapture:
         dataBitMap = win32ui.CreateBitmap()
         try:
             dataBitMap.CreateCompatibleBitmap(dcObj, self.w, self.h)
+            cDC.SelectObject(dataBitMap)
+            cDC.BitBlt((0, 0), (self.w, self.h), dcObj,
+                       (self.cropped_x, self.cropped_y), win32con.SRCCOPY)
         except:
             # print("Error with window handle, trying to continue")
             count = 0
@@ -76,17 +79,23 @@ class WindowCapture:
                 dcObj = win32ui.CreateDCFromHandle(wDC)
                 cDC = dcObj.CreateCompatibleDC()
                 dataBitMap = win32ui.CreateBitmap()
+                cDC.SelectObject(dataBitMap)
+                cDC.BitBlt((0, 0), (self.w, self.h), dcObj,
+                           (self.cropped_x, self.cropped_y), win32con.SRCCOPY)
                 try:
                     dataBitMap.CreateCompatibleBitmap(dcObj, self.w, self.h)
+                    cDC.SelectObject(dataBitMap)
+                    cDC.BitBlt((0, 0), (self.w, self.h), dcObj,
+                               (self.cropped_x, self.cropped_y), win32con.SRCCOPY)
                     result = True
                 except:
                     count += 1
                     if count > 5:
                         print("Could not do handle multiple times")
                         os._exit(1)
-        cDC.SelectObject(dataBitMap)
-        cDC.BitBlt((0, 0), (self.w, self.h), dcObj,
-                   (self.cropped_x, self.cropped_y), win32con.SRCCOPY)
+        # cDC.SelectObject(dataBitMap)
+        # cDC.BitBlt((0, 0), (self.w, self.h), dcObj,
+        #            (self.cropped_x, self.cropped_y), win32con.SRCCOPY)
         # convert the raw data into a format opencv can read
         signedIntsArray = dataBitMap.GetBitmapBits(True)
         img = np.fromstring(signedIntsArray, dtype='uint8')
