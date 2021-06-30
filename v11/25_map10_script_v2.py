@@ -900,7 +900,7 @@ if __name__ == "__main__":
     with open("gamename.txt") as f:
         gamename = f.readline()
     time.sleep(1)
-    num_loops = 27
+    num_loops = 23
     start = time.time()
     map = Map10_MS30()
     map.click_on_game(gamename)
