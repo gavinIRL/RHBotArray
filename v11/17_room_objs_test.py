@@ -52,6 +52,14 @@ class Map10_MS30():
         self.perform_endmap(repeat)
 
 
+class Weapon:
+    def __init__(self, weapon="MS") -> None:
+        if weapon == "MS":
+            self.primary_clear = "h"
+            self.continue_clear = ["h", "a", "g", "f", "s", "d"]
+            self.continue_boss = ["a", "g", "f", "s", "d"]
+
+
 class Room():
     def __init__(self, line: str) -> None:
         # Format of each line in the file should be as follows
@@ -77,9 +85,9 @@ class Room():
         self.action_list = []
         self.coord_list = []
         self.tags = []
-        self.rects = []
+        self.rect = []
         for point in rect.split(","):
-            self.rects.append(int(point))
+            self.rect.append(int(point))
         for coord in coords.split("|"):
             x, y = coord.split(",")
             self.coord_list.append((int(x), int(y)))
@@ -90,9 +98,10 @@ class Room():
 
 
 class RoomHandler():
-    def __init__(self, room: Room) -> None:
+    def __init__(self, room: Room, weapon: Weapon) -> None:
         # Add a timestamp to catch if have gotten stuck
         self.last_event_time = time.time()
+        self.weapon = weapon
         self.room = room
         with open("gamename.txt") as f:
             self.gamename = f.readline()
@@ -147,7 +156,10 @@ class RoomHandler():
                 if not sect_cleared:
                     self.perform_repos(coords, dir)
             elif "loot" in action:
-                self.perform_loot(coords, curbss)
+                if not curbss:
+                    self.perform_loot(coords)
+                else:
+                    self.perform_endlevel(coords)
             elif "wypt" in action:
                 outcome = self.perform_wypt(coords)
                 if not outcome:
@@ -216,14 +228,62 @@ class RoomHandler():
         self.perform_navigation(coords, True)
         self.face_direction(dir)
 
-    def perform_loot(self, coords, currbss=False):
+    def perform_endlevel(self, coords):
+        # First step is to go past death cutscene if required
+        reward_skip_det = False
+        endlevel_event_det = False
+        while Events.detect_in_dungeon():
+            time.sleep(0.006)
+            if Events.detect_move_reward_screen(self.gamename):
+                reward_skip_det = True
+                break
+        # Then it is to skip through endlevel event cutscene
+        if not reward_skip_det:
+            while not Events.detect_in_dungeon():
+                pydirectinput.press('esc')
+                time.sleep(0.05)
+                BotUtils.close_map_and_menu(self.gamename)
+                if Events.detect_move_reward_screen(self.gamename):
+                    reward_skip_det = True
+                    break
+                time.sleep(0.15)
+        # Then to finally confirm either one of the two events
+        if not reward_skip_det:
+            while True:
+                # Need to check for endlevel event
+                if Events.detect_endlevel_bonus_area(self.gamename):
+                    endlevel_event_det = True
+                    break
+                if Events.detect_move_reward_screen(self.gamename):
+                    reward_skip_det = True
+                    break
+                pydirectinput.press('esc')
+                time.sleep(0.05)
+                BotUtils.close_map_and_menu(self.gamename)
+        # And then do the endlevel event handling is required
+        if endlevel_event_det:
+            self.perform_endlevel_event_handling()
+        # Then move to primary loot point
+        AntiStickUtils.move_bigmap_dynamic(
+            coords[0], coords[1], rect=self.room.rect, checkmap=False)
+
+    def perform_endlevel_event_handling(self):
+        pass
+
+    def perform_endlevel_loot(self):
+        while Events.detect_in_dungeon():
+            if not self.loot_everything(self.gamename):
+                self.move_slightly_left()
+                # Try once more to loot
+                Looting.grab_nearby_loot(self.gamename)
+                self.loot_everything(self.gamename)
+                # Click centre of screen to skip
+                self.skip_to_reward(self.gamename)
+                break
+
+    def perform_loot(self, coords):
         self.perform_navigation(coords)
-        # TBD need to loot until can't detect indungeon if curbss
-        if currbss:
-            pass
-        # Otherwise need to loot until all gone
-        else:
-            pass
+        # Then perform looting as required
         time.sleep(0.3)
         return True
 
@@ -291,13 +351,22 @@ class RoomHandler():
                     int(coords[0]), int(coords[1]))
 
     def perform_primary_clear(self):
-        pass
+        key = self.weapon.primary_clear
+        CustomInput.press_key(CustomInput.key_map[key], key)
+        time.sleep(0.02)
+        CustomInput.release_key(CustomInput.key_map[key], key)
 
     def perform_continue_clear(self):
-        pass
+        for key in self.weapon.continue_clear:
+            CustomInput.press_key(CustomInput.key_map[key], key)
+            time.sleep(0.02)
+            CustomInput.release_key(CustomInput.key_map[key], key)
 
     def perform_boss_combo(self):
-        pass
+        for key in self.weapon.continue_boss:
+            CustomInput.press_key(CustomInput.key_map[key], key)
+            time.sleep(0.02)
+            CustomInput.release_key(CustomInput.key_map[key], key)
 
 
 class AntiStickUtils:
@@ -378,6 +447,8 @@ class AntiStickUtils:
             return True
 
     def move_bigmap_dynamic_sectclrchk(x, y, gamename=False, rect=False, checkmap=True):
+        if BotUtils.detect_sect_clear(gamename):
+            return True
         if not gamename:
             with open("gamename.txt") as f:
                 gamename = f.readline()
@@ -394,12 +465,16 @@ class AntiStickUtils:
                 time.sleep(0.03)
         else:
             BotUtils.try_toggle_map()
+        if BotUtils.detect_sect_clear(gamename):
+            return True
         # Then need to find where the player is
         if not rect:
             rect = [561, 282, 1111, 666]
         playerx, playery = BotUtils.grab_player_posv2(gamename, rect)
         if not playerx:
             if not checkmap:
+                if BotUtils.detect_sect_clear(gamename):
+                    return True
                 time.sleep(0.5)
                 BotUtils.try_toggle_map()
                 time.sleep(0.005)
@@ -421,6 +496,9 @@ class AntiStickUtils:
         noplyr_count = 0
         start_time = time.time()
         while abs(relx) > margin or abs(rely) > margin:
+            if BotUtils.detect_sect_clear(gamename):
+                follower.release_all_keys()
+                return True
             rect = [playerx - 50, playery - 50, playerx + 50, playery + 50]
             playerx, playery = BotUtils.grab_player_posv2(gamename, rect)
             if playerx:
