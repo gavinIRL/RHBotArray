@@ -9,7 +9,7 @@ import math
 import ctypes
 import logging
 from fuzzywuzzy import fuzz
-from rhba_utils import BotUtils, Events, SellRepair, RHClick, Looting, WindowCapture, Vision, HsvFilter
+from rhba_utils import BotUtils, Events, SellRepair, RHClick, Looting, WindowCapture, Vision, HsvFilter, Follower
 import pydirectinput
 from custom_input import CustomInput
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
@@ -37,7 +37,7 @@ class Map10_MS30():
             self.gamename, enemy_custom_rect)
         self.enemy_minimap_vision = Vision('enemy67.jpg')
         # Var for tracking gold progress
-        self.gold = 700000
+        self.gold = 860000
 
     def load_map_rooms(self):
         # Temporary, will be replace by objects later
@@ -925,6 +925,84 @@ class Map10_MS30():
             0x0002, 0, 0, 0, 0)
         ctypes.windll.user32.mouse_event(
             0x0004, 0, 0, 0, 0)
+
+
+class AntiStickUtils:
+
+    def check_bigmap_open(gamename=False):
+        pass
+
+    def open_bigmap(gamename=False):
+        pass
+
+    def move_bigmap_dynamic(x, y, gamename=False, rect=False, checkmap=True):
+        if not gamename:
+            with open("gamename.txt") as f:
+                gamename = f.readline()
+        if Events.detect_yes_no(gamename):
+            RHClick.click_no(gamename)
+        if checkmap:
+            count = 0
+            while not BotUtils.detect_bigmap_open(gamename):
+                count += 1
+                if count % 2 == 0:
+                    BotUtils.try_toggle_map_clicking()
+                else:
+                    BotUtils.try_toggle_map()
+                time.sleep(0.03)
+        else:
+            BotUtils.try_toggle_map()
+        # Then need to find where the player is
+        if not rect:
+            rect = [561, 282, 1111, 666]
+        playerx, playery = BotUtils.grab_player_posv2(gamename, rect)
+        if not playerx:
+            if not checkmap:
+                time.sleep(0.5)
+                BotUtils.try_toggle_map()
+                time.sleep(0.005)
+                playerx, playery = BotUtils.grab_player_posv2(gamename, rect)
+                if not playerx:
+                    return False
+            else:
+                time.sleep(0.5)
+                BotUtils.try_toggle_map()
+                time.sleep(0.005)
+                playerx, playery = BotUtils.grab_player_posv2(gamename, rect)
+                if not playerx:
+                    print("Unable to find player")
+                    return False
+        relx = x - playerx
+        rely = playery - y
+        margin = 1
+        follower = Follower(margin)
+        noplyr_count = 0
+        start_time = time.time()
+        while abs(relx) > margin or abs(rely) > margin:
+            rect = [playerx - 50, playery - 50, playerx + 50, playery + 50]
+            playerx, playery = BotUtils.grab_player_posv2(gamename, rect)
+            if playerx:
+                if noplyr_count > 0:
+                    noplyr_count -= 1
+                relx = x - playerx
+                rely = playery - y
+                follower.navigate_towards(relx, rely)
+            else:
+                noplyr_count += 1
+                if noplyr_count > 10:
+                    break
+            if time.time() - start_time > 10:
+                print("Got stuck during navigation")
+                BotUtils.try_toggle_map()
+                follower.release_all_keys()
+                return False
+            time.sleep(0.02)
+        follower.release_all_keys()
+        BotUtils.try_toggle_map()
+        if noplyr_count > 10:
+            return False
+        else:
+            return True
 
 
 if __name__ == "__main__":
