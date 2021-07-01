@@ -16,9 +16,18 @@ os.chdir(os.path.dirname(os.path.abspath(__file__)))
 logging.getLogger().setLevel(logging.ERROR)
 
 
-class Map10_MS30():
-    def __init__(self, roomdata):
+class Weapon:
+    def __init__(self, weapon="MS") -> None:
+        if weapon == "MS":
+            self.primary_clear = "h"
+            self.continue_clear = ["h", "a", "g", "f", "s", "d"]
+            self.continue_boss = ["a", "g", "f", "s", "d"]
+
+
+class MapHandler():
+    def __init__(self, roomdata, weapon: Weapon):
         self.rooms = roomdata
+        self.weapon = weapon
         self.speed = 22.5
         self.map_rect = [561, 282, 1111, 666]
         with open("gamename.txt") as f:
@@ -50,14 +59,6 @@ class Map10_MS30():
             rh.start_room()
         # And then perform the endmap routine
         self.perform_endmap(repeat)
-
-
-class Weapon:
-    def __init__(self, weapon="MS") -> None:
-        if weapon == "MS":
-            self.primary_clear = "h"
-            self.continue_clear = ["h", "a", "g", "f", "s", "d"]
-            self.continue_boss = ["a", "g", "f", "s", "d"]
 
 
 class Room():
@@ -284,7 +285,17 @@ class RoomHandler():
             coords[0], coords[1], rect=self.room.rect, checkmap=False)
 
     def perform_endlevel_event_handling(self):
-        pass
+        time.sleep(0.4)
+        RHClick.click_otherworld_ok(self.gamename)
+        time.sleep(2)
+        while not self.check_if_the_crack(self.gamename):
+            time.sleep(0.006)
+        # Then clear the area
+        self.perform_otherworld_combat(self.gamename)
+        # Then move to collect the loot
+        self.navigate_otherworld_loot(self.gamename)
+        # And then finally leave the otherworld
+        self.leave_otherworld(self.gamename)
 
     def perform_endlevel_loot(self):
         while Events.detect_in_dungeon():
