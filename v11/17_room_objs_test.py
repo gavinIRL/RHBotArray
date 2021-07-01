@@ -297,6 +297,34 @@ class RoomHandler():
         # And then finally leave the otherworld
         self.leave_otherworld(self.gamename)
 
+    def perform_otherworld_combat(self, gamename):
+        result = AntiStickUtils.move_bigmap_dynamic(660, 548)
+        while not result:
+            BotUtils.try_toggle_map_clicking()
+            result = AntiStickUtils.move_bigmap_dynamic(660, 548)
+        time.sleep(0.01)
+        CustomInput.press_key(CustomInput.key_map["h"])
+        time.sleep(0.005)
+        CustomInput.release_key(CustomInput.key_map["h"])
+        time.sleep(1)
+        result = AntiStickUtils.move_bigmap_dynamic(608, 532)
+        while not result:
+            BotUtils.try_toggle_map_clicking()
+            result = AntiStickUtils.move_bigmap_dynamic(608, 532)
+        counter = 10
+        while counter > 0:
+            if self.detect_enemies_overworld(gamename):
+                if counter < 10:
+                    counter += 1
+            else:
+                counter -= 1
+            self.continue_otherworld_attacks()
+
+    def check_if_the_crack(self):
+        if "ack" in BotUtils.detect_level_name(self.gamename):
+            return True
+        return False
+
     def perform_endlevel_loot(self):
         while Events.detect_in_dungeon():
             if not self.loot_everything(self.gamename):
