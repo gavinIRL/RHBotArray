@@ -336,6 +336,50 @@ class RoomHandler():
                 self.skip_to_reward(self.gamename)
                 break
 
+    def navigate_otherworld_loot(self, gamename):
+        # BotUtils.try_toggle_map_clicking()
+        result = AntiStickUtils.move_bigmap_dynamic(593, 419)
+        while not result:
+            BotUtils.try_toggle_map_clicking()
+            result = AntiStickUtils.move_bigmap_dynamic(593, 419)
+        AntiStickUtils.move_bigmap_dynamic(667, 392)
+        while not result:
+            BotUtils.try_toggle_map_clicking()
+            result = AntiStickUtils.move_bigmap_dynamic(667, 392)
+        BotUtils.close_map_and_menu(gamename)
+        self.loot_everything(gamename)
+        # Then have a second bite at looting
+        AntiStickUtils.move_bigmap_dynamic(667, 407)
+        self.loot_everything(gamename)
+
+    def leave_otherworld(self, gamename):
+        AntiStickUtils.move_bigmap_dynamic(667, 455)
+        time.sleep(0.5)
+        RHClick.click_yes(gamename)
+        time.sleep(2.5)
+
+    def detect_enemies_overworld(self, gamename):
+        count = 0
+        while not BotUtils.detect_bigmap_open(gamename):
+            count += 1
+            if count % 2 == 0:
+                BotUtils.try_toggle_map()
+            else:
+                BotUtils.try_toggle_map_clicking()
+            time.sleep(0.008)
+        wincap = WindowCapture(gamename, [519, 304, 830, 610])
+        othr_plyr_vision = Vision("otherplayerinvert.jpg")
+        image = wincap.get_screenshot()
+        filter = HsvFilter(0, 198, 141, 8, 255, 255, 0, 0, 0, 0)
+        image = cv2.blur(image, (4, 4))
+        image = BotUtils.filter_blackwhite_invert(filter, image)
+        rectangles = othr_plyr_vision.find(
+            image, threshold=0.41, epsilon=0.5)
+        points = othr_plyr_vision.get_click_points(rectangles)
+        if len(points) >= 1:
+            return True
+        return False
+
     def perform_loot(self, coords):
         self.perform_navigation(coords)
         # Then perform looting as required
