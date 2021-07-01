@@ -387,6 +387,88 @@ class RoomHandler():
             time.sleep(0.02)
             CustomInput.release_key(CustomInput.key_map[key], key)
 
+    def calculate_travel_time(self, x, y, currx=False, curry=False):
+        if not currx:
+            if not BotUtils.BotUtils.detect_bigmap_open(self.gamename):
+                BotUtils.try_toggle_map_clicking(self.gamename)
+            currx, curry = BotUtils.grab_player_posv2(
+                self.gamename, [x-75, y-75, x+75, y+75])
+            BotUtils.close_map_and_menu(self.gamename)
+        xdist = abs(currx - int(x))
+        ydist = abs(int(y) - curry)
+        smaller = min(xdist, ydist)
+        diag = math.hypot(smaller, smaller)
+        travel_time = (diag + max(xdist, ydist) - smaller)/self.speed
+        return travel_time
+
+    def aim_at_enemies(self):
+        points = self.grab_enemy_points()
+        if points:
+            if points[0][0] < 94:
+                CustomInput.press_key(CustomInput.key_map["left"], "left")
+            if points[0][0] > 94:
+                CustomInput.press_key(CustomInput.key_map["right"], "right")
+            if points[0][1] < 69:
+                CustomInput.press_key(CustomInput.key_map["up"], "up")
+            if points[0][1] > 69:
+                CustomInput.press_key(CustomInput.key_map["down"], "down")
+            time.sleep(0.005)
+            BotUtils.stop_movement()
+
+    def find_nearest_enemy(self):
+        try:
+            points = self.grab_enemy_points()[0]
+        except:
+            return False
+        return [points[0] - 94, 69-points[1]]
+
+    def grab_off_cooldown(self, skill_list=False, gamename=False):
+        if not gamename:
+            with open("gamename.txt") as f:
+                gamename = f.readline()
+        if not skill_list:
+            skill_list = ["a", "s", "d", "f", "g", "h"]
+        available = []
+        wincap = WindowCapture(gamename, [395, 745, 591, 748])
+        image = wincap.get_screenshot()
+        a, _, _ = [int(i) for i in image[0][0]]
+        b, _, _ = [int(i) for i in image[0][39]]
+        c, _, _ = [int(i) for i in image[0][78]]
+        d, _, _ = [int(i) for i in image[0][117]]
+        e, _, _ = [int(i) for i in image[0][156]]
+        f, _, _ = [int(i) for i in image[0][195]]
+        if a == 56 and "a" in skill_list:
+            available.append("a")
+        if b == 11 and "s" in skill_list:
+            available.append("s")
+        if c == 44 and "d" in skill_list:
+            available.append("d")
+        if d == 245 and "f" in skill_list:
+            available.append("f")
+        if e == 231 and "g" in skill_list:
+            available.append("g")
+        if f == 142 and "h" in skill_list:
+            available.append("h")
+        if len(available) > 0:
+            return available
+        else:
+            return False
+
+    def grab_enemy_points(self):
+        minimap_screenshot = self.enemy_minimap_wincap.get_screenshot()
+        # pre-process the image to help with detection
+        enemy_output_image = BotUtils.apply_hsv_filter(
+            minimap_screenshot, self.enemy_minimap_filter)
+        # do object detection, this time grab points
+        enemy_rectangles = self.enemy_minimap_vision.find(
+            enemy_output_image, threshold=0.61, epsilon=0.5)
+        # then return answer to whether enemies are detected
+        if len(enemy_rectangles) >= 1:
+            points = self.enemy_minimap_vision.get_click_points(
+                enemy_rectangles)
+            return points
+        return False
+
 
 class AntiStickUtils:
 
