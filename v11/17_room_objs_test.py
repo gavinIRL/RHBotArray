@@ -170,17 +170,33 @@ class RoomHandler():
         self.perform_navigation(coords, True)
         self.face_direction(dir)
         if not repos:
-            pass
-            # Then need to press the primary clear button
-
-            # And continue attacking until sectclr is detected
+            while not BotUtils.detect_sect_clear(self.gamename):
+                if time.time() - aim_cd > 2:
+                    # print("Aiming at enemies again")
+                    self.aim_at_enemies()
+                    aim_cd = time.time() + 1
+                    self.perform_continue_clear()
+                else:
+                    self.perform_continue_clear()
+            return True
         # Alternative handling if reposition is required mid-clear
         else:
-            pass
-            # Then need to press the primary clear button
-
-            # And continue attacking until sectclr is detected
-            # or reposition time has been reached
+            start_time = time.time()
+            need_to_repos = False
+            while not BotUtils.detect_sect_clear(self.gamename):
+                if time.time() - aim_cd > 2:
+                    # print("Aiming at enemies again")
+                    self.aim_at_enemies()
+                    aim_cd = time.time() + 1
+                    self.perform_continue_clear()
+                elif time.time() - start_time > repos:
+                    need_to_repos = True
+                    break
+                else:
+                    self.perform_continue_clear()
+            if not need_to_repos:
+                return True
+            return False
 
     def perform_boss(self, coords, dir, repos=False, curbss=False):
         self.perform_navigation(coords, True)
@@ -291,6 +307,9 @@ class RoomHandler():
         self.perform_navigation(coords)
         time.sleep(0.3)
         return True
+
+    def perform_midlevel_event(self):
+        pass
 
     def cancel_momo_summon(self):
         wincap = WindowCapture(self.gamename)
