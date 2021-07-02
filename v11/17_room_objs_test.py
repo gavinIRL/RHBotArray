@@ -337,6 +337,20 @@ class RoomHandler():
         if self.repeat:
             self.repeat_level(self.gamename)
 
+    def loot_everything(self, gamename):
+        player_name = False
+        player_name = BotUtils.detect_player_name(gamename)
+        if not player_name:
+            # print("Didn't detect name")
+            return Looting.grab_all_visible_lootv2(gamename)
+        else:
+            return Looting.grab_all_visible_lootv2(gamename, player_name)
+
+    def skip_to_reward(self, gamename):
+        wincap = WindowCapture(gamename)
+        pydirectinput.click(
+            wincap.window_rect[0]+656, wincap.window_rect[1]+276)
+
     def perform_endlevel_event_handling(self):
         time.sleep(0.4)
         RHClick.click_otherworld_ok(self.gamename)
@@ -374,6 +388,24 @@ class RoomHandler():
             else:
                 counter -= 1
             self.continue_otherworld_attacks()
+
+    def move_slightly_left(self):
+        CustomInput.press_key(CustomInput.key_map["left"], "left")
+        time.sleep(0.25)
+        CustomInput.release_key(CustomInput.key_map["left"], "left")
+        time.sleep(0.1)
+
+    def click_on_game(self, gamename):
+        wincap = WindowCapture(gamename)
+        centre_x = int(0.5 * wincap.w +
+                       wincap.window_rect[0])
+        centre_y = int(3 +
+                       wincap.window_rect[1])
+        ctypes.windll.user32.SetCursorPos(centre_x, centre_y)
+        ctypes.windll.user32.mouse_event(
+            0x0002, 0, 0, 0, 0)
+        ctypes.windll.user32.mouse_event(
+            0x0004, 0, 0, 0, 0)
 
     def release_dir_keys(self):
         KEYS = {
