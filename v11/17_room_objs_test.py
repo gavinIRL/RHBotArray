@@ -302,12 +302,14 @@ class RoomHandler():
         while not result:
             BotUtils.try_toggle_map_clicking()
             result = AntiStickUtils.move_bigmap_dynamic(660, 548)
+        self.point_angle(0)
         time.sleep(0.01)
         CustomInput.press_key(CustomInput.key_map["h"])
         time.sleep(0.005)
         CustomInput.release_key(CustomInput.key_map["h"])
         time.sleep(1)
         result = AntiStickUtils.move_bigmap_dynamic(608, 532)
+        self.point_angle(0)
         while not result:
             BotUtils.try_toggle_map_clicking()
             result = AntiStickUtils.move_bigmap_dynamic(608, 532)
@@ -319,6 +321,29 @@ class RoomHandler():
             else:
                 counter -= 1
             self.continue_otherworld_attacks()
+
+    def release_dir_keys(self):
+        KEYS = {
+            'left': 37,
+            'up': 38,
+            'right': 39,
+            'down': 40
+        }
+        for key in ["up", "down", "left", "right"]:
+            if ctypes.windll.user32.GetKeyState(KEYS[key]) > 2:
+                CustomInput.release_key(CustomInput.key_map[key], key)
+
+    def point_angle(self, angle):
+        if angle >= 300 or angle < 60:
+            CustomInput.press_key(CustomInput.key_map["up"], "up")
+        if angle >= 210 and angle < 330:
+            CustomInput.press_key(CustomInput.key_map["left"], "left")
+        if angle >= 120 and angle < 240:
+            CustomInput.press_key(CustomInput.key_map["down"], "down")
+        if angle >= 30 and angle < 150:
+            CustomInput.press_key(CustomInput.key_map["right"], "right")
+        time.sleep(0.01)
+        self.release_dir_keys()
 
     def check_if_the_crack(self):
         if "ack" in BotUtils.detect_level_name(self.gamename):
