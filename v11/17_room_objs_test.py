@@ -289,9 +289,6 @@ class RoomHandler():
         AntiStickUtils.move_bigmap_dynamic(
             coords[0], coords[1], rect=self.room.rect, checkmap=False)
         Looting.grab_nearby_loot(self.gamename)
-        # Once event is complete move to correct place in room
-        self.move_to_loot_point()
-        # And then commence looting
         # print("Got to post-move to loot point")
         while Events.detect_in_dungeon():
             if not self.loot_everything(self.gamename):
@@ -322,13 +319,21 @@ class RoomHandler():
             pydirectinput.press('esc')
             time.sleep(0.05)
         # Then check for loot one last time
-        self.check_loot_preshop(self.gamename)
+        AntiStickUtils.move_bigmap_dynamic(
+            coords[0], coords[1], rect=self.room.rect, checkmap=False)
+        while self.loot_everything(self.gamename):
+            self.move_slightly_left()
+            # Try once more to loot
+            Looting.grab_nearby_loot(self.gamename)
+            self.loot_everything(self.gamename)
+            # Click centre of screen to skip
+            self.skip_to_reward(self.gamename)
         # And then perform the sell and repair actions
         sr = SellRepair()
         sr.ident_sell_repair()
         # And then go to next level if needs be
         # print("Got to pre-restart")
-        self.calculate_profit(self.gamename)
+        # self.calculate_profit(self.gamename)
         if self.repeat:
             self.repeat_level(self.gamename)
 
