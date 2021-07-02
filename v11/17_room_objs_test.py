@@ -99,11 +99,12 @@ class Room():
 
 
 class RoomHandler():
-    def __init__(self, room: Room, weapon: Weapon) -> None:
+    def __init__(self, room: Room, weapon: Weapon, repeat=False) -> None:
         # Add a timestamp to catch if have gotten stuck
         self.last_event_time = time.time()
         self.weapon = weapon
         self.room = room
+        self.repeat = repeat
         with open("gamename.txt") as f:
             self.gamename = f.readline()
 
@@ -287,6 +288,49 @@ class RoomHandler():
         # Then move to primary loot point
         AntiStickUtils.move_bigmap_dynamic(
             coords[0], coords[1], rect=self.room.rect, checkmap=False)
+        Looting.grab_nearby_loot(self.gamename)
+        # Once event is complete move to correct place in room
+        self.move_to_loot_point()
+        # And then commence looting
+        # print("Got to post-move to loot point")
+        while Events.detect_in_dungeon():
+            if not self.loot_everything(self.gamename):
+                self.move_slightly_left()
+                # Try once more to loot
+                Looting.grab_nearby_loot(self.gamename)
+                self.loot_everything(self.gamename)
+                # Click centre of screen to skip
+                self.skip_to_reward(self.gamename)
+                break
+        # print("Got to pre-card check")
+        # Then wait until card select appears
+        while not Events.detect_reward_choice_open(self.gamename):
+            time.sleep(0.2)
+        # print("Got to pre-choose reward")
+        # Then wait until the cards become selectable
+        time.sleep(4)
+        # Then choose a random card
+        Events.choose_random_reward(self.gamename)
+        # Then wait until store is detected
+        # print("Got to pre-shop check")
+        while not Events.detect_store(self.gamename):
+            time.sleep(0.2)
+        # print("Got to pre-sellrepair")
+        # Then wait to see if chest event appears
+        time.sleep(2)
+        if Events.detect_endlevel_chest(self.gamename):
+            pydirectinput.press('esc')
+            time.sleep(0.05)
+        # Then check for loot one last time
+        self.check_loot_preshop(self.gamename)
+        # And then perform the sell and repair actions
+        sr = SellRepair()
+        sr.ident_sell_repair()
+        # And then go to next level if needs be
+        # print("Got to pre-restart")
+        self.calculate_profit(self.gamename)
+        if self.repeat:
+            self.repeat_level(self.gamename)
 
     def perform_endlevel_event_handling(self):
         time.sleep(0.4)
