@@ -4,15 +4,15 @@
 A family of socket-controlled video game bots derived from https://github.com/gavinIRL/RHBot. See the parent repo for details on the game in question, etc. Each version is more autonomous with more features than the last. Goal is for fully autonomous bots.
 
 ## Current Status
-### 21st June
-The autonomous effort ran into a snag in the past week due to getting stuck attempting to loot and also general moving around. Therefore two new more accurate methods have been developed to reduce the chances of getting stuck. Additionally, looting now occurs by moving in a diagonal manner which greatly reduces the time taken and also reduces probability of getting stuck. There is also a much more robust catch for inaccessible loot, with the attempt timeout dictated by the main loop rather than the looting loop as before. The current aim is fully finishing testing the end-level sequence and then incorporating it into the existing map10 bot, therefore the fully autonomous single-level bot ETA is now 27th June. However there will immediately be an upgrade campaign aimed at updating combat capabilities (especially target selection), catching/handling stuck bots, and also special event handling. Once that has been completed it will be on to enabling running of all other maps and multi-bot integration.
+### 2nd July
+The fully autonomous single-level bot has been completed and the initial upgrade package to improve profitability and robustness is currently underway. It has however been noticed that there are issues when running the bot on other PCs due to a memory leak related to screenshot grabbing. When a small screenshot is taken in the time that a big screenshot in a separate thread is underway but not complete then errors will cascade. Thread locking has merely shifted the problem and so has resource deallocation due to the main logic flow. Therefore a full rewrite of the flow is likely required. But either way a rewrite of the primary logic to allow for a universal map handler is required and therefore both tasks are to be undertaken at the same time. The primary goal for the next week is to finish the universal map handler and then start to add the required map navigation points to the database to enable running more maps. Beyond that the goal is to add bounty contract handling.
 
 ## Rough plan as of 4th June 2021
 1) DONE -> Clean up and integrate autonomous looting into utils
 2) DONE -> Add tests for detection and handling of events
 3) DONE -> Add tests for endlevel handling
 4) DONE -> Implement endlevel handling, event handling, and autonomous looting into map10 bot
-5) Test improved autonomous combat capabilities
+5) DONE -> Test improved autonomous combat capabilities
 6) Add handling for a party of bots
 7) Add all other maps to catalogue
 8) Add autonomous bounty mission acceptance and completion
@@ -52,6 +52,9 @@ The autonomous effort ran into a snag in the past week due to getting stuck atte
 
 ## Previous Status Updates 
 Full list at https://github.com/gavinIRL/RHBotArray/blob/main/STATUS_UPDATES.txt
+### 21st June
+The autonomous effort ran into a snag in the past week due to getting stuck attempting to loot and also general moving around. Therefore two new more accurate methods have been developed to reduce the chances of getting stuck. Additionally, looting now occurs by moving in a diagonal manner which greatly reduces the time taken and also reduces probability of getting stuck. There is also a much more robust catch for inaccessible loot, with the attempt timeout dictated by the main loop rather than the looting loop as before. The current aim is fully finishing testing the end-level sequence and then incorporating it into the existing map10 bot, therefore the fully autonomous single-level bot ETA is now 27th June. However there will immediately be an upgrade campaign aimed at updating combat capabilities (especially target selection), catching/handling stuck bots, and also special event handling. Once that has been completed it will be on to enabling running of all other maps and multi-bot integration.
+
 ### 14th June
 The past week has been spent upgrading the client and server to v12 with all of the speed and experimental upgrades from the v10/v11 tests. The planned date of June 13th for a single-level autonomous bot has passed due to a change in priorities. Now the plan is to proceed with the autonomnous efforts again and to now aim for 20th June for a fully autonomous single-level bot. Some other issues currently persist which need to be rectified in the near term such as the regroup function not opening the map correctly.
 
