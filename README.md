@@ -7,17 +7,11 @@ A family of socket-controlled video game bots derived from https://github.com/ga
 ### 2nd July
 The fully autonomous single-level bot has been completed and the initial upgrade package to improve profitability and robustness is currently underway. It has however been noticed that there are issues when running the bot on other PCs due to a memory leak related to screenshot grabbing. When a small screenshot is taken in the time that a big screenshot in a separate thread is underway but not complete then errors will cascade. Thread locking has merely shifted the problem and so has resource deallocation due to the main logic flow. Therefore a full rewrite of the flow is likely required. But either way a rewrite of the primary logic to allow for a universal map handler is required and therefore both tasks are to be undertaken at the same time. The primary goal for the next week is to finish the universal map handler and then start to add the required map navigation points to the database to enable running more maps. Beyond that the goal is to add bounty contract handling.
 
-## Rough plan as of 4th June 2021
-1) DONE -> Clean up and integrate autonomous looting into utils
-2) DONE -> Add tests for detection and handling of events
-3) DONE -> Add tests for endlevel handling
-4) DONE -> Implement endlevel handling, event handling, and autonomous looting into map10 bot
-5) DONE -> Test improved autonomous combat capabilities
-6) Add handling for a party of bots
-7) Add all other maps to catalogue
-8) Add autonomous bounty mission acceptance and completion
-9) DONE -> Add upgraded RHBot follower mode into server
-10) Add autonomous farloot into server
+## Rough plan as of 2nd July 2021
+1) Add ultra-robust autonomous map bot configurable for any map
+2) Add all other maps to catalogue
+3) Add autonomous bounty mission acceptance and completion
+4) Add handling for a party of bots
 
 ## Versions
 ### Version Features
@@ -32,8 +26,9 @@ The fully autonomous single-level bot has been completed and the initial upgrade
 * Version 9 - Update for wired switch connection, Tesseract experiments, regroup, autoloot, quest handling
 * Version 10 - Loot identification, automatic sell and repair, delayed batch playback
 * Version 11 - Fully autonomous bot with combat, looting, navigation, event handling
-* Version 12 - Version 10 client-server upgraded with follower and auto-farloot capabilities
-* Version 13 - Autonomous bounty mission accept and fulfilment
+* Version 12 - Version 10 client-server upgraded with follower and robustness upgrades
+* Version 13 - Multi-level autonomous bot
+* Version 14 - Autonomous bounty mission accept and fulfilment
 
 ### Version Status
 * Version 1 - Complete
