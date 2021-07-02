@@ -202,27 +202,31 @@ class RoomHandler():
     def perform_boss(self, coords, dir, repos=False, curbss=False):
         self.perform_navigation(coords, True)
         self.face_direction(dir)
+        no_dunchk_count = 0
         if not repos:
-            pass
-            # Then need to start the primary bosskill combo
-            # And continue attacking until bosskill is detected
-            if curbss:
-                pass
-            # or else until sectclear detected
-            else:
-                pass
+            while not BotUtils.detect_sect_clear(self.gamename):
+                if not Events.detect_in_dungeon():
+                    no_dunchk_count += 1
+                    if no_dunchk_count > 3:
+                        return True
+                else:
+                    no_dunchk_count = 0
+                if Events.detect_move_reward_screen(self.gamename):
+                    return True
+                if Events.detect_endlevel_bonus_area(self.gamename):
+                    return True
+                if time.time() - aim_cd > 2:
+                    # print("Aiming at enemies again")
+                    self.aim_at_enemies()
+                    aim_cd = time.time() + 1
+                    self.perform_continue_clear()
+                else:
+                    self.perform_continue_clear()
+            return True
         # Alternative handling if reposition is required mid-clear
         else:
-            pass
-            # Then need to start the primary bosskill combo
-            # And continue attacking until bosskill is detected
-            # or reposition time has been reached
-            if curbss:
-                pass
-            # or else until sectclear detected
-            # or reposition time has been reached
-            else:
-                pass
+            # TBD
+            return False
 
     def perform_exit(self, coords, nxtbss_dir=False, petoff=False):
         self.perform_navigation(coords)
