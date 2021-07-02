@@ -46,6 +46,7 @@ class WindowCapture:
 
     def __init__(self, window_name=None, custom_rect=None):
         self.custom_rect = custom_rect
+        self.window_name = window_name
         if window_name is None:
             self.hwnd = win32gui.GetDesktopWindow()
         else:
@@ -69,13 +70,23 @@ class WindowCapture:
             cDC.SelectObject(dataBitMap)
             cDC.BitBlt((0, 0), (self.w, self.h), dcObj,
                        (self.cropped_x, self.cropped_y), win32con.SRCCOPY)
-        except:
+        except Exception as e:
+            print(e)
             # print("Error with window handle, trying to continue")
             count = 0
             result = False
             while not result:
-                time.sleep(0.01)
+                time.sleep(0.05)
                 try:
+                    dcObj.DeleteDC()
+                    cDC.DeleteDC()
+                    win32gui.ReleaseDC(self.hwnd, wDC)
+                    win32gui.DeleteObject(dataBitMap.GetHandle())
+                except:
+                    pass
+                try:
+                    self.hwnd = win32gui.FindWindow(None, self.window_name)
+                    self.update_window_position()
                     wDC = win32gui.GetWindowDC(self.hwnd)
                     dcObj = win32ui.CreateDCFromHandle(wDC)
                     cDC = dcObj.CreateCompatibleDC()
@@ -86,9 +97,18 @@ class WindowCapture:
                     cDC.BitBlt((0, 0), (self.w, self.h), dcObj,
                                (self.cropped_x, self.cropped_y), win32con.SRCCOPY)
                     result = True
-                except:
+                except Exception as e:
+                    try:
+                        dcObj.DeleteDC()
+                        cDC.DeleteDC()
+                        win32gui.ReleaseDC(self.hwnd, wDC)
+                        win32gui.DeleteObject(dataBitMap.GetHandle())
+                    except:
+                        pass
                     count += 1
-                    if count > 5:
+                    if count > 50:
+                        # WindowCapture.list_window_names()
+                        print(e)
                         print("Could not do handle multiple times")
                         os._exit(1)
         # cDC.SelectObject(dataBitMap)
@@ -112,6 +132,13 @@ class WindowCapture:
 
     def focus_window(self):
         win32gui.SetForegroundWindow(self.hwnd)
+
+    @staticmethod
+    def list_window_names():
+        def winEnumHandler(hwnd, ctx):
+            if win32gui.IsWindowVisible(hwnd):
+                print(hex(hwnd), win32gui.GetWindowText(hwnd))
+        win32gui.EnumWindows(winEnumHandler, None)
 
     def update_window_position(self, border=True):
         self.window_rect = win32gui.GetWindowRect(self.hwnd)
