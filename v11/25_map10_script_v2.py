@@ -471,9 +471,12 @@ class Map10_MS30():
                 counter -= 1
             self.continue_otherworld_attacks()
             if time.time()-start_time > 20:
-                print("need to move closer to detected enemies")
+                # print("need to move closer to detected enemies")
                 start_time = time.time() - 5
-                # os._exit(1)
+                while not result:
+                    BotUtils.try_toggle_map_clicking()
+                    result = AntiStickUtils.move_bigmap_dynamic(660, 548)
+                    self.point_angle(0)
 
     def continue_otherworld_attacks(self):
         self.continue_clear()
