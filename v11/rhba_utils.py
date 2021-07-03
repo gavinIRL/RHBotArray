@@ -759,12 +759,21 @@ class BotUtils:
         d, e, f = [int(i) for i in image[0][127]]
         g, h, i = [int(i) for i in image[0][-1]]
         j, k, l = [int(i) for i in image[0][163]]
-        if j+k+l > 760:
-            # This is a false positive
-            return False
+        m, n, o = [int(i) for i in image[0][6]]
+        p, q, r = [int(i) for i in image[0][122]]
         if a+b+c > 760:
             if d+e+f > 760:
+                if j+k+l > 760:
+                    # This is a false positive
+                    return False
+                if m+n+o > 760:
+                    # This is a false positive
+                    return False
+                if p+q+r > 760:
+                    # This is a false positive
+                    return False
                 if g+h+i > 760:
+                    # cv2.imwrite("testytest.jpg", image)
                     return True
         return False
 
