@@ -59,7 +59,7 @@ class WindowCapture:
         self.offset_x, self.offset_y
         self.update_window_position()
 
-    def get_screenshot(self):
+    def get_screenshot(self, stagger=False):
         # get the window image data
         try:
             wDC = win32gui.GetWindowDC(self.hwnd)
@@ -77,6 +77,8 @@ class WindowCapture:
             result = False
             while not result:
                 time.sleep(0.05)
+                if stagger:
+                    time.sleep(0.5)
                 try:
                     dcObj.DeleteDC()
                     cDC.DeleteDC()

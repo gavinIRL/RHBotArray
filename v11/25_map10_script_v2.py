@@ -793,7 +793,7 @@ class Map10_MS30():
         while True:
             if self.check_in_town(gamename):
                 wincap = WindowCapture(gamename)
-                image = wincap.get_screenshot()
+                image = wincap.get_screenshot(True)
                 cv2.imwrite("ErrorCause.jpg", image)
                 print("Exited as detected in town")
                 BotUtils.stop_movement()
