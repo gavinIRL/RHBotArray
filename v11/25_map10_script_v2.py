@@ -472,6 +472,7 @@ class Map10_MS30():
             self.continue_otherworld_attacks()
             if time.time()-start_time > 20:
                 # print("need to move closer to detected enemies")
+                result = False
                 start_time = time.time() - 5
                 while not result:
                     BotUtils.try_toggle_map_clicking()

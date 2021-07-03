@@ -392,6 +392,7 @@ class RoomHandler():
             if time.time()-start_time > 20:
                 # print("need to move closer to detected enemies")
                 start_time = time.time() - 5
+                result = False
                 while not result:
                     BotUtils.try_toggle_map_clicking()
                     result = AntiStickUtils.move_bigmap_dynamic(660, 548)
