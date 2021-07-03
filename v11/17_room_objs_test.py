@@ -401,7 +401,7 @@ class RoomHandler():
 
     def move_slightly_left(self):
         CustomInput.press_key(CustomInput.key_map["left"], "left")
-        time.sleep(0.25)
+        time.sleep(0.15)
         CustomInput.release_key(CustomInput.key_map["left"], "left")
         time.sleep(0.1)
 
@@ -504,6 +504,12 @@ class RoomHandler():
         self.perform_navigation(coords)
         # Then perform looting as required
         time.sleep(0.3)
+        while not self.loot_everything(self.gamename):
+            self.move_slightly_left()
+            # Try once more to loot
+            Looting.grab_nearby_loot(self.gamename)
+            self.loot_everything(self.gamename)
+            self.perform_navigation(coords)
         return True
 
     def perform_wypt(self, coords):
