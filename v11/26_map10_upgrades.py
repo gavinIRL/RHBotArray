@@ -272,6 +272,27 @@ def detect_sect_clear_robust(gamename=False):
     return False
 
 
+def detect_town_quick(gamename=False):
+    wincap = WindowCapture(gamename, [1115, 41, 1145, 43])
+    image = wincap.get_screenshot()
+    a, b, c = [int(i) for i in image[0][2]]
+    d, e, f = [int(i) for i in image[0][10]]
+    g, h, i = [int(i) for i in image[0][15]]
+    j, k, l = [int(i) for i in image[0][20]]
+    m, n, o = [int(i) for i in image[0][23]]
+    p, q, r = [int(i) for i in image[0][28]]
+    t, u, v = [int(i) for i in image[0][29]]
+    cv2.imwrite("testytest.jpg", image)
+    if a+b+c > 760 and d+e+f > 760:
+        # print("Yes to #1")
+        if j+k+l > 760 and m+n+o > 760:
+            # print("Yes to #2")
+            if p+q+r > 760 and g+h+i > 760:
+                if not t+u+v > 760:
+                    return True
+    return False
+
+
 time.sleep(1.5)
 with open("gamename.txt") as f:
     gamename = f.readline()
@@ -286,5 +307,6 @@ start = time.time()
 # in_town_check_thread(gamename, [True])
 # click_on_game(gamename)
 # print(detect_yes_no_robust(gamename))
-print(detect_sect_clear_robust(gamename))
+# print(detect_sect_clear_robust(gamename))
+print(detect_town_quick(gamename))
 print("Time taken: {}s".format(time.time() - start))
