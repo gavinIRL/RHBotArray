@@ -253,13 +253,21 @@ def detect_sect_clear_robust(gamename=False):
     d, e, f = [int(i) for i in image[0][127]]
     g, h, i = [int(i) for i in image[0][-1]]
     j, k, l = [int(i) for i in image[0][163]]
-    if j+k+l > 760:
-        # This is a false positive
-        return False
+    m, n, o = [int(i) for i in image[0][6]]
+    p, q, r = [int(i) for i in image[0][122]]
     if a+b+c > 760:
         if d+e+f > 760:
+            if j+k+l > 760:
+                # This is a false positive
+                return False
+            if m+n+o > 760:
+                # This is a false positive
+                return False
+            if p+q+r > 760:
+                # This is a false positive
+                return False
             if g+h+i > 760:
-                cv2.imwrite("testytest.jpg", image)
+                # cv2.imwrite("testytest.jpg", image)
                 return True
     return False
 
@@ -267,6 +275,7 @@ def detect_sect_clear_robust(gamename=False):
 time.sleep(1.5)
 with open("gamename.txt") as f:
     gamename = f.readline()
+start = time.time()
 # check_petmenu_open(gamename)
 # detect_gold_amount(gamename)
 # print(Events.detect_move_reward_screen(gamename))
@@ -278,3 +287,4 @@ with open("gamename.txt") as f:
 # click_on_game(gamename)
 # print(detect_yes_no_robust(gamename))
 print(detect_sect_clear_robust(gamename))
+print("Time taken: {}s".format(time.time() - start))
