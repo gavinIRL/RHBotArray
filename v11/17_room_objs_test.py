@@ -82,6 +82,7 @@ class Room():
         # pet,on - this makes sure the pet is summoned (pre) or hidden (post)
         # nxtbss,dir - next room is the boss room, hold l to enter
         # curbss - this room is the boss room
+        # multi - this room will have multiple sectclear notifications
         rect, coords, actions, tags = line.split("#")
         self.action_list = []
         self.coord_list = []
@@ -116,6 +117,7 @@ class RoomHandler():
         curbss = False if not "curbss" in tags else True
         nxtbss = False if not "nxtbss" in tags else True
         peton = False if not "pet,on" in tags else True
+        multi = False if not "multi" in tags else True
         petoff = False if not "pet,off" in tags else True
         repos = False if not "repos" in acts else True
         sect_cleared = False
@@ -124,7 +126,6 @@ class RoomHandler():
         if nxtbss:
             nxtbss_dir = tags.split("curbss", 1)[1].split("|", 1)[
                 0].replace(",", "")
-
         # Then go through the actions and carry them out
         for i, action in enumerate(room.action_list):
             self.last_event_time = time.time()
