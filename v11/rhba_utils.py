@@ -1171,16 +1171,15 @@ class BotUtils:
                 return points
         return False
 
-    def find_midlevel_event(gamename=False, playerx=False, playery=False):
+    def find_midlevel_event(rect=False, gamename=False):
         if not gamename:
             with open("gamename.txt") as f:
                 gamename = f.readline()
-        if not playerx:
-            playerx, playery = BotUtils.grab_player_pos(
-                gamename, [1100, 50, 1260, 210], True)
+        if not rect:
+            rect = [1100, 50, 1260, 210]
         filter = HsvFilter(76, 247, 170, 100, 255, 255, 0, 0, 0, 0)
         vision = Vision("otherplayerinvert.jpg")
-        wincap = WindowCapture(gamename, [1100, 50, 1260, 210])
+        wincap = WindowCapture(gamename, rect)
         image = wincap.get_screenshot()
         image = cv2.blur(image, (4, 4))
         image = BotUtils.filter_blackwhite_invert(filter, image)
@@ -1188,9 +1187,7 @@ class BotUtils:
             image, threshold=0.61, epsilon=0.5)
         points = vision.get_click_points(rectangles)
         if len(points) >= 1:
-            relx = points[0][0] - playerx
-            rely = playery - points[0][1]
-            return relx, rely
+            return points[0][0], points[0][1]
         return False, False
 
     def stop_movement(follower=False):
