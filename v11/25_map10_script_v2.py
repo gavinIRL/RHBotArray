@@ -900,11 +900,11 @@ if __name__ == "__main__":
     with open("gamename.txt") as f:
         gamename = f.readline()
     time.sleep(1)
-    num_loops = 23
+    num_loops = 36
     start = time.time()
     map = Map10_MS30()
     map.click_on_game(gamename)
-    map.create_towncheck_thread(gamename)
+    # map.create_towncheck_thread(gamename)
     time.sleep(1)
     for i in range(num_loops):
         print("Starting run {} of {}".format(i+1, num_loops))
