@@ -240,6 +240,30 @@ def detect_yes_no_robust(gamename):
     return False
 
 
+def detect_sect_clear_robust(gamename=False):
+    if not gamename:
+        with open("gamename.txt") as f:
+            gamename = f.readline()
+    # wincap = WindowCapture(gamename, custom_rect=[
+    #     464+156, 640, 464+261, 741])
+    wincap = WindowCapture(gamename, custom_rect=[
+        464+29, 640, 464+261, 641])
+    image = wincap.get_screenshot()
+    a, b, c = [int(i) for i in image[0][0]]
+    d, e, f = [int(i) for i in image[0][127]]
+    g, h, i = [int(i) for i in image[0][-1]]
+    j, k, l = [int(i) for i in image[0][163]]
+    if j+k+l > 760:
+        # This is a false positive
+        return False
+    if a+b+c > 760:
+        if d+e+f > 760:
+            if g+h+i > 760:
+                cv2.imwrite("testytest.jpg", image)
+                return True
+    return False
+
+
 time.sleep(1.5)
 with open("gamename.txt") as f:
     gamename = f.readline()
@@ -252,4 +276,5 @@ with open("gamename.txt") as f:
 # prevent_dodge_check(0.05)
 # in_town_check_thread(gamename, [True])
 # click_on_game(gamename)
-print(detect_yes_no_robust(gamename))
+# print(detect_yes_no_robust(gamename))
+print(detect_sect_clear_robust(gamename))
