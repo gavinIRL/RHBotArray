@@ -181,6 +181,9 @@ class RoomHandler():
                     self.perform_continue_clear()
                 else:
                     self.perform_continue_clear()
+            if not Events.detect_in_dungeon():
+                self.perform_midlevel_event()
+                time.sleep(0.8)
             return True
         # Alternative handling if reposition is required mid-clear
         else:
@@ -197,6 +200,9 @@ class RoomHandler():
                     break
                 else:
                     self.perform_continue_clear()
+            if not Events.detect_in_dungeon():
+                self.perform_midlevel_event()
+                time.sleep(0.8)
             if not need_to_repos:
                 return True
             return False
@@ -518,7 +524,26 @@ class RoomHandler():
         return True
 
     def perform_midlevel_event(self):
-        pass
+        pydirectinput.press("esc")
+        time.sleep(0.3)
+        # Check if user has cards available to trade
+        if Events.detect_one_card(self.gamename):
+            # Then try grab event pos
+            x, y = BotUtils.find_midlevel_event(self.room.rect)
+            if x:
+                self.perform_navigation([x, y])
+                pydirectinput.press("x")
+                # Then need to accept card trade
+                if Events.detect_yes_no(self.gamename):
+                    RHClick.click_yes(self.gamename)
+                    time.sleep(0.1)
+                    pydirectinput.press('esc')
+                    while not Events.detect_in_dungeon():
+                        pydirectinput.press('esc')
+                        time.sleep(0.05)
+                        BotUtils.close_map_and_menu(self.gamename)
+        else:
+            print("Don't have a card available to trade")
 
     def cancel_momo_summon(self):
         wincap = WindowCapture(self.gamename)
