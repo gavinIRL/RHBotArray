@@ -381,13 +381,21 @@ class RoomHandler():
             BotUtils.try_toggle_map_clicking()
             result = AntiStickUtils.move_bigmap_dynamic(608, 532)
         counter = 10
+        start_time = time.time()
         while counter > 0:
             if self.detect_enemies_overworld(gamename):
                 if counter < 10:
                     counter += 1
             else:
                 counter -= 1
-            self.continue_otherworld_attacks()
+            self.perform_continue_clear()
+            if time.time()-start_time > 20:
+                # print("need to move closer to detected enemies")
+                start_time = time.time() - 5
+                while not result:
+                    BotUtils.try_toggle_map_clicking()
+                    result = AntiStickUtils.move_bigmap_dynamic(660, 548)
+                    self.point_angle(0)
 
     def move_slightly_left(self):
         CustomInput.press_key(CustomInput.key_map["left"], "left")
