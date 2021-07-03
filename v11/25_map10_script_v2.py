@@ -787,10 +787,30 @@ class Map10_MS30():
         CustomInput.release_key(CustomInput.key_map["left"], "left")
         time.sleep(0.1)
 
-    def check_in_town(self, gamename):
-        name = BotUtils.detect_level_name(gamename, chars="BramunezMkt")
-        if fuzz.ratio(name, "BramunezMarket") > 85:
-            return True
+    # def check_in_town(self, gamename):
+    #     name = BotUtils.detect_level_name(gamename, chars="BramunezMkt")
+    #     if fuzz.ratio(name, "BramunezMarket") > 85:
+    #         return True
+    #     return False
+
+    def check_in_town(self, gamename=False):
+        wincap = WindowCapture(gamename, [1115, 41, 1145, 43])
+        image = wincap.get_screenshot()
+        a, b, c = [int(i) for i in image[0][2]]
+        d, e, f = [int(i) for i in image[0][10]]
+        g, h, i = [int(i) for i in image[0][15]]
+        j, k, l = [int(i) for i in image[0][20]]
+        m, n, o = [int(i) for i in image[0][23]]
+        p, q, r = [int(i) for i in image[0][28]]
+        t, u, v = [int(i) for i in image[0][29]]
+        cv2.imwrite("testytest.jpg", image)
+        if a+b+c > 760 and d+e+f > 760:
+            # print("Yes to #1")
+            if j+k+l > 760 and m+n+o > 760:
+                # print("Yes to #2")
+                if p+q+r > 760 and g+h+i > 760:
+                    if not t+u+v > 760:
+                        return True
         return False
 
     def in_town_check_thread(self, gamename):
