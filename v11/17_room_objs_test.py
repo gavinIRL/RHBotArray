@@ -662,6 +662,17 @@ class RoomHandler():
             return points
         return False
 
+    def repeat_level(self, gamename):
+        # Close the shop
+        pydirectinput.press('esc')
+        time.sleep(0.1)
+        pydirectinput.press('esc')
+        time.sleep(0.1)
+        BotUtils.close_map_and_menu(gamename)
+        time.sleep(0.1)
+        RHClick.click_explore_again(gamename)
+        time.sleep(1.5)
+
 
 class AntiStickUtils:
 
