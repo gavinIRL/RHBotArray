@@ -653,16 +653,30 @@ class RoomHandler():
         CustomInput.release_key(CustomInput.key_map[key], key)
 
     def perform_continue_clear(self):
-        for key in self.weapon.continue_clear:
+        available = self.grab_off_cooldown(
+            self.weapon.continue_clear, self.gamename)
+        if not available:
+            # Need to dodge right and left?
+            return False
+        else:
+            key = available[0]
             CustomInput.press_key(CustomInput.key_map[key], key)
-            time.sleep(0.02)
+            time.sleep(0.015)
             CustomInput.release_key(CustomInput.key_map[key], key)
+            time.sleep(0.2)
 
     def perform_boss_combo(self):
-        for key in self.weapon.continue_boss:
+        available = self.grab_off_cooldown(
+            self.weapon.continue_boss, self.gamename)
+        if not available:
+            # Need to dodge right and left?
+            return False
+        else:
+            key = available[0]
             CustomInput.press_key(CustomInput.key_map[key], key)
-            time.sleep(0.02)
+            time.sleep(0.015)
             CustomInput.release_key(CustomInput.key_map[key], key)
+            time.sleep(0.2)
 
     def calculate_travel_time(self, x, y, currx=False, curry=False):
         if not currx:
