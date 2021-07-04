@@ -913,5 +913,6 @@ def load_level_data(filename):
 filename = os.path.dirname(
     os.path.abspath(__file__)) + "/levels/map10updated.txt"
 rooms = load_level_data(filename)
-room1 = rooms[0]
-print(room1.action_list)
+wp = Weapon("MS")
+mh = MapHandler(rooms)
+mh.start(False)
