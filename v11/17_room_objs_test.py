@@ -267,7 +267,11 @@ class RoomHandler():
 
     def perform_exit(self, coords):
         self.perform_navigation(coords)
-        time.sleep(0.1)
+        time_end = time.time() + 1
+        while time_end > time.time():
+            time.sleep(0.005)
+            if BotUtils.detect_sect_clear(self.gamename):
+                time_end = time.time() + 1
         return True
 
     def perform_chest(self, coords, dir):
