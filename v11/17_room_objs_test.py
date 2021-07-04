@@ -214,6 +214,7 @@ class RoomHandler():
     def perform_clear(self, coords, dir, repos=False):
         self.perform_navigation(coords, True)
         self.face_direction(dir)
+        self.perform_primary_clear()
         aim_cd = time.time()
         if not repos:
             while not BotUtils.detect_sect_clear(self.gamename):
