@@ -52,7 +52,6 @@ class MapHandler():
         time.sleep(1.5)
         while not Events.detect_in_dungeon():
             time.sleep(0.25)
-        self.summon_momo(self.gamename)
         # Now using full universal room handler instead
         for i, room in enumerate(self.rooms):
             rh = RoomHandler(self, room, self.weapon)
@@ -61,33 +60,6 @@ class MapHandler():
             # print(f"Finished room {i}")
         # And then perform the endmap routine
         self.perform_endmap(repeat)
-
-    def summon_momo(self, gamename):
-        wincap = WindowCapture(gamename)
-        x = wincap.window_rect[0]
-        y = wincap.window_rect[1]
-        pydirectinput.press("j")
-        time.sleep(0.1)
-        while not BotUtils.detect_petmenu_open(gamename):
-            pydirectinput.press("j")
-            time.sleep(0.25)
-        pydirectinput.click(x+471, y+178)
-        time.sleep(0.1)
-        pydirectinput.click(x+713, y+682)
-        time.sleep(0.1)
-        # Now empty first 3 inventory slots
-        pydirectinput.click(x+471, y+178)
-        time.sleep(0.05)
-        pydirectinput.rightClick(x+683, y+277)
-        time.sleep(0.05)
-        pydirectinput.rightClick(x+728, y+277)
-        time.sleep(0.05)
-        # pydirectinput.rightClick(x+772, y+277)
-        # time.sleep(0.1)
-        # pydirectinput.rightClick(x+814, y+277)
-        # time.sleep(0.1)
-        pydirectinput.press("esc")
-        time.sleep(0.1)
 
     def perform_endmap(self, repeat=False):
         print("Would typically perform the endmap now")
@@ -155,20 +127,9 @@ class RoomHandler():
         tags = "".join(room.tags).strip()
         acts = "".join(room.action_list)
         curbss = False if not "curbss" in tags else True
-        nxtbss = False if not "nxtbss" in tags else True
-        peton = False if not "pet,on" in tags else True
         multi = False if not "multi" in tags else True
-        petoff = False if not "pet,off" in tags else True
         repos = False if not "repos" in acts else True
         sect_cleared = False
-        nxtbss_dir = False
-        # Check which direction for nxtboss if reqd
-        if nxtbss:
-            if len(room.tags) > 1:
-                nxtbss_dir = tags.split("curbss", 1)[1].split("|", 1)[
-                    0].replace(",", "")
-            else:
-                nxtbss_dir = tags.split(",", 1)[1]
         # Then go through the actions and carry them out
         for i, action in enumerate(room.action_list):
             self.last_event_time = time.time()
@@ -190,7 +151,7 @@ class RoomHandler():
                 if outcome:
                     sect_cleared = True
             elif "exit" in action:
-                outcome = self.perform_exit(coords, nxtbss_dir, petoff)
+                outcome = self.perform_exit(coords)
                 if not outcome:
                     print("Problem with nav during exit, need to add handling")
                     os._exit(1)
@@ -211,6 +172,12 @@ class RoomHandler():
                 if not outcome:
                     print("Problem with nav during exit, need to add handling")
                     os._exit(1)
+            elif "nxtbss" in action:
+                pass
+            elif "peton" in action:
+                self.summon_momo()
+            elif "petoff" in action:
+                self.cancel_momo_summon()
 
     def perform_clear(self, coords, dir, repos=False):
         self.perform_navigation(coords, True)
@@ -294,16 +261,9 @@ class RoomHandler():
             # TBD
             return False
 
-    def perform_exit(self, coords, nxtbss_dir=False, petoff=False):
+    def perform_exit(self, coords):
         self.perform_navigation(coords)
-        # Then turn pet off if required
-        if petoff:
-            self.cancel_momo_summon()
-        if nxtbss_dir:
-            # Need to press down the required key
-            CustomInput.press_key(CustomInput.key_map[nxtbss_dir], nxtbss_dir)
-        else:
-            time.sleep(0.3)
+        time.sleep(0.1)
         return True
 
     def perform_chest(self, coords, dir):
@@ -600,6 +560,33 @@ class RoomHandler():
                         BotUtils.close_map_and_menu(self.gamename)
         else:
             print("Don't have a card available to trade")
+
+    def summon_momo(self):
+        wincap = WindowCapture(self.gamename)
+        x = wincap.window_rect[0]
+        y = wincap.window_rect[1]
+        pydirectinput.press("j")
+        time.sleep(0.1)
+        while not BotUtils.detect_petmenu_open(self.gamename):
+            pydirectinput.press("j")
+            time.sleep(0.25)
+        pydirectinput.click(x+471, y+178)
+        time.sleep(0.1)
+        pydirectinput.click(x+713, y+682)
+        time.sleep(0.1)
+        # Now empty first 3 inventory slots
+        pydirectinput.click(x+471, y+178)
+        time.sleep(0.05)
+        pydirectinput.rightClick(x+683, y+277)
+        time.sleep(0.05)
+        pydirectinput.rightClick(x+728, y+277)
+        time.sleep(0.05)
+        # pydirectinput.rightClick(x+772, y+277)
+        # time.sleep(0.1)
+        # pydirectinput.rightClick(x+814, y+277)
+        # time.sleep(0.1)
+        pydirectinput.press("esc")
+        time.sleep(0.1)
 
     def cancel_momo_summon(self):
         wincap = WindowCapture(self.gamename)
