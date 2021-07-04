@@ -18,6 +18,7 @@ class Weapon:
     def __init__(self, weapon="MS") -> None:
         if weapon == "MS":
             self.primary_clear = "h"
+            self.primary_clear_cd = 8.8
             self.continue_clear = ["h", "a", "g", "f", "s", "d"]
             self.continue_boss = ["a", "g", "f", "s", "d"]
             self.chest_open = "d"
@@ -54,7 +55,7 @@ class MapHandler():
         self.summon_momo(self.gamename)
         # Now using full universal room handler instead
         for i, room in enumerate(self.rooms):
-            rh = RoomHandler(room, self.weapon)
+            rh = RoomHandler(self, room, self.weapon)
             # print(f"Starting room {i}")
             rh.start_room()
             # print(f"Finished room {i}")
@@ -101,6 +102,7 @@ class Room():
         # format coords is x,y
         # ------------------------------------
         # list actions is as follows:
+        # peton / petoff - handle pet
         # clear,dir - position to perform clear from, point left
         # boss,dir - position to perform boss attacks from
         # exit - position to exit room from
@@ -108,10 +110,9 @@ class Room():
         # repos,dir,5 - position to reposition to, point left, after seconds
         # loot - position to attempt to loot from
         # wypt - this is a travel waypoint only
+        # nxtbss,dir - next room is the boss room, hold l to enter
         # ------------------------------------
         # list of tags is as follows
-        # pet,on - this makes sure the pet is summoned (pre) or hidden (post)
-        # nxtbss,dir - next room is the boss room, hold l to enter
         # curbss - this room is the boss room
         # multi - this room will have multiple sectclear notifications
         # midcut - this room will have a mid-clear cutscene
@@ -132,12 +133,12 @@ class Room():
 
 
 class RoomHandler():
-    def __init__(self, room: Room, weapon: Weapon, repeat=False) -> None:
+    def __init__(self, mh: MapHandler, room: Room, weapon: Weapon) -> None:
         # Add a timestamp to catch if have gotten stuck
         self.last_event_time = time.time()
         self.weapon = weapon
         self.room = room
-        self.repeat = repeat
+        self.maphandler = mh
         with open("gamename.txt") as f:
             self.gamename = f.readline()
         # For aiming at enemies
@@ -252,6 +253,19 @@ class RoomHandler():
             return False
 
     def perform_boss(self, coords, dir, repos=False, curbss=False):
+        # First need to wait until cutscreen or boss appear and react
+        if curbss:
+            while True:
+                time.sleep(0.006)
+                if not Events.detect_in_dungeon():
+                    # need to stop the movement
+                    BotUtils.stop_movement()
+                    pydirectinput.press('esc')
+                    time.sleep(0.05)
+                    break
+                if BotUtils.detect_boss_healthbar(self.gamename):
+                    break
+        # Then need to navigate to the boss
         self.perform_navigation(coords, True)
         self.face_direction(dir)
         no_dunchk_count = 0
@@ -385,8 +399,6 @@ class RoomHandler():
         # And then go to next level if needs be
         # print("Got to pre-restart")
         # self.calculate_profit(self.gamename)
-        if self.repeat:
-            self.repeat_level(self.gamename)
 
     def loot_everything(self, gamename):
         player_name = False
@@ -615,9 +627,11 @@ class RoomHandler():
                 available = self.grab_off_cooldown(
                     [key], self.gamename)
         CustomInput.press_key(CustomInput.key_map[key], key)
+        time.sleep(0.02)
         CustomInput.release_key(CustomInput.key_map[key], key)
         time.sleep(0.3)
         CustomInput.press_key(CustomInput.key_map[key], key)
+        time.sleep(0.02)
         CustomInput.release_key(CustomInput.key_map[key], key)
 
     def perform_navigation(self, coords, sectclr_chk=False):
@@ -661,6 +675,7 @@ class RoomHandler():
         CustomInput.press_key(CustomInput.key_map[key], key)
         time.sleep(0.02)
         CustomInput.release_key(CustomInput.key_map[key], key)
+        self.maphandler.last_clear = time.time()
 
     def perform_continue_clear(self):
         available = self.grab_off_cooldown(
@@ -673,6 +688,8 @@ class RoomHandler():
             CustomInput.press_key(CustomInput.key_map[key], key)
             time.sleep(0.015)
             CustomInput.release_key(CustomInput.key_map[key], key)
+            if key == self.weapon.primary_clear:
+                self.maphandler.last_clear = time.time()
             time.sleep(0.2)
 
     def perform_boss_combo(self):
