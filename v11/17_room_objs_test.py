@@ -20,6 +20,7 @@ class Weapon:
             self.primary_clear = "h"
             self.continue_clear = ["h", "a", "g", "f", "s", "d"]
             self.continue_boss = ["a", "g", "f", "s", "d"]
+            self.chest_open = "d"
 
 
 class MapHandler():
@@ -603,14 +604,15 @@ class RoomHandler():
 
     def hit_chest(self):
         Looting.grab_nearby_loot(self.gamename)
-        key = "d"
-        available = self.grab_off_cooldown(
-            [key], self.gamename)
-        while not available[0]:
-            # Need to dodge right and left?
-            time.sleep(0.05)
+        key = self.weapon.chest_open
+        if key != "x":
             available = self.grab_off_cooldown(
                 [key], self.gamename)
+            while not available:
+                # Need to dodge right and left?
+                time.sleep(0.05)
+                available = self.grab_off_cooldown(
+                    [key], self.gamename)
         CustomInput.press_key(CustomInput.key_map[key], key)
         CustomInput.release_key(CustomInput.key_map[key], key)
         time.sleep(0.3)
