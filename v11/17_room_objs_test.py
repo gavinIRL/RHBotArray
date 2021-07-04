@@ -135,10 +135,13 @@ class RoomHandler():
             self.last_event_time = time.time()
             # Need to check if reposition is the next item
             repos_time = False
-            if repos:
-                next = room.action_list[i+1]
-                if "repos" in next:
-                    _, _, repos_time = next.split(",")
+            try:
+                if repos:
+                    next = room.action_list[i+1]
+                    if "repos" in next:
+                        _, _, repos_time = next.split(",")
+            except:
+                pass
             coords = room.coord_list[i]
             if "clear" in action:
                 _, dir = action.split(",")
@@ -173,12 +176,14 @@ class RoomHandler():
                     print("Problem with nav during exit, need to add handling")
                     os._exit(1)
             elif "nxtbss" in action:
+                print("Got to pre-nxtbss")
                 _, dir = action.split(",")
                 self.perform_move_into_bossroom(dir)
             elif "peton" in action:
                 self.summon_momo()
             elif "petoff" in action:
                 self.cancel_momo_summon()
+                print("Got past pet off")
 
     def perform_clear(self, coords, dir, repos=False):
         travel_time = self.calculate_travel_time(coords[0], coords[1])
