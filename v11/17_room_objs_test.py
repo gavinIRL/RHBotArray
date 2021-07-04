@@ -444,6 +444,8 @@ class RoomHandler():
             0x0004, 0, 0, 0, 0)
 
     def perform_move_into_bossroom(self, dir):
+        time.sleep(0.01)
+        print("Got to here")
         CustomInput.press_key(CustomInput.key_map[dir], dir)
 
     def release_dir_keys(self):
@@ -603,6 +605,7 @@ class RoomHandler():
         time.sleep(0.1)
         pydirectinput.click(x+148, y+213)
         time.sleep(0.1)
+        print("Got to pet off")
 
     def face_direction(self, dir):
         CustomInput.press_key(CustomInput.key_map[dir], dir)
@@ -647,7 +650,7 @@ class RoomHandler():
                     int(coords[0]), int(coords[1]), closemap=False)
         else:
             outcome = AntiStickUtils.move_bigmap_dynamic_sectclrchk(
-                int(coords[0]), int(coords[1]))
+                int(coords[0]), int(coords[1]), closemap=False)
             nodetcnt = 0
             while not outcome:
                 if BotUtils.detect_sect_clear(self.gamename):
@@ -662,7 +665,7 @@ class RoomHandler():
                     CustomInput.press_key(CustomInput.key_map[key], key)
                     CustomInput.release_key(CustomInput.key_map[key], key)
                 outcome = AntiStickUtils.move_bigmap_dynamic_sectclrchk(
-                    int(coords[0]), int(coords[1]))
+                    int(coords[0]), int(coords[1]), closemap=False)
 
     def perform_primary_clear(self):
         key = self.weapon.primary_clear
@@ -701,7 +704,7 @@ class RoomHandler():
 
     def calculate_travel_time(self, x, y, currx=False, curry=False, closemap=False):
         if not currx:
-            if not BotUtils.BotUtils.detect_bigmap_open(self.gamename):
+            if not BotUtils.detect_bigmap_open(self.gamename):
                 BotUtils.try_toggle_map_clicking(self.gamename)
             currx, curry = BotUtils.grab_player_posv2(
                 self.gamename, [x-75, y-75, x+75, y+75])
@@ -711,7 +714,7 @@ class RoomHandler():
         ydist = abs(int(y) - curry)
         smaller = min(xdist, ydist)
         diag = math.hypot(smaller, smaller)
-        travel_time = (diag + max(xdist, ydist) - smaller)/self.speed
+        travel_time = (diag + max(xdist, ydist) - smaller)/30
         return travel_time
 
     def aim_at_enemies(self):
