@@ -200,8 +200,29 @@ class Map10_MS30():
         self.start_endlevel_scriptv2(self.gamename, repeat)
 
     def perform_midmap_event(self):
-        # print("Midmap event detected")
         pydirectinput.press("esc")
+        time.sleep(0.3)
+        # Check if user has cards available to trade
+        if Events.detect_one_card(self.gamename):
+            # Then try grab event pos
+            px, py = BotUtils.grab_player_posv2(self.gamename)
+            if px:
+                rect = [px-75, py-75, px+75, py+75]
+                x, y = BotUtils.find_midlevel_event(rect)
+                if x:
+                    self.perform_navigation([x, y])
+                    pydirectinput.press("x")
+                    # Then need to accept card trade
+                    if Events.detect_yes_no(self.gamename):
+                        RHClick.click_yes(self.gamename)
+                        time.sleep(0.1)
+                        pydirectinput.press('esc')
+                        while not Events.detect_in_dungeon():
+                            pydirectinput.press('esc')
+                            time.sleep(0.05)
+                            BotUtils.close_map_and_menu(self.gamename)
+        else:
+            print("Don't have a card available to trade")
 
     def cancel_momo_summon(self, gamename):
         wincap = WindowCapture(gamename)
@@ -924,7 +945,7 @@ if __name__ == "__main__":
     with open("gamename.txt") as f:
         gamename = f.readline()
     time.sleep(1)
-    num_loops = 36
+    num_loops = 31
     start = time.time()
     map = Map10_MS30()
     map.click_on_game(gamename)
