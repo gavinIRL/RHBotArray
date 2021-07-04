@@ -181,8 +181,11 @@ class RoomHandler():
                 self.cancel_momo_summon()
 
     def perform_clear(self, coords, dir, repos=False):
+        travel_time = self.calculate_travel_time(coords[0], coords[1])
         self.perform_navigation(coords, True)
         self.face_direction(dir)
+        if travel_time < 1.8:
+            time.sleep(0.6)
         self.perform_primary_clear()
         aim_cd = time.time()
         if not repos:
@@ -628,7 +631,7 @@ class RoomHandler():
     def perform_navigation(self, coords, sectclr_chk=False):
         if not sectclr_chk:
             outcome = AntiStickUtils.move_bigmap_dynamic(
-                int(coords[0]), int(coords[1]))
+                int(coords[0]), int(coords[1]), closemap=False)
             nodetcnt = 0
             while not outcome:
                 nodetcnt += 1
@@ -641,7 +644,7 @@ class RoomHandler():
                     CustomInput.press_key(CustomInput.key_map[key], key)
                     CustomInput.release_key(CustomInput.key_map[key], key)
                 outcome = AntiStickUtils.move_bigmap_dynamic(
-                    int(coords[0]), int(coords[1]))
+                    int(coords[0]), int(coords[1]), closemap=False)
         else:
             outcome = AntiStickUtils.move_bigmap_dynamic_sectclrchk(
                 int(coords[0]), int(coords[1]))
@@ -696,13 +699,14 @@ class RoomHandler():
             CustomInput.release_key(CustomInput.key_map[key], key)
             time.sleep(0.2)
 
-    def calculate_travel_time(self, x, y, currx=False, curry=False):
+    def calculate_travel_time(self, x, y, currx=False, curry=False, closemap=False):
         if not currx:
             if not BotUtils.BotUtils.detect_bigmap_open(self.gamename):
                 BotUtils.try_toggle_map_clicking(self.gamename)
             currx, curry = BotUtils.grab_player_posv2(
                 self.gamename, [x-75, y-75, x+75, y+75])
-            BotUtils.close_map_and_menu(self.gamename)
+            if closemap:
+                BotUtils.close_map_and_menu(self.gamename)
         xdist = abs(currx - int(x))
         ydist = abs(int(y) - curry)
         smaller = min(xdist, ydist)
@@ -798,7 +802,7 @@ class AntiStickUtils:
     def open_bigmap(gamename=False):
         pass
 
-    def move_bigmap_dynamic(x, y, gamename=False, rect=False, checkmap=True):
+    def move_bigmap_dynamic(x, y, gamename=False, rect=False, checkmap=True, closemap=True):
         if not gamename:
             with open("gamename.txt") as f:
                 gamename = f.readline()
@@ -861,13 +865,14 @@ class AntiStickUtils:
                 return False
             time.sleep(0.02)
         follower.release_all_keys()
-        BotUtils.try_toggle_map()
+        if closemap:
+            BotUtils.try_toggle_map()
         if noplyr_count > 10:
             return False
         else:
             return True
 
-    def move_bigmap_dynamic_sectclrchk(x, y, gamename=False, rect=False, checkmap=True):
+    def move_bigmap_dynamic_sectclrchk(x, y, gamename=False, rect=False, checkmap=True, closemap=True):
         if BotUtils.detect_sect_clear(gamename):
             return True
         if not gamename:
@@ -939,7 +944,8 @@ class AntiStickUtils:
                 return False
             time.sleep(0.02)
         follower.release_all_keys()
-        BotUtils.try_toggle_map()
+        if closemap:
+            BotUtils.try_toggle_map()
         if noplyr_count > 10:
             return False
         else:
