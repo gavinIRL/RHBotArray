@@ -3,12 +3,10 @@
 from threading import Thread
 import time
 import os
-import numpy as np
 import cv2
 import math
 import ctypes
 import logging
-from fuzzywuzzy import fuzz
 from rhba_utils import BotUtils, Events, SellRepair, RHClick, Looting, WindowCapture, Vision, HsvFilter, Follower
 import pydirectinput
 from custom_input import CustomInput
@@ -54,9 +52,11 @@ class MapHandler():
             time.sleep(0.25)
         self.summon_momo(self.gamename)
         # Now using full universal room handler instead
-        for room in self.rooms:
+        for i, room in enumerate(self.rooms):
             rh = RoomHandler(room, self.weapon)
+            # print(f"Starting room {i}")
             rh.start_room()
+            # print(f"Finished room {i}")
         # And then perform the endmap routine
         self.perform_endmap(repeat)
 
@@ -162,8 +162,11 @@ class RoomHandler():
         nxtbss_dir = False
         # Check which direction for nxtboss if reqd
         if nxtbss:
-            nxtbss_dir = tags.split("curbss", 1)[1].split("|", 1)[
-                0].replace(",", "")
+            if len(room.tags) > 1:
+                nxtbss_dir = tags.split("curbss", 1)[1].split("|", 1)[
+                    0].replace(",", "")
+            else:
+                nxtbss_dir = tags.split("curbss,", 1)[1]
         # Then go through the actions and carry them out
         for i, action in enumerate(room.action_list):
             self.last_event_time = time.time()
@@ -595,11 +598,12 @@ class RoomHandler():
 
     def face_direction(self, dir):
         CustomInput.press_key(CustomInput.key_map[dir], dir)
+        time.sleep(0.003)
         CustomInput.release_key(CustomInput.key_map[dir], dir)
 
     def hit_chest(self):
         Looting.grab_nearby_loot(self.gamename)
-        key = "x"
+        key = "d"
         CustomInput.press_key(CustomInput.key_map[key], key)
         CustomInput.release_key(CustomInput.key_map[key], key)
         time.sleep(0.3)
