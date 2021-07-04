@@ -83,6 +83,7 @@ class Room():
         # loot - position to attempt to loot from
         # wypt - this is a travel waypoint only
         # nxtbss,dir - next room is the boss room, hold l to enter
+        # bsslt - bossloot coords i.e. initial boss looting point
         # ------------------------------------
         # list of tags is as follows
         # curbss - this room is the boss room
@@ -166,24 +167,23 @@ class RoomHandler():
                 if not sect_cleared:
                     self.perform_repos(coords, dir)
             elif "loot" in action:
-                if not curbss:
-                    self.perform_loot(coords)
-                else:
-                    self.perform_endlevel(coords)
+                self.perform_loot(coords)
             elif "wypt" in action:
                 outcome = self.perform_wypt(coords)
                 if not outcome:
                     print("Problem with nav during exit, need to add handling")
                     os._exit(1)
             elif "nxtbss" in action:
-                print("Got to pre-nxtbss")
+                # print("Got to pre-nxtbss")
                 _, dir = action.split(",")
                 self.perform_move_into_bossroom(dir)
+            elif "bsslt" in action:
+                self.perform_endlevel(coords)
             elif "peton" in action:
                 self.summon_momo()
             elif "petoff" in action:
                 self.cancel_momo_summon()
-                print("Got past pet off")
+                # print("Got past pet off")
 
     def perform_clear(self, coords, dir, repos=False):
         travel_time = self.calculate_travel_time(coords[0], coords[1])
@@ -236,8 +236,12 @@ class RoomHandler():
                 if not Events.detect_in_dungeon():
                     # need to stop the movement
                     BotUtils.stop_movement()
-                    pydirectinput.press('esc')
-                    time.sleep(0.05)
+                    while not Events.detect_in_dungeon():
+                        pydirectinput.press('esc')
+                        time.sleep(0.05)
+                        BotUtils.close_map_and_menu(self.gamename)
+                        time.sleep(0.25)
+                        break
                     break
                 if BotUtils.detect_boss_healthbar(self.gamename):
                     break
@@ -245,6 +249,7 @@ class RoomHandler():
         self.perform_navigation(coords, True)
         self.face_direction(dir)
         no_dunchk_count = 0
+        aim_cd = time.time()
         if not repos:
             while not BotUtils.detect_sect_clear(self.gamename):
                 if not Events.detect_in_dungeon():
@@ -454,8 +459,14 @@ class RoomHandler():
 
     def perform_move_into_bossroom(self, dir):
         time.sleep(0.01)
-        print("Got to here")
+        # print("Got to here")
         CustomInput.press_key(CustomInput.key_map[dir], dir)
+        # while True:
+        #     time.sleep(0.005)
+        #     if not BotUtils.detect_sect_clear(self.gamename):
+        #         break
+        #     if BotUtils.detect_boss_healthbar(self.gamename):
+        #         break
 
     def release_dir_keys(self):
         KEYS = {
@@ -614,7 +625,7 @@ class RoomHandler():
         time.sleep(0.1)
         pydirectinput.click(x+148, y+213)
         time.sleep(0.1)
-        print("Got to pet off")
+        # print("Got to pet off")
 
     def face_direction(self, dir):
         CustomInput.press_key(CustomInput.key_map[dir], dir)
