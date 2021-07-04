@@ -151,7 +151,7 @@ class RoomHandler():
     def start_room(self):
         room = self.room
         # Check through the tags first
-        tags = "".join(room.tags)
+        tags = "".join(room.tags).strip()
         acts = "".join(room.action_list)
         curbss = False if not "curbss" in tags else True
         nxtbss = False if not "nxtbss" in tags else True
@@ -167,7 +167,7 @@ class RoomHandler():
                 nxtbss_dir = tags.split("curbss", 1)[1].split("|", 1)[
                     0].replace(",", "")
             else:
-                nxtbss_dir = tags.split("curbss,", 1)[1]
+                nxtbss_dir = tags.split(",", 1)[1]
         # Then go through the actions and carry them out
         for i, action in enumerate(room.action_list):
             self.last_event_time = time.time()
