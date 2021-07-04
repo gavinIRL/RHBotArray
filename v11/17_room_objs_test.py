@@ -113,6 +113,7 @@ class Room():
         # nxtbss,dir - next room is the boss room, hold l to enter
         # curbss - this room is the boss room
         # multi - this room will have multiple sectclear notifications
+        # midcut - this room will have a mid-clear cutscene
         rect, coords, actions, tags = line.split("#")
         self.action_list = []
         self.coord_list = []
@@ -138,6 +139,13 @@ class RoomHandler():
         self.repeat = repeat
         with open("gamename.txt") as f:
             self.gamename = f.readline()
+        # For aiming at enemies
+        self.enemy_minimap_filter = HsvFilter(
+            0, 128, 82, 8, 255, 255, 0, 66, 30, 34)
+        enemy_custom_rect = [1094, 50, 1284, 210]
+        self.enemy_minimap_wincap = WindowCapture(
+            self.gamename, enemy_custom_rect)
+        self.enemy_minimap_vision = Vision('enemy67.jpg')
 
     def start_room(self):
         room = self.room
