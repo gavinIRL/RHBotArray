@@ -55,7 +55,7 @@ class MapHandler():
         self.summon_momo(self.gamename)
         # Now using full universal room handler instead
         for room in self.rooms:
-            rh = RoomHandler(room)
+            rh = RoomHandler(room, self.weapon)
             rh.start_room()
         # And then perform the endmap routine
         self.perform_endmap(repeat)
@@ -202,6 +202,7 @@ class RoomHandler():
     def perform_clear(self, coords, dir, repos=False):
         self.perform_navigation(coords, True)
         self.face_direction(dir)
+        aim_cd = time.time()
         if not repos:
             while not BotUtils.detect_sect_clear(self.gamename):
                 if time.time() - aim_cd > 2:
@@ -914,5 +915,6 @@ filename = os.path.dirname(
     os.path.abspath(__file__)) + "/levels/map10updated.txt"
 rooms = load_level_data(filename)
 wp = Weapon("MS")
-mh = MapHandler(rooms)
+mh = MapHandler(rooms, wp)
+time.sleep(2)
 mh.start(False)
