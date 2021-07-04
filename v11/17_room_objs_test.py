@@ -60,6 +60,36 @@ class MapHandler():
         # And then perform the endmap routine
         self.perform_endmap(repeat)
 
+    def summon_momo(self, gamename):
+        wincap = WindowCapture(gamename)
+        x = wincap.window_rect[0]
+        y = wincap.window_rect[1]
+        pydirectinput.press("j")
+        time.sleep(0.1)
+        while not BotUtils.detect_petmenu_open(gamename):
+            pydirectinput.press("j")
+            time.sleep(0.25)
+        pydirectinput.click(x+471, y+178)
+        time.sleep(0.1)
+        pydirectinput.click(x+713, y+682)
+        time.sleep(0.1)
+        # Now empty first 3 inventory slots
+        pydirectinput.click(x+471, y+178)
+        time.sleep(0.05)
+        pydirectinput.rightClick(x+683, y+277)
+        time.sleep(0.05)
+        pydirectinput.rightClick(x+728, y+277)
+        time.sleep(0.05)
+        # pydirectinput.rightClick(x+772, y+277)
+        # time.sleep(0.1)
+        # pydirectinput.rightClick(x+814, y+277)
+        # time.sleep(0.1)
+        pydirectinput.press("esc")
+        time.sleep(0.1)
+
+    def perform_endmap(self, repeat=False):
+        print("Would typically perform the endmap now")
+
 
 class Room():
     def __init__(self, line: str) -> None:
