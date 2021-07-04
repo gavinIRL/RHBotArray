@@ -173,7 +173,8 @@ class RoomHandler():
                     print("Problem with nav during exit, need to add handling")
                     os._exit(1)
             elif "nxtbss" in action:
-                pass
+                _, dir = action.split(",")
+                self.perform_move_into_bossroom(dir)
             elif "peton" in action:
                 self.summon_momo()
             elif "petoff" in action:
@@ -438,6 +439,9 @@ class RoomHandler():
             0x0002, 0, 0, 0, 0)
         ctypes.windll.user32.mouse_event(
             0x0004, 0, 0, 0, 0)
+
+    def perform_move_into_bossroom(self, dir):
+        CustomInput.press_key(CustomInput.key_map[dir], dir)
 
     def release_dir_keys(self):
         KEYS = {
