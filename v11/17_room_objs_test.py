@@ -199,7 +199,7 @@ class RoomHandler():
         self.perform_navigation(coords, True)
         self.face_direction(dir)
         if travel_time < 1.8:
-            time.sleep(0.6)
+            time.sleep(0.8)
         self.perform_primary_clear()
         aim_cd = time.time()
         if not repos:
@@ -286,11 +286,11 @@ class RoomHandler():
 
     def perform_exit(self, coords):
         self.perform_navigation(coords)
-        time_end = time.time() + 1
+        time_end = time.time() + 0.5
         while time_end > time.time():
             time.sleep(0.005)
             if BotUtils.detect_sect_clear(self.gamename):
-                time_end = time.time() + 1
+                time_end = time.time() + 0.5
         return True
 
     def perform_chest(self, coords, dir):
