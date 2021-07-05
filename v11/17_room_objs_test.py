@@ -59,10 +59,18 @@ class MapHandler():
             rh.start_room()
             # print(f"Finished room {i}")
         # And then perform the endmap routine
-        self.perform_endmap(repeat)
+        self.repeat_level(self.gamename)
 
-    def perform_endmap(self, repeat=False):
-        print("Would typically perform the endmap now")
+    def repeat_level(self, gamename):
+        # Close the shop
+        pydirectinput.press('esc')
+        time.sleep(0.1)
+        pydirectinput.press('esc')
+        time.sleep(0.1)
+        BotUtils.close_map_and_menu(gamename)
+        time.sleep(0.1)
+        RHClick.click_explore_again(gamename)
+        time.sleep(1.5)
 
 
 class Room():
@@ -804,17 +812,6 @@ class RoomHandler():
                 enemy_rectangles)
             return points
         return False
-
-    def repeat_level(self, gamename):
-        # Close the shop
-        pydirectinput.press('esc')
-        time.sleep(0.1)
-        pydirectinput.press('esc')
-        time.sleep(0.1)
-        BotUtils.close_map_and_menu(gamename)
-        time.sleep(0.1)
-        RHClick.click_explore_again(gamename)
-        time.sleep(1.5)
 
 
 class AntiStickUtils:
