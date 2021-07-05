@@ -20,7 +20,7 @@ class Weapon:
             self.primary_clear = "h"
             self.primary_clear_cd = 8.8
             self.continue_clear = ["h", "a", "g", "f", "s", "d"]
-            self.continue_boss = ["a", "g", "f", "s", "d"]
+            self.continue_boss = ["s", "d", "f", "a", "g"]
             self.chest_open = "d"
 
 
@@ -59,7 +59,8 @@ class MapHandler():
             rh.start_room()
             # print(f"Finished room {i}")
         # And then perform the endmap routine
-        self.repeat_level(self.gamename)
+        if repeat:
+            self.repeat_level(self.gamename)
 
     def repeat_level(self, gamename):
         # Close the shop
@@ -236,7 +237,7 @@ class RoomHandler():
                 return True
             return False
 
-    def perform_boss(self, coords, dir, repos=False, curbss=False):
+    def perform_boss(self, coords, dir, repos=False, curbss=True):
         # First need to wait until cutscreen or boss appear and react
         if curbss:
             while True:
@@ -245,11 +246,11 @@ class RoomHandler():
                     # need to stop the movement
                     BotUtils.stop_movement()
                     while not Events.detect_in_dungeon():
+                        print("Curbss check loop esc press")
                         pydirectinput.press('esc')
                         time.sleep(0.05)
                         BotUtils.close_map_and_menu(self.gamename)
                         time.sleep(0.25)
-                        break
                     break
                 if BotUtils.detect_boss_healthbar(self.gamename):
                     break
