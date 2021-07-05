@@ -489,6 +489,11 @@ class RoomHandler():
                 CustomInput.release_key(CustomInput.key_map[key], key)
 
     def point_angle(self, angle):
+        key = "z"
+        CustomInput.press_key(CustomInput.key_map[key], key)
+        time.sleep(0.02)
+        CustomInput.release_key(CustomInput.key_map[key], key)
+        time.sleep(0.02)
         if angle >= 300 or angle < 60:
             CustomInput.press_key(CustomInput.key_map["up"], "up")
         if angle >= 210 and angle < 330:
@@ -637,6 +642,11 @@ class RoomHandler():
         # print("Got to pet off")
 
     def face_direction(self, dir):
+        key = "z"
+        CustomInput.press_key(CustomInput.key_map[key], key)
+        time.sleep(0.02)
+        CustomInput.release_key(CustomInput.key_map[key], key)
+        time.sleep(0.02)
         CustomInput.press_key(CustomInput.key_map[dir], dir)
         time.sleep(0.003)
         CustomInput.release_key(CustomInput.key_map[dir], dir)
