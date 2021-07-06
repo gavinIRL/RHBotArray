@@ -583,7 +583,11 @@ class RoomHandler():
         return True
 
     def perform_midlevel_event(self):
-        pydirectinput.press("esc")
+        time.sleep(0.1)
+        while not Events.detect_in_dungeon():
+            pydirectinput.press('esc')
+            time.sleep(0.05)
+            BotUtils.close_map_and_menu(self.gamename)
         time.sleep(0.3)
         # Check if user has cards available to trade
         if Events.detect_one_card(self.gamename):
