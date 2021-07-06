@@ -200,6 +200,8 @@ class RoomHandler():
         self.face_direction(dir)
         if travel_time < 1.8:
             time.sleep(0.8)
+        if travel_time < 0.6:
+            time.sleep(0.2)
         self.perform_primary_clear()
         aim_cd = time.time()
         if not repos:
