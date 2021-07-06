@@ -92,7 +92,11 @@ class Room():
         # loot - position to attempt to loot from
         # wypt - this is a travel waypoint only
         # nxtbss,dir - next room is the boss room, hold l to enter
+        # sllrpr - perform post-boss sell and repair
         # bsslt - bossloot coords i.e. initial boss looting point
+        # ------------------------------------
+        # please note: bsslt includes endmap handling, only one is required
+        # use loot/wypt/chest to continue looting post-boss
         # ------------------------------------
         # list of tags is as follows
         # curbss - this room is the boss room
@@ -188,6 +192,8 @@ class RoomHandler():
                 self.perform_move_into_bossroom(dir)
             elif "bsslt" in action:
                 self.perform_endlevel(coords)
+            elif "sllrpr" in action:
+                self.perform_sell_and_repair()
             elif "peton" in action:
                 self.summon_momo()
             elif "petoff" in action:
@@ -382,12 +388,14 @@ class RoomHandler():
             self.loot_everything(self.gamename)
             # Click centre of screen to skip
             self.skip_to_reward(self.gamename)
-        # And then perform the sell and repair actions
-        sr = SellRepair()
-        sr.ident_sell_repair()
         # And then go to next level if needs be
         # print("Got to pre-restart")
         # self.calculate_profit(self.gamename)
+
+    def perform_sell_and_repair(self):
+        # And then perform the sell and repair actions
+        sr = SellRepair()
+        sr.ident_sell_repair()
 
     def loot_everything(self, gamename):
         player_name = False
