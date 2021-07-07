@@ -394,6 +394,9 @@ class RoomHandler():
 
     def perform_sell_and_repair(self):
         # And then perform the sell and repair actions
+        time.sleep(0.5)
+        BotUtils.close_map_and_menu(self.gamename)
+        time.sleep(0.5)
         sr = SellRepair()
         sr.ident_sell_repair()
 
