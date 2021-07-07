@@ -3,4 +3,4 @@
 702,509,820,565#754,547|805,536#clear,up|exit#
 790,509,909,568#861,540|834,526|836,556#clear,right|chest,right|exit#
 807,542,905,646#833,617|861,606|898,615|898,616|898,617#clear,up|chest,up|exit|petoff|nxtbss,right#
-884,546,1125,675#1022,617|1041,617|995,588|995,588|920,587|1041,617#boss,right|bsslt|peton|chest,up|chest,up|sllrpr#curbss
+884,546,1125,675#1022,617|1041,617|995,588|995,591|920,591|1041,617#boss,right|bsslt|peton|chest,up|chest,up|sllrpr#curbss
