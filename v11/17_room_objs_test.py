@@ -415,7 +415,7 @@ class RoomHandler():
         time.sleep(0.4)
         RHClick.click_otherworld_ok(self.gamename)
         time.sleep(2)
-        while not self.check_if_the_crack(self.gamename):
+        while not self.check_if_the_crack():
             time.sleep(0.006)
         # Then clear the area
         self.perform_otherworld_combat(self.gamename)
