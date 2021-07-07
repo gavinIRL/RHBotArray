@@ -1,0 +1,6 @@
+642,590,774,647#734,615|734,615|736,604|749,615#peton|clear,left|chest,up|exit#
+744,542,813,647#777,596|771,563#clear,up|exit#
+702,509,820,565#754,547|805,536#clear,up|exit#
+790,509,909,568#861,540|834,526|836,556#clear,right|chest,right|exit#
+807,542,905,646#833,617|861,606|898,615|898,616|898,617#clear,up|chest,up|exit|petoff|nxtbss,right#
+884,546,1125,675#1022,617|1041,617|995,588#boss,right|bsslt|sllrpr#curbss
