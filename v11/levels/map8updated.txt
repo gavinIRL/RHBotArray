@@ -1,7 +1,7 @@
-642,590,774,647#604,638|668,641|684,577#peton|clear,right|exit#
-790,509,909,568#662,552|661,546|728,549#clear,left|chest,up|exit#
-790,509,909,568#776,545|800,545|800,489#clear,right|chest,right|exit#
-790,509,909,568#800,441|779,407|766,422|779,407|849,436#clear,up|wypt|chest,down|wypt|exit#
-790,509,909,568#890,436|890,436|898,432|953,438#clear,right|chest,down|chest,up|exit#
-790,509,909,568#996,435|1045,434|1033,431|1033,431#clear,right|chest,up|wypt|nxtbss,up#
-884,546,1125,675#1034,365|1031,345|1034,365|1069,333|1071,345|1071,345#singclr|boss,up|bsslt|chest,up|chest,down|sllrpr#curbss
+577,612,721,672#604,638|668,641|684,577#peton|clear,right|exit#
+553,501,752,587#662,552|661,546|728,549#clear,left|chest,up|exit#
+686,476,840,581#776,545|800,545|800,489#clear,right|chest,right|exit#
+730,364,869,506#800,441|779,407|766,422|779,407|849,436#clear,up|wypt|chest,down|wypt|exit#
+828,400,972,485#890,436|890,436|898,432|953,438#clear,right|chest,down|chest,up|exit#
+931,401,1074,476#996,435|1045,434|1033,431|1033,431#clear,right|chest,up|wypt|nxtbss,up#
+956,283,1118,448#1034,365|1031,345|1034,365|1069,333|1071,345|1071,345#singclr|boss,up|bsslt|chest,up|chest,down|sllrpr#curbss
