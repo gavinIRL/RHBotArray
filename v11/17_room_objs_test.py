@@ -94,6 +94,7 @@ class Room():
         # nxtbss,dir - next room is the boss room, hold l to enter
         # sllrpr - perform post-boss sell and repair
         # bsslt - bossloot coords i.e. initial boss looting point
+        # singclr - do a single main clear skill
         # ------------------------------------
         # please note: bsslt includes endmap handling, only one is required
         # use loot/wypt/chest to continue looting post-boss
@@ -186,6 +187,8 @@ class RoomHandler():
                 if not outcome:
                     print("Problem with nav during exit, need to add handling")
                     os._exit(1)
+            elif "singclr" in action:
+                self.perform_singclr(coords)
             elif "nxtbss" in action:
                 # print("Got to pre-nxtbss")
                 _, dir = action.split(",")
@@ -244,6 +247,10 @@ class RoomHandler():
             if not need_to_repos:
                 return True
             return False
+
+    def perform_singclr(self, coords):
+        self.perform_navigation(coords, True)
+        self.perform_primary_clear()
 
     def perform_boss(self, coords, dir, repos=False, curbss=True):
         # First need to wait until cutscreen or boss appear and react
