@@ -259,7 +259,7 @@ class RoomHandler():
                 time.sleep(0.006)
                 if not Events.detect_in_dungeon():
                     # need to stop the movement
-                    BotUtils.stop_movement()
+                    # BotUtils.stop_movement()
                     while not Events.detect_in_dungeon():
                         print("Curbss check loop esc press")
                         pydirectinput.press('esc')
