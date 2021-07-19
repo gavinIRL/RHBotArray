@@ -863,12 +863,6 @@ class RoomHandler():
 class AntiStickUtils:
     # This class is specially-developed utility functions
     # Which are modified to catch times where the bot has gotten stuck
-    def check_bigmap_open(gamename=False):
-        pass
-
-    def open_bigmap(gamename=False):
-        pass
-
     def move_bigmap_dynamic(x, y, gamename=False, rect=False, checkmap=True, closemap=True):
         if not gamename:
             with open("gamename.txt") as f:
