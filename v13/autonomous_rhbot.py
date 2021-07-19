@@ -1,5 +1,6 @@
-# This file will test how to best store data on each room
-# Will preferably load information from a single file
+# This file autonomously performs a level (multiple times if required)
+# The level data is drawn from a self-created database
+# of actions and locations, see the levels folder
 from threading import Thread
 import time
 import os
@@ -15,6 +16,8 @@ logging.getLogger().setLevel(logging.ERROR)
 
 
 class Weapon:
+    # This class defines what keys to press for a given weapon
+
     def __init__(self, weapon="MS") -> None:
         if weapon == "MS":
             self.primary_clear = "h"
@@ -25,6 +28,8 @@ class Weapon:
 
 
 class MapHandler():
+    # This class handles the entire map (consisting of multiple rooms)
+
     def __init__(self, roomdata, weapon: Weapon):
         self.rooms = roomdata
         self.weapon = weapon
@@ -75,6 +80,10 @@ class MapHandler():
 
 
 class Room():
+    # This class holds data for a room
+    # Room data is taken from the manual database
+    # The room data is given to the roomhandler for execution
+
     def __init__(self, line: str) -> None:
         # Format of each line in the file should be as follows
         # rect # coords_n | coords_n+1 # action_n | action_n+1 # tags
@@ -120,6 +129,8 @@ class Room():
 
 
 class RoomHandler():
+    # This class executes all required actions in a given room
+
     def __init__(self, mh: MapHandler, room: Room, weapon: Weapon) -> None:
         # Add a timestamp to catch if have gotten stuck
         self.last_event_time = time.time()
@@ -850,7 +861,8 @@ class RoomHandler():
 
 
 class AntiStickUtils:
-
+    # This class is specially-developed utility functions
+    # Which are modified to catch times where the bot has gotten stuck
     def check_bigmap_open(gamename=False):
         pass
 
@@ -1008,6 +1020,8 @@ class AntiStickUtils:
 
 
 def load_level_data(filename):
+    # This functions simply loads the given database
+    # And returns the list of room data
     with open(filename) as f:
         lines = f.readlines()
     list_rooms = []
