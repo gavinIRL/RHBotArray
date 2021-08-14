@@ -1013,9 +1013,15 @@ class AntiStickUtils:
             return True
 
 
-def load_level_data(filename):
-    # This functions simply loads the given database
-    # And returns the list of room data
+def load_level_data(filename: str):
+    """This functions simply loads the given database
+    And returns the list of room data
+            Parameters:
+                    filename (str): Path to database
+
+            Returns:
+                    list_rooms (list): 2D list containing data for all rooms
+    """
     with open(filename) as f:
         lines = f.readlines()
     list_rooms = []
