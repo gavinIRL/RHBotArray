@@ -54,6 +54,11 @@ class MapHandler():
         self.gold = 860000
 
     def start(self, repeat=False):
+        """This functions performs all functions necessary to complete a map, 
+        and start the level repeat logic if required.
+                Parameters:
+                        repeat (bool): Whether to do endlevel repeat logic
+        """
         time.sleep(1.5)
         while not Events.detect_in_dungeon():
             time.sleep(0.25)
@@ -68,6 +73,10 @@ class MapHandler():
             self.repeat_level(self.gamename)
 
     def repeat_level(self, gamename):
+        """This functions performs the actions required to start a new level.
+                Parameters:
+                        gamename (str): Game window name
+        """
         # Close the shop
         pydirectinput.press('esc')
         time.sleep(0.1)
@@ -148,6 +157,11 @@ class RoomHandler():
         self.enemy_minimap_vision = Vision('enemy67.jpg')
 
     def start_room(self):
+        """This functions performs the actions required to complete a room
+        It can handle any action per the database and terminates once the 
+        room is cleared or the move to next room logic has completed.
+        All input is handled using the current room object data.
+        """
         room = self.room
         # Check through the tags first
         tags = "".join(room.tags).strip()
@@ -215,6 +229,16 @@ class RoomHandler():
                 # print("Got past pet off")
 
     def perform_clear(self, coords, dir, repos=False):
+        """This functions performs the actions required to clear a room.
+        It continues until the room clear message is received.
+                Parameters:
+                        coords (tuple): Big map coordinates character moves to begin clearing.
+                        dir (str): Direction character should face to begin clearing.
+                        repos (float): The time after which the character should relocate and continue clearing.
+
+                Returns:
+                        bool: whether the room clear message was detected during function logic.
+        """
         travel_time = self.calculate_travel_time(coords[0], coords[1])
         self.perform_navigation(coords, True)
         self.face_direction(dir)
