@@ -74,6 +74,7 @@ class MapHandler():
 
     def repeat_level(self, gamename):
         """This functions performs the actions required to start a new level.
+
                 Parameters:
                         gamename (str): Game window name
         """
@@ -157,7 +158,7 @@ class RoomHandler():
         self.enemy_minimap_vision = Vision('enemy67.jpg')
 
     def start_room(self):
-        """This functions performs the actions required to complete a room
+        """This functions performs the actions required to complete a room. 
         It can handle any action per the database and terminates once the 
         room is cleared or the move to next room logic has completed.
         All input is handled using the current room object data.
@@ -232,7 +233,7 @@ class RoomHandler():
         """This functions performs the actions required to clear a room.
         It continues until the room clear message is received.
                 Parameters:
-                        coords (tuple): Big map coordinates character moves to begin clearing.
+                        coords (tuple): Big map coordinates to move to to start clearing from.
                         dir (str): Direction character should face to begin clearing.
                         repos (float): The time after which the character should relocate and continue clearing.
 
