@@ -57,7 +57,7 @@ class MapHandler():
         """This functions performs all functions necessary to complete a map, 
         and start the level repeat logic if required.
                 Parameters:
-                        repeat (bool): Whether to do endlevel repeat logic
+                        repeat (bool, optional): Whether to do end-of-level start new level logic. Defaults to disabled.
         """
         time.sleep(1.5)
         while not Events.detect_in_dungeon():
@@ -235,7 +235,7 @@ class RoomHandler():
                 Parameters:
                         coords (tuple): Big map coordinates to move to to start clearing from.
                         dir (str): Direction character should face to begin clearing.
-                        repos (float): The time after which the character should relocate and continue clearing.
+                        repos (float, optional): The time after which the character should relocate and continue clearing. Defaults to disabled.
 
                 Returns:
                         bool: whether the room clear message was detected during function logic.
