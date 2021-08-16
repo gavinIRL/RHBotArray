@@ -285,10 +285,26 @@ class RoomHandler():
             return False
 
     def perform_singclr(self, coords):
+        """This functions performs a single press of clear skill at requested location.
+        It does not continue until the room clear message is received.
+                Parameters:
+                        coords (tuple): Big map coordinates to move to to press clear button from.
+        """
         self.perform_navigation(coords, True)
         self.perform_primary_clear()
 
     def perform_boss(self, coords, dir, repos=False, curbss=True):
+        """This functions performs the typical actions for a boss kill.
+        It continues either until the boss is killed, or a reposition is required, or else until section cleared.
+                Parameters:
+                        coords (tuple): Big map coordinates to move to to start boss-killer attacks from.
+                        dir (str): Direction character should face to begin boss attacks.
+                        repos (float, optional): The time after which the character should relocate and continue attacking. Defaults to disabled.
+                        curbss (bool, optional): Whether the current room is the boss room or just a standard room. Defaults to boss room.
+
+                Returns:
+                        bool: whether the room clear message or boss kill message was detected during function logic.
+        """
         # First need to wait until cutscreen or boss appear and react
         if curbss:
             while True:
@@ -297,7 +313,7 @@ class RoomHandler():
                     # need to stop the movement
                     # BotUtils.stop_movement()
                     while not Events.detect_in_dungeon():
-                        print("Curbss check loop esc press")
+                        # print("Curbss check loop esc press")
                         pydirectinput.press('esc')
                         time.sleep(0.05)
                         BotUtils.close_map_and_menu(self.gamename)
@@ -336,6 +352,14 @@ class RoomHandler():
             return False
 
     def perform_exit(self, coords):
+        """This functions performs the actions required to navigate to start of next room.
+        It will wait to until the previous section clear message has full disappeared before continuing.
+                Parameters:
+                        coords (tuple): Big map coordinates to move to to wait to enter next room.
+
+                Returns:
+                        bool: whether the command was completed successfully.
+        """
         self.perform_navigation(coords)
         time_end = time.time() + 0.5
         while time_end > time.time():
