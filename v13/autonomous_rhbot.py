@@ -54,8 +54,9 @@ class MapHandler():
         self.gold = 860000
 
     def start(self, repeat=False):
-        """This functions performs all functions necessary to complete a map, 
+        """This function performs all functions necessary to complete a map, 
         and start the level repeat logic if required.
+
                 Parameters:
                         repeat (bool, optional): Whether to do end-of-level start new level logic. Defaults to disabled.
         """
@@ -73,7 +74,7 @@ class MapHandler():
             self.repeat_level(self.gamename)
 
     def repeat_level(self, gamename):
-        """This functions performs the actions required to start a new level.
+        """This function performs the actions required to start a new level.
 
                 Parameters:
                         gamename (str): Game window name
@@ -158,7 +159,7 @@ class RoomHandler():
         self.enemy_minimap_vision = Vision('enemy67.jpg')
 
     def start_room(self):
-        """This functions performs the actions required to complete a room. 
+        """This function performs the actions required to complete a room. 
         It can handle any action per the database and terminates once the 
         room is cleared or the move to next room logic has completed.
         All input is handled using the current room object data.
@@ -230,8 +231,9 @@ class RoomHandler():
                 # print("Got past pet off")
 
     def perform_clear(self, coords, dir, repos=False):
-        """This functions performs the actions required to clear a room.
+        """This function performs the actions required to clear a room.
         It continues until the room clear message is received.
+
                 Parameters:
                         coords (tuple): Big map coordinates to move to to start clearing from.
                         dir (str): Direction character should face to begin clearing.
@@ -285,8 +287,9 @@ class RoomHandler():
             return False
 
     def perform_singclr(self, coords):
-        """This functions performs a single press of clear skill at requested location.
+        """This function performs a single press of clear skill at requested location.
         It does not continue until the room clear message is received.
+
                 Parameters:
                         coords (tuple): Big map coordinates to move to to press clear button from.
         """
@@ -294,8 +297,9 @@ class RoomHandler():
         self.perform_primary_clear()
 
     def perform_boss(self, coords, dir, repos=False, curbss=True):
-        """This functions performs the typical actions for a boss kill.
+        """This function performs the typical actions for a boss kill.
         It continues either until the boss is killed, or a reposition is required, or else until section cleared.
+
                 Parameters:
                         coords (tuple): Big map coordinates to move to to start boss-killer attacks from.
                         dir (str): Direction character should face to begin boss attacks.
@@ -352,8 +356,9 @@ class RoomHandler():
             return False
 
     def perform_exit(self, coords):
-        """This functions performs the actions required to navigate to start of next room.
+        """This function performs the actions required to navigate to start of next room.
         It will wait to until the previous section clear message has full disappeared before continuing.
+
                 Parameters:
                         coords (tuple): Big map coordinates to move to to wait to enter next room.
 
@@ -371,6 +376,7 @@ class RoomHandler():
     def perform_chest(self, coords, dir):
         """This function navigates the character to the location of the chest firstly.
         It will then face the correct location to open the chest, and then press the appropriate skill.
+
                 Parameters:
                         coords (tuple): Big map coordinates of where to stand to open chest.
                         dir (str): Direction that character should face to open the chest.
@@ -382,6 +388,7 @@ class RoomHandler():
     def perform_repos(self, coords, dir):
         """This functions performs the actions required to navigate to predetermined repositioning point.
         It will then face in a certain direction once the destination is reached.
+
                 Parameters:
                         coords (tuple): Big map coordinates for where to reposition to.
                         dir (str): Direction that character should face to open the chest.
@@ -394,6 +401,7 @@ class RoomHandler():
         It will handle any end-level events, manual looting of boss loot, and also automatically sell all junk loot.
 
         Note: more loot points and chest opening points can be specified after this action.
+
                 Parameters:
                         coords (tuple): Big map coordinates for the primary bossloot point.
 
