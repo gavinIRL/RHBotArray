@@ -369,15 +369,37 @@ class RoomHandler():
         return True
 
     def perform_chest(self, coords, dir):
+        """This function navigates the character to the location of the chest firstly.
+        It will then face the correct location to open the chest, and then press the appropriate skill.
+                Parameters:
+                        coords (tuple): Big map coordinates of where to stand to open chest.
+                        dir (str): Direction that character should face to open the chest.
+        """
         self.perform_navigation(coords)
         self.face_direction(dir)
         self.hit_chest()
 
     def perform_repos(self, coords, dir):
+        """This functions performs the actions required to navigate to predetermined repositioning point.
+        It will then face in a certain direction once the destination is reached.
+                Parameters:
+                        coords (tuple): Big map coordinates for where to reposition to.
+                        dir (str): Direction that character should face to open the chest.
+        """
         self.perform_navigation(coords, True)
         self.face_direction(dir)
 
     def perform_endlevel(self, coords):
+        """This function performs the entire set of actions required once the boss is dead to be ready for next level.
+        It will handle any end-level events, manual looting of boss loot, and also automatically sell all junk loot.
+
+        Note: more loot points and chest opening points can be specified after this action.
+                Parameters:
+                        coords (tuple): Big map coordinates for the primary bossloot point.
+
+                Returns:
+                        bool: whether the command was completed successfully.
+        """
         # First step is to go past death cutscene if required
         reward_skip_det = False
         endlevel_event_det = False
