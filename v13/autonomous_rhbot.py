@@ -490,6 +490,8 @@ class RoomHandler():
         # self.calculate_profit(self.gamename)
 
     def perform_sell_and_repair(self):
+        '''This function makes the necessary calls to sell all loot below 
+        a particular rarity, and repair all equipped gear.'''
         # And then perform the sell and repair actions
         time.sleep(0.5)
         BotUtils.close_map_and_menu(self.gamename)
@@ -498,6 +500,14 @@ class RoomHandler():
         sr.ident_sell_repair()
 
     def loot_everything(self, gamename):
+        '''This function makes the necessary calls to grab all visible 
+        loot on screen
+
+                Parameters:
+                        gamename (str): Game window name.
+
+                Returns:
+                        bool: whether the command was completed successfully.'''
         player_name = False
         player_name = BotUtils.detect_player_name(gamename)
         if not player_name:
