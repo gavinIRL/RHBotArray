@@ -517,11 +517,21 @@ class RoomHandler():
             return Looting.grab_all_visible_lootv2(gamename, player_name)
 
     def skip_to_reward(self, gamename):
+        '''This function clicks on the correct spot to skip the waiting
+        period. Usually only called after skip has been detected.
+
+                Parameters:
+                        gamename (str): Game window name.
+        '''
         wincap = WindowCapture(gamename)
         pydirectinput.click(
             wincap.window_rect[0]+656, wincap.window_rect[1]+276)
 
     def perform_endlevel_event_handling(self):
+        '''This is the high-level handling function for all
+        end-of-map logic in the event map. Typically called
+        only after end-level event has been detected. 
+        '''
         time.sleep(0.4)
         RHClick.click_otherworld_ok(self.gamename)
         time.sleep(2)
@@ -535,6 +545,14 @@ class RoomHandler():
         self.leave_otherworld(self.gamename)
 
     def perform_otherworld_combat(self, gamename):
+        '''This function makes the necessary calls to eliminate all 
+        enemies in the end-level event map. It will loop until done.
+        Also has anti-stick checks so that it doesn't get stuck
+        infinitely nor does it cancel prematurely.
+
+                Parameters:
+                        gamename (str): Game window name.
+        '''
         result = AntiStickUtils.move_bigmap_dynamic(660, 548)
         while not result:
             BotUtils.try_toggle_map_clicking()
