@@ -633,6 +633,8 @@ class RoomHandler():
         #         break
 
     def release_dir_keys(self):
+        '''This function makes sure that all direction keys are released.
+        '''
         KEYS = {
             'left': 37,
             'up': 38,
@@ -643,7 +645,14 @@ class RoomHandler():
             if ctypes.windll.user32.GetKeyState(KEYS[key]) > 2:
                 CustomInput.release_key(CustomInput.key_map[key], key)
 
-    def point_angle(self, angle):
+    def point_angle(self, angle: int):
+        '''This function moves the character in correct direction to start the 
+        boss encounter
+
+                Parameters:
+                        angle (int): The relative angle of position to point at 
+                        e.g. 0 being north/up and 270 being west/left.
+        '''
         key = "z"
         CustomInput.press_key(CustomInput.key_map[key], key)
         time.sleep(0.02)
@@ -661,6 +670,11 @@ class RoomHandler():
         self.release_dir_keys()
 
     def check_if_the_crack(self):
+        '''This function checks if character is in the endlevel event map
+
+                    Returns:
+                        bool: whether the endlevel event map was detected.
+        '''
         if "ack" in BotUtils.detect_level_name(self.gamename):
             return True
         return False
