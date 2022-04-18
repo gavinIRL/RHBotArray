@@ -18,7 +18,7 @@ logging.getLogger().setLevel(logging.ERROR)
 class Weapon:
     # This class defines what keys to press for a given weapon
 
-    def __init__(self, weapon="MS") -> None:
+    def __init__(self, weapon: str = "MS") -> None:
         if weapon == "MS":
             self.primary_clear = "h"
             self.primary_clear_cd = 8.8
@@ -30,7 +30,7 @@ class Weapon:
 class MapHandler():
     # This class handles the entire map (consisting of multiple rooms)
 
-    def __init__(self, roomdata, weapon: Weapon):
+    def __init__(self, roomdata: list, weapon: Weapon) -> None:
         self.rooms = roomdata
         self.weapon = weapon
         self.speed = 22.5
@@ -53,7 +53,7 @@ class MapHandler():
         # Var for tracking gold progress
         self.gold = 860000
 
-    def start(self, repeat=False):
+    def start(self, repeat: bool = False) -> None:
         """This function performs all functions necessary to complete a map, 
         and start the level repeat logic if required.
 
@@ -73,7 +73,7 @@ class MapHandler():
         if repeat:
             self.repeat_level(self.gamename)
 
-    def repeat_level(self, gamename):
+    def repeat_level(self, gamename: str) -> None:
         """This function performs the actions required to start a new level.
 
                 Parameters:
