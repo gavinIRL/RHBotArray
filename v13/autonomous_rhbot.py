@@ -355,7 +355,7 @@ class RoomHandler():
             # TBD
             return False
 
-    def perform_exit(self, coords):
+    def perform_exit(self, coords: tuple):
         """This function performs the actions required to navigate to start of next room.
         It will wait to until the previous section clear message has full disappeared before continuing.
 
@@ -373,7 +373,7 @@ class RoomHandler():
                 time_end = time.time() + 0.5
         return True
 
-    def perform_chest(self, coords, dir):
+    def perform_chest(self, coords: tuple, dir: str):
         """This function navigates the character to the location of the chest firstly.
         It will then face the correct location to open the chest, and then press the appropriate skill.
 
@@ -385,7 +385,7 @@ class RoomHandler():
         self.face_direction(dir)
         self.hit_chest()
 
-    def perform_repos(self, coords, dir):
+    def perform_repos(self, coords: tuple, dir: str):
         """This functions performs the actions required to navigate to predetermined repositioning point.
         It will then face in a certain direction once the destination is reached.
 
@@ -396,7 +396,7 @@ class RoomHandler():
         self.perform_navigation(coords, True)
         self.face_direction(dir)
 
-    def perform_endlevel(self, coords):
+    def perform_endlevel(self, coords: tuple):
         """This function performs the entire set of actions required once the boss is dead to be ready for next level.
         It will handle any end-level events, manual looting of boss loot, and also automatically sell all junk loot.
 
@@ -499,7 +499,7 @@ class RoomHandler():
         sr = SellRepair()
         sr.ident_sell_repair()
 
-    def loot_everything(self, gamename):
+    def loot_everything(self, gamename: str):
         '''This function makes the necessary calls to grab all visible 
         loot on screen
 
@@ -516,7 +516,7 @@ class RoomHandler():
         else:
             return Looting.grab_all_visible_lootv2(gamename, player_name)
 
-    def skip_to_reward(self, gamename):
+    def skip_to_reward(self, gamename: str):
         '''This function clicks on the correct spot to skip the waiting
         period. Usually only called after skip has been detected.
 
@@ -544,7 +544,7 @@ class RoomHandler():
         # And then finally leave the otherworld
         self.leave_otherworld(self.gamename)
 
-    def perform_otherworld_combat(self, gamename):
+    def perform_otherworld_combat(self, gamename: str):
         '''This function makes the necessary calls to eliminate all 
         enemies in the end-level event map. It will loop until done.
         Also has anti-stick checks so that it doesn't get stuck
@@ -597,7 +597,7 @@ class RoomHandler():
         CustomInput.release_key(CustomInput.key_map["left"], "left")
         time.sleep(0.1)
 
-    def click_on_game(self, gamename):
+    def click_on_game(self, gamename: str):
         '''This function ensures that the game is the window in focus
         by clicking on the header bar at the top.
 
@@ -694,7 +694,7 @@ class RoomHandler():
                 self.skip_to_reward(self.gamename)
                 break
 
-    def navigate_otherworld_loot(self, gamename):
+    def navigate_otherworld_loot(self, gamename: str):
         '''This function moves the character to the fixed loot point for 
         endlevel event and then picks up all loot. Calls movement functions 
         that are specifically resilient to getting stuck.
@@ -717,7 +717,7 @@ class RoomHandler():
         AntiStickUtils.move_bigmap_dynamic(667, 407)
         self.loot_everything(gamename)
 
-    def leave_otherworld(self, gamename):
+    def leave_otherworld(self, gamename: str):
         '''This function navigates the player to the endlevel event exit, and
         then selects the exit option and pauses for the required amount of time.
 
