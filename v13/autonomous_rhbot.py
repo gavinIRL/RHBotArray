@@ -230,7 +230,7 @@ class RoomHandler():
                 self.cancel_momo_summon()
                 # print("Got past pet off")
 
-    def perform_clear(self, coords, dir, repos=False):
+    def perform_clear(self, coords: tuple, dir: str, repos: bool = False):
         """This function performs the actions required to clear a room.
         It continues until the room clear message is received.
 
@@ -286,7 +286,7 @@ class RoomHandler():
                 return True
             return False
 
-    def perform_singclr(self, coords):
+    def perform_singclr(self, coords: tuple):
         """This function performs a single press of clear skill at requested location.
         It does not continue until the room clear message is received.
 
@@ -296,7 +296,7 @@ class RoomHandler():
         self.perform_navigation(coords, True)
         self.perform_primary_clear()
 
-    def perform_boss(self, coords, dir, repos=False, curbss=True):
+    def perform_boss(self, coords: tuple, dir: str, repos: bool = False, curbss: bool = True):
         """This function performs the typical actions for a boss kill.
         It continues either until the boss is killed, or a reposition is required, or else until section cleared.
 
