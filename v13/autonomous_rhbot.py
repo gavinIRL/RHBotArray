@@ -587,12 +587,23 @@ class RoomHandler():
                     self.point_angle(0)
 
     def move_slightly_left(self):
+        '''This will simply move the player so that they're pointing to the 
+        left. Will also result in slight movement also. Typically used
+        during looting to do the equivalent of bashing something 
+        electrical to get it to start. 
+        '''
         CustomInput.press_key(CustomInput.key_map["left"], "left")
         time.sleep(0.15)
         CustomInput.release_key(CustomInput.key_map["left"], "left")
         time.sleep(0.1)
 
     def click_on_game(self, gamename):
+        '''This function ensures that the game is the window in focus
+        by clicking on the header bar at the top.
+
+                Parameters:
+                        gamename (str): Game window name.
+        '''
         wincap = WindowCapture(gamename)
         centre_x = int(0.5 * wincap.w +
                        wincap.window_rect[0])
@@ -604,7 +615,13 @@ class RoomHandler():
         ctypes.windll.user32.mouse_event(
             0x0004, 0, 0, 0, 0)
 
-    def perform_move_into_bossroom(self, dir):
+    def perform_move_into_bossroom(self, dir: str):
+        '''This function moves the character in correct direction to start the 
+        boss encounter
+
+                Parameters:
+                        dir (str): The (singular) direction key to press.
+        '''
         time.sleep(0.01)
         # print("Got to here")
         CustomInput.press_key(CustomInput.key_map[dir], dir)
