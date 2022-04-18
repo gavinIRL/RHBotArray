@@ -680,6 +680,10 @@ class RoomHandler():
         return False
 
     def perform_endlevel_loot(self):
+        '''This function picks up all of the visible loot at the end of level.
+        Differs from normal loot collect as it skips to reward if all loot 
+        is picked up.
+        '''
         while Events.detect_in_dungeon():
             if not self.loot_everything(self.gamename):
                 self.move_slightly_left()
@@ -691,6 +695,13 @@ class RoomHandler():
                 break
 
     def navigate_otherworld_loot(self, gamename):
+        '''This function moves the character to the fixed loot point for 
+        endlevel event and then picks up all loot. Calls movement functions 
+        that are specifically resilient to getting stuck.
+
+                Parameters:
+                        gamename (str): Game window name.
+        '''
         # BotUtils.try_toggle_map_clicking()
         result = AntiStickUtils.move_bigmap_dynamic(593, 419)
         while not result:
@@ -707,6 +718,12 @@ class RoomHandler():
         self.loot_everything(gamename)
 
     def leave_otherworld(self, gamename):
+        '''This function navigates the player to the endlevel event exit, and
+        then selects the exit option and pauses for the required amount of time.
+
+                Parameters:
+                        gamename (str): Game window name.
+        '''
         AntiStickUtils.move_bigmap_dynamic(667, 455)
         time.sleep(0.5)
         RHClick.click_yes(gamename)
