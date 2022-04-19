@@ -729,7 +729,15 @@ class RoomHandler():
         RHClick.click_yes(gamename)
         time.sleep(2.5)
 
-    def detect_enemies_overworld(self, gamename):
+    def detect_enemies_overworld(self, gamename) -> bool:
+        '''This function is for detecting enemies specifically on the big
+        map in the endlevel event area.
+
+                Parameters:
+                        gamename (str): Game window name.
+                Returns:
+                        bool: whether any enemies were detected.
+        '''
         count = 0
         while not BotUtils.detect_bigmap_open(gamename):
             count += 1
