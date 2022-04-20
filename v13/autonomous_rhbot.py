@@ -759,7 +759,7 @@ class RoomHandler():
             return True
         return False
 
-    def perform_loot(self, coords):
+    def perform_loot(self, coords: tuple):
         '''This function is for looting a specific position on the big map.
         Grabs both the nearby loot and far away loot.
 
@@ -779,7 +779,7 @@ class RoomHandler():
             self.perform_navigation(coords)
         return True
 
-    def perform_wypt(self, coords):
+    def perform_wypt(self, coords: tuple):
         '''This function is for moving to a specific waypoint on the bigmap.
         Typically used when no other logic is required.
 
@@ -855,7 +855,7 @@ class RoomHandler():
         time.sleep(0.1)
         # print("Got to pet off")
 
-    def face_direction(self, dir):
+    def face_direction(self, dir: str):
         key = "z"
         CustomInput.press_key(CustomInput.key_map[key], key)
         time.sleep(0.02)
@@ -884,7 +884,7 @@ class RoomHandler():
         time.sleep(0.02)
         CustomInput.release_key(CustomInput.key_map[key], key)
 
-    def perform_navigation(self, coords, sectclr_chk=False):
+    def perform_navigation(self, coords: tuple, sectclr_chk: bool = False):
         if not sectclr_chk:
             outcome = AntiStickUtils.move_bigmap_dynamic(
                 int(coords[0]), int(coords[1]), closemap=False)
