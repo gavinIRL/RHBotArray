@@ -760,6 +760,14 @@ class RoomHandler():
         return False
 
     def perform_loot(self, coords):
+        '''This function is for looting a specific position on the big map.
+        Grabs both the nearby loot and far away loot.
+
+                Parameters:
+                        coords (tuple): bigmap coords to check for loot
+                Returns:
+                        bool: whether the looting operation was successful.
+        '''
         self.perform_navigation(coords)
         # Then perform looting as required
         time.sleep(0.3)
@@ -772,6 +780,14 @@ class RoomHandler():
         return True
 
     def perform_wypt(self, coords):
+        '''This function is for moving to a specific waypoint on the bigmap.
+        Typically used when no other logic is required.
+
+                Parameters:
+                        coords (tuple): bigmap coords to move to
+                Returns:
+                        bool: whether the moving operation was successful.
+        '''
         self.perform_navigation(coords)
         time.sleep(0.3)
         return True
