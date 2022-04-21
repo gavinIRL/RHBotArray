@@ -823,6 +823,9 @@ class RoomHandler():
             print("Don't have a card available to trade")
 
     def summon_momo(self):
+        '''This function performs the necessary actions to summon the
+        autolooting pet.
+        '''
         wincap = WindowCapture(self.gamename)
         x = wincap.window_rect[0]
         y = wincap.window_rect[1]
@@ -850,6 +853,9 @@ class RoomHandler():
         time.sleep(0.1)
 
     def cancel_momo_summon(self):
+        '''This function performs the necessary actions to cancel the 
+        summon of the autolooting pet.
+        '''
         wincap = WindowCapture(self.gamename)
         x = wincap.window_rect[0]
         y = wincap.window_rect[1]
