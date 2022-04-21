@@ -793,6 +793,10 @@ class RoomHandler():
         return True
 
     def perform_midlevel_event(self):
+        '''This function will perform all handling for when a mid-level event
+        is detected, including checking for a card to trade, and then both
+        navigating to the event and accepting the challenge.
+        '''
         time.sleep(0.1)
         while not Events.detect_in_dungeon():
             pydirectinput.press('esc')
