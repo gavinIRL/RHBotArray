@@ -866,6 +866,12 @@ class RoomHandler():
         # print("Got to pet off")
 
     def face_direction(self, dir: str):
+        '''This function points the character in a certain direction. Typically
+        only used for targeting during combat, and for opening chests.
+
+                Parameters:
+                        dir (str): direction to face e.g. up, down, left, right
+        '''
         key = "z"
         CustomInput.press_key(CustomInput.key_map[key], key)
         time.sleep(0.02)
@@ -876,6 +882,10 @@ class RoomHandler():
         CustomInput.release_key(CustomInput.key_map[dir], dir)
 
     def hit_chest(self):
+        '''This function is used to attack a nearby chest. Requires pointing
+        in the correct direction beforehand. Will make sure to pick up existing
+        loot in case chest already opened.
+        '''
         Looting.grab_nearby_loot(self.gamename)
         key = self.weapon.chest_open
         if key != "x":
