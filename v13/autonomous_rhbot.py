@@ -905,6 +905,18 @@ class RoomHandler():
         CustomInput.release_key(CustomInput.key_map[key], key)
 
     def perform_navigation(self, coords: tuple, sectclr_chk: bool = False):
+        '''This function is used to reposition the character to another
+        point on the big map. It comes with the option to cancel movement
+        if the section is cleared prior to the movement being completed.
+                Parameters:
+                        coords (tuple): bigmap coords to move character to.
+                        sectclr_chk (bool): whether to cancel if section
+                        is cleared prior to finishing.
+                Returns:
+                        bool: whether movement completed successfully, 
+                        typically only false is useful.
+        '''
+
         if not sectclr_chk:
             outcome = AntiStickUtils.move_bigmap_dynamic(
                 int(coords[0]), int(coords[1]), closemap=False)
@@ -939,6 +951,7 @@ class RoomHandler():
                     CustomInput.release_key(CustomInput.key_map[key], key)
                 outcome = AntiStickUtils.move_bigmap_dynamic_sectclrchk(
                     int(coords[0]), int(coords[1]), closemap=False)
+        return True
 
     def perform_primary_clear(self):
         key = self.weapon.primary_clear
